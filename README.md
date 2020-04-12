@@ -1,6 +1,14 @@
 # saas-y
 saas-y generates framework code and configuration for a SaaS platform.
 
+## Installation
+TODO
+
+## Usage
+```bash
+# TODO
+```
+
 ## Input
 The input consists of a JSON file with the following format
 ```json
@@ -93,14 +101,8 @@ The input consists of a JSON file with the following format
 ## Framework generation
 TODO: description
 
-
-## Installation
-TODO
-
-## Usage
-```bash
-# TODO
-```
+### services
+TODO: services' JSON -> AST services -> generated directories and files
 
 ## License
 Proprietary
