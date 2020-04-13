@@ -34,17 +34,51 @@ The input consists of a JSON file with the following format
             "name": "foo-service",
             "port": 80,
             "api": {
-                "type": "http",
                 "paths": [
                     {
-                        "path": "/getfoo",
-                        "parameters": ["param0", "param1"],
-                        "return": "return_struct_name"
+                        "path": "/foo",
+                        "methods": {
+                            "get": {
+                                "header_params": [
+                                    {
+                                        "header": "header_param_name",
+                                        "value": "value"
+                                    }
+                                ],
+                                "query_params": [
+                                    {
+                                        "name": "query_param_name",
+                                        "value": "value"
+                                    }
+                                ],
+                                "return": "return_struct_name"
+                            },
+                            "post": {
+                                "input": "input_struct_name",
+                                "return": "return_struct_name"
+                            },
+                            "options": [
+                                {
+                                    "header": "header_name",
+                                    "value": "value"
+                                }
+                            ]
+                        }
                     },
                     {
-                        "path": "/postfoo",
-                        "input": "input_struct_name",
-                        "return": "return_struct_name"
+                        "path": "/bar/{param(type)}",
+                        "methods": {
+                            "get": {
+                                "return": "return_struct_name"
+                            },
+                            "delete": {
+                                "return": "return_struct_name"
+                            },
+                            "patch": {
+                                "input": "input_struct_name",
+                                "return": "return_struct_name"
+                            }
+                        }
                     }
                 ]
             },
