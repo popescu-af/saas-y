@@ -32,59 +32,62 @@ The input consists of a JSON file with the following format
     "services": [
         {
             "name": "foo-service",
-            "port": 80,
-            "api": {
-                "paths": [
-                    {
-                        "path": "/foo",
-                        "methods": {
-                            "get": {
-                                "header_params": [
-                                    {
-                                        "header": "header_param_name",
-                                        "value": "value"
-                                    }
-                                ],
-                                "query_params": [
-                                    {
-                                        "name": "query_param_name",
-                                        "value": "value"
-                                    }
-                                ],
-                                "return": "return_struct_name"
-                            },
-                            "post": {
-                                "input": "input_struct_name",
-                                "return": "return_struct_name"
-                            },
-                            "options": [
+            "port": "80",
+            "api": [
+                {
+                    "path": "/foo",
+                    "methods": {
+                        "get": {
+                            "header_params": [
                                 {
-                                    "header": "header_name",
+                                    "header": "header_param_name",
+                                    "type": "type",
+                                    "value": "value"
+                                }
+                            ],
+                            "query_params": [
+                                {
+                                    "name": "query_param_name",
+                                    "type": "type",
+                                    "value": "value"
+                                }
+                            ],
+                            "return_type": "return_struct_name"
+                        },
+                        "post": {
+                            "input_type": "input_struct_name",
+                            "return_type": "return_struct_name"
+                        },
+                        "options": {
+                            "header_params": [
+                                {
+                                    "header": "header_param_name",
                                     "value": "value"
                                 }
                             ]
                         }
-                    },
-                    {
-                        "path": "/bar/{param(type)}",
-                        "methods": {
-                            "get": {
-                                "return": "return_struct_name"
-                            },
-                            "delete": {
-                                "return": "return_struct_name"
-                            },
-                            "patch": {
-                                "input": "input_struct_name",
-                                "return": "return_struct_name"
-                            }
+                    }
+                },
+                {
+                    "path": "/bar/{param(type)}",
+                    "methods": {
+                        "get": {
+                            "return_type": "return_struct_name"
+                        },
+                        "delete": {
+                            "return_type": "return_struct_name"
+                        },
+                        "patch": {
+                            "input_type": "input_struct_name",
+                            "return_type": "return_struct_name"
                         }
                     }
-                ]
-            },
+                }
+            ],
             "env": [
                 {
                     "name": "ENV_VAR_NAME",
+                    "type": "type",
                     "value": "env_var_value"
                 }
             ],
@@ -105,11 +108,12 @@ The input consists of a JSON file with the following format
     "external_services": [
         {
             "name": "external-service",
-            "port": 80,
+            "port": "80",
             "image_url": "localhost:5000/external-service:latest",
             "env": [
                 {
                     "name": "ENV_VAR_NAME",
+                    "type": "type",
                     "value": "env_var_value"
                 }
             ],
