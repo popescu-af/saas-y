@@ -1,4 +1,4 @@
-package parser
+package model
 
 type Spec struct {
 	Domain           string            `json:"domain"`

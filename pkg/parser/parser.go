@@ -1,7 +1,10 @@
 package parser
 
-import "io"
+import (
+	"github.com/popescu-af/saas-y/pkg/model"
+)
 
-type AbstractParser interface {
-	Parse(r io.Reader) *Spec
+// Abstract is the interface for saas-y parsers of different input formats.
+type Abstract interface {
+	Parse(filename string) (*model.Spec, error)
 }
