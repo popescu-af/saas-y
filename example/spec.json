@@ -87,6 +87,10 @@
                 {
                     "name": "a_field_name",
                     "type": "int"
+                },
+                {
+                    "name": "another_field_name",
+                    "type": "string"
                 }
             ]
         }
