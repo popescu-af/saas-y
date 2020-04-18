@@ -1,17 +1,89 @@
 package generator
 
 import (
+	"html/template"
+	"os"
+	"path"
+
 	"github.com/popescu-af/saas-y/pkg/model"
 )
 
 // Abstract is the interface for saas-y code & infrastructure generators.
 type Abstract interface {
-	structs(structs []model.Struct, outdir string) error
+	CommandPath() string
+	PackagePath() string
+	StructsTemplate() string
+	CodeFormatter(path string) (err error)
 }
 
 // Do generates code and infrastructure declaration for the given Spec
 // and dumps it in the specified output directory.
-func Do(generator Abstract, spec *model.Spec, outdir string) (err error) {
-	err = generator.structs(spec.Structs, outdir)
+func Do(g Abstract, spec *model.Spec, outdir string) (err error) {
+	err = structs(g, spec.Structs, outdir)
+	if err != nil {
+		return
+	}
+
+	for _, svc := range spec.Services {
+		err = generator.service(g, svc, outdir)
+		if err != nil {
+			return
+		}
+	}
+
 	return
+}
+
+func structs(g Abstract, structs []model.Struct, outdir string) (err error) {
+	dir := path.Join(outdir, g.PackagePath(), "structs")
+	if err = os.MkdirAll(dir, 0770); err != nil {
+		return
+	}
+
+	filler := templateFiller(g.StructsTemplate, g.CodeFormatter)
+	for _, s := range structs {
+		fPath := path.Join(dir, s.Name+".go")
+		err = filler(s, fPath)
+		if err != nil {
+			return
+		}
+	}
+
+	return
+}
+
+func service(g Abstract, svc []model.Service, outdir string) (err error) {
+	// dir := path.Join(outdir, g.StructsPath())
+	// if err = os.MkdirAll(dir, 0770); err != nil {
+	// 	return
+	// }
+
+	// filler := templateFiller(g.StructsTemplate, g.CodeFormatter)
+	// for _, s := range structs {
+	// 	fPath := path.Join(dir, s.Name+".go")
+	// 	err = filler(s, fPath)
+	// 	if err != nil {
+	// 		return
+	// 	}
+	// }
+
+	return
+}
+
+type templateFillerFunction func(interface{}, string) error
+
+func templateFiller(templateGetter func() string, codeFormatter func(string) error) templateFillerFunction {
+	templ := template.Must(template.New("templ").Parse(templateGetter()))
+
+	return func(s interface{}, resultPath string) (err error) {
+		var f *os.File
+		f, err = os.Create(resultPath)
+		if err != nil {
+			return
+		}
+		templ.Execute(f, s)
+		f.Close()
+		err = codeFormatter(resultPath)
+		return
+	}
 }

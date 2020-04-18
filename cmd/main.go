@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"github.com/popescu-af/saas-y/pkg/generator"
+	gengo "github.com/popescu-af/saas-y/pkg/generator/go"
 	"github.com/popescu-af/saas-y/pkg/parser"
 )
 
@@ -17,6 +18,6 @@ func main() {
 		log.Fatalf("saas-y error: %v", err)
 	}
 
-	g := &generator.Go{}
+	g := &gengo.Generator{}
 	generator.Do(g, spec, outdir)
 }
