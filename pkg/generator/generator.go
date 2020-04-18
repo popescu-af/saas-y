@@ -10,9 +10,13 @@ import (
 
 // Abstract is the interface for saas-y code & infrastructure generators.
 type Abstract interface {
+	FileExtension() string
+
 	CommandPath() string
 	PackagePath() string
 	StructsTemplate() string
+	MainTemplate() string
+
 	CodeFormatter(path string) (err error)
 }
 
@@ -25,7 +29,7 @@ func Do(g Abstract, spec *model.Spec, outdir string) (err error) {
 	}
 
 	for _, svc := range spec.Services {
-		err = generator.service(g, svc, outdir)
+		err = service(g, svc, outdir)
 		if err != nil {
 			return
 		}
@@ -42,7 +46,7 @@ func structs(g Abstract, structs []model.Struct, outdir string) (err error) {
 
 	filler := templateFiller(g.StructsTemplate, g.CodeFormatter)
 	for _, s := range structs {
-		fPath := path.Join(dir, s.Name+".go")
+		fPath := path.Join(dir, s.Name+g.FileExtension())
 		err = filler(s, fPath)
 		if err != nil {
 			return
@@ -52,20 +56,30 @@ func structs(g Abstract, structs []model.Struct, outdir string) (err error) {
 	return
 }
 
-func service(g Abstract, svc []model.Service, outdir string) (err error) {
-	// dir := path.Join(outdir, g.StructsPath())
-	// if err = os.MkdirAll(dir, 0770); err != nil {
-	// 	return
-	// }
+func service(g Abstract, svc model.Service, outdir string) (err error) {
+	base := path.Join(outdir, "services", svc.Name)
+	dirs := []string{
+		path.Join(base, g.CommandPath()),
+		path.Join(base, "deploy"),
+		path.Join(base, g.PackagePath(), "config"),
+		path.Join(base, g.PackagePath(), "logic", "example"),
+		path.Join(base, g.PackagePath(), "service"),
+	}
 
-	// filler := templateFiller(g.StructsTemplate, g.CodeFormatter)
-	// for _, s := range structs {
-	// 	fPath := path.Join(dir, s.Name+".go")
-	// 	err = filler(s, fPath)
-	// 	if err != nil {
-	// 		return
-	// 	}
-	// }
+	for _, dir := range dirs {
+		if err = os.MkdirAll(dir, 0770); err != nil {
+			return
+		}
+	}
+
+	filler := templateFiller(g.MainTemplate, g.CodeFormatter)
+	fPath := path.Join(dirs[0], "main"+g.FileExtension())
+	err = filler(svc, fPath)
+	if err != nil {
+		return
+	}
+
+	// TODO: continue
 
 	return
 }

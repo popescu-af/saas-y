@@ -15,6 +15,11 @@ import (
 type Generator struct {
 }
 
+// FileExtension returns the file extension for go code.
+func (g *Generator) FileExtension() string {
+	return ".go"
+}
+
 // CommandPath returns the command path for go code.
 func (g *Generator) CommandPath() string {
 	return path.Join("cmd")
@@ -28,6 +33,11 @@ func (g *Generator) PackagePath() string {
 // StructsTemplate returns the structs template for go code.
 func (g *Generator) StructsTemplate() string {
 	return templates.Struct
+}
+
+// MainTemplate returns the main template for go code.
+func (g *Generator) MainTemplate() string {
+	return templates.Main
 }
 
 // CodeFormatter returns the code formatter for go code.
