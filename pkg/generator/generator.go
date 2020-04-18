@@ -79,10 +79,23 @@ func service(g Abstract, svc model.Service, outdir string) (err error) {
 		return
 	}
 
-	// TODO: continue
+	// TODO:
+	// - go.mod
+	// - pkg/config/env.go
+	// - pkg/logic/api_implementation.go
+	// - pkg/service/api_definition.go
+	// - pkg/service/http_router.go
+	// - pkg/service/http_wrapper.go
+	// - Dockerfile
+	// - deploy/
+	// - client code for accessing dependencies
 
 	return
 }
+
+// TODO:
+// - ingress
+// - external services
 
 type templateFillerFunction func(interface{}, string) error
 
