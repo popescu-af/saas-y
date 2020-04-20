@@ -2,6 +2,7 @@ package gengo
 
 import (
 	"bytes"
+	"fmt"
 	"io/ioutil"
 	"os/exec"
 	"path"
@@ -31,26 +32,35 @@ func (g *Generator) PackagePath() string {
 	return path.Join("pkg")
 }
 
-// StructsTemplate returns the structs template for go code.
-func (g *Generator) StructsTemplate() string {
-	return templates.Struct
-}
+// GetTemplate returns the named template for go code.
+func (g *Generator) GetTemplate(name string) string {
+	switch name {
+	case "config":
+		return templates.Config
+	case "main":
+		return templates.Main
+	case "struct":
+		return templates.Struct
+	}
 
-// MainTemplate returns the main template for go code.
-func (g *Generator) MainTemplate() string {
-	return templates.Main
+	fmt.Println("Returning empty template!")
+	return ""
 }
 
 // CodeFormatter returns the code formatter for go code.
 func (g *Generator) CodeFormatter(path string) (err error) {
+	fmt.Println("Formatting", path)
+
 	re := regexp.MustCompile(`(type|struct field) ([a-zA-Z0-9_]+) should be ([a-zA-Z0-9]+)`)
 	lint := exec.Command("golint", path)
 
-	var out bytes.Buffer
+	var out, errout bytes.Buffer
 	lint.Stdout = &out
+	lint.Stderr = &errout
 
 	err = lint.Run()
 	if err != nil {
+		fmt.Println(errout.String())
 		return
 	}
 
@@ -58,8 +68,8 @@ func (g *Generator) CodeFormatter(path string) (err error) {
 	if err != nil {
 		return
 	}
-	contents := strings.ReplaceAll(string(b), "\n\n", "\n")
 
+	contents := string(b)
 	for _, subst := range re.FindAllStringSubmatch(out.String(), -1) {
 		old := subst[2] + " "
 		new := subst[3] + " "
@@ -67,13 +77,16 @@ func (g *Generator) CodeFormatter(path string) (err error) {
 		contents = strings.ReplaceAll(contents, old, new)
 	}
 	out.Reset()
+	errout.Reset()
 
 	format := exec.Command("gofmt")
 	format.Stdin = bytes.NewBufferString(contents)
 	format.Stdout = &out
+	format.Stderr = &errout
 
 	err = format.Run()
 	if err != nil {
+		fmt.Printf("%s", errout.String())
 		return
 	}
 
@@ -92,18 +105,21 @@ func (g *Generator) GenerateProject(name, path string) (err error) {
 }
 
 func (g *Generator) createGoModFile(name, path string) (err error) {
-	var out bytes.Buffer
+	var out, errout bytes.Buffer
 
 	cmd := exec.Command("go", "env")
 	cmd.Stdout = &out
+	cmd.Stderr = &errout
 	if err = cmd.Run(); err != nil {
+		fmt.Printf("%s", errout.String())
 		return
 	}
 
 	cmd = exec.Command("go", "mod", "init", name)
 	cmd.Env = []string{"GO111MODULE=on"}
 	cmd.Dir = path
-	cmd.Stderr = &out
+	cmd.Stdout = &out
+	cmd.Stderr = &errout
 
 	neededVars := []string{"GOCACHE", "GOPATH"}
 	lines := strings.Split(out.String(), "\n")
@@ -121,7 +137,11 @@ func (g *Generator) createGoModFile(name, path string) (err error) {
 		}
 	}
 	out.Reset()
+	errout.Reset()
 
-	err = cmd.Run()
+	if err = cmd.Run(); err != nil {
+		fmt.Printf("%s", errout.String())
+		err = nil
+	}
 	return
 }

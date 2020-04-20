@@ -5,7 +5,6 @@ const Struct = `package structs
 
 // {{.Name}} - generated API structure
 type {{.Name}} struct {
-{{range .Fields}}
-	{{.Name}} {{.Type}} ` + "`" + `json:"{{.Name}}"` + "`" +
-	`{{end}}
+	{{range .Fields}}{{.Name}} {{.Type}} ` + "`" + `json:"{{.Name}}"` + "`" + `
+	{{end}}
 }`

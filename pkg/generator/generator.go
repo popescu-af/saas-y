@@ -4,6 +4,7 @@ import (
 	"html/template"
 	"os"
 	"path"
+	"strings"
 
 	"github.com/popescu-af/saas-y/pkg/model"
 )
@@ -13,9 +14,7 @@ type Abstract interface {
 	FileExtension() string
 	CommandPath() string
 	PackagePath() string
-	StructsTemplate() string
-	MainTemplate() string
-
+	GetTemplate(name string) string
 	CodeFormatter(path string) (err error)
 	GenerateProject(name, path string) (err error)
 }
@@ -25,19 +24,6 @@ type Abstract interface {
 func Do(g Abstract, spec *model.Spec, outdir string) (err error) {
 	for _, svc := range spec.Services {
 		err = service(g, svc, outdir)
-		if err != nil {
-			return
-		}
-	}
-
-	return
-}
-
-func structs(g Abstract, structs []model.Struct, outdir string) (err error) {
-	filler := templateFiller(g.StructsTemplate, g.CodeFormatter)
-	for _, s := range structs {
-		fPath := path.Join(outdir, s.Name+g.FileExtension())
-		err = filler(s, fPath)
 		if err != nil {
 			return
 		}
@@ -68,9 +54,19 @@ func service(g Abstract, svc model.Service, outdir string) (err error) {
 		}
 	}
 
-	filler := templateFiller(g.MainTemplate, g.CodeFormatter)
+	filler := templateFiller(g.GetTemplate("main"), g.CodeFormatter)
 	fPath := path.Join(dirs[0], "main"+g.FileExtension())
 	err = filler(svc, fPath)
+	if err != nil {
+		return
+	}
+
+	err = envVars(g, svc, dirs[2])
+	if err != nil {
+		return
+	}
+
+	err = structs(g, svc.Structs, dirs[5])
 	if err != nil {
 		return
 	}
@@ -83,9 +79,28 @@ func service(g Abstract, svc model.Service, outdir string) (err error) {
 	// - pkg/service/http_wrapper.go
 	// - deploy/
 
-	err = structs(g, svc.Structs, dirs[5])
+	return
+}
+
+func envVars(g Abstract, svc model.Service, outdir string) (err error) {
+	filler := templateFiller(g.GetTemplate("config"), g.CodeFormatter)
+	fPath := path.Join(outdir, "config"+g.FileExtension())
+	err = filler(svc, fPath)
 	if err != nil {
 		return
+	}
+
+	return
+}
+
+func structs(g Abstract, structs []model.Struct, outdir string) (err error) {
+	filler := templateFiller(g.GetTemplate("struct"), g.CodeFormatter)
+	for _, s := range structs {
+		fPath := path.Join(outdir, s.Name+g.FileExtension())
+		err = filler(s, fPath)
+		if err != nil {
+			return
+		}
 	}
 
 	return
@@ -97,8 +112,13 @@ func service(g Abstract, svc model.Service, outdir string) (err error) {
 
 type templateFillerFunction func(interface{}, string) error
 
-func templateFiller(templateGetter func() string, codeFormatter func(string) error) templateFillerFunction {
-	templ := template.Must(template.New("templ").Parse(templateGetter()))
+func templateFiller(templ string, codeFormatter func(string) error) templateFillerFunction {
+	loadedTempl := template.Must(template.New("templ").
+		Funcs(template.FuncMap{
+			"tolower": strings.ToLower,
+			"toupper": strings.ToUpper,
+		}).
+		Parse(templ))
 
 	return func(s interface{}, resultPath string) (err error) {
 		var f *os.File
@@ -106,7 +126,7 @@ func templateFiller(templateGetter func() string, codeFormatter func(string) err
 		if err != nil {
 			return
 		}
-		templ.Execute(f, s)
+		loadedTempl.Execute(f, s)
 		f.Close()
 		err = codeFormatter(resultPath)
 		return
