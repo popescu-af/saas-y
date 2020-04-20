@@ -1,7 +1,7 @@
 package templates
 
-// Config is a template for the environment config go file.
-const Config = `package config
+// Env is a template for the environment config go file.
+const Env = `package config
 
 import "github.com/kelseyhightower/envconfig"
 

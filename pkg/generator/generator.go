@@ -33,37 +33,27 @@ func Do(g Abstract, spec *model.Spec, outdir string) (err error) {
 }
 
 func service(g Abstract, svc model.Service, outdir string) (err error) {
-	base := path.Join(outdir, "services", svc.Name)
+	basePath := path.Join(outdir, "services", svc.Name)
 
-	dirs := []string{
-		path.Join(base, g.CommandPath()),
-		path.Join(base, "deploy"),
-		path.Join(base, g.PackagePath(), "config"),
-		path.Join(base, g.PackagePath(), "logic", "example"),
-		path.Join(base, g.PackagePath(), "service"),
-		path.Join(base, g.PackagePath(), "structs"),
-	}
-
-	if err = g.GenerateProject(svc.Name, base); err != nil {
+	dirs, err := serviceDirs(g, basePath)
+	if err != nil {
 		return
 	}
 
-	for _, dir := range dirs {
-		if err = os.MkdirAll(dir, 0770); err != nil {
+	if err = g.GenerateProject(svc.Name, basePath); err != nil {
+		return
+	}
+
+	components := map[string]string{
+		"main": dirs[0],
+		"env":  dirs[2],
+	}
+
+	for component, outdir := range components {
+		err = serviceComponent(g, svc, component, outdir)
+		if err != nil {
 			return
 		}
-	}
-
-	filler := templateFiller(g.GetTemplate("main"), g.CodeFormatter)
-	fPath := path.Join(dirs[0], "main"+g.FileExtension())
-	err = filler(svc, fPath)
-	if err != nil {
-		return
-	}
-
-	err = envVars(g, svc, dirs[2])
-	if err != nil {
-		return
 	}
 
 	err = structs(g, svc.Structs, dirs[5])
@@ -72,7 +62,6 @@ func service(g Abstract, svc model.Service, outdir string) (err error) {
 	}
 
 	// TODO:
-	// - pkg/config/env.go
 	// - pkg/logic/api_implementation.go
 	// - pkg/service/api_definition.go
 	// - pkg/service/http_router.go
@@ -82,14 +71,28 @@ func service(g Abstract, svc model.Service, outdir string) (err error) {
 	return
 }
 
-func envVars(g Abstract, svc model.Service, outdir string) (err error) {
-	filler := templateFiller(g.GetTemplate("config"), g.CodeFormatter)
-	fPath := path.Join(outdir, "config"+g.FileExtension())
-	err = filler(svc, fPath)
-	if err != nil {
-		return
+func serviceDirs(g Abstract, basePath string) (dirs []string, err error) {
+	dirs = []string{
+		path.Join(basePath, g.CommandPath()),
+		path.Join(basePath, "deploy"),
+		path.Join(basePath, g.PackagePath(), "config"),
+		path.Join(basePath, g.PackagePath(), "logic", "example"),
+		path.Join(basePath, g.PackagePath(), "service"),
+		path.Join(basePath, g.PackagePath(), "structs"),
 	}
 
+	for _, dir := range dirs {
+		if err = os.MkdirAll(dir, 0770); err != nil {
+			return
+		}
+	}
+	return
+}
+
+func serviceComponent(g Abstract, svc model.Service, componentName, outdir string) (err error) {
+	filler := templateFiller(g.GetTemplate(componentName), g.CodeFormatter)
+	fPath := path.Join(outdir, componentName+g.FileExtension())
+	err = filler(svc, fPath)
 	return
 }
 
