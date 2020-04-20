@@ -70,6 +70,21 @@
                     }
                 }
             ],
+            "structs": [
+                {
+                    "name": "input_struct_name",
+                    "fields": [
+                        {
+                            "name": "a_field_name",
+                            "type": "int"
+                        },
+                        {
+                            "name": "another_field_name",
+                            "type": "string"
+                        }
+                    ]
+                }
+            ],
             "env": [
                 {
                     "name": "ENV_VAR_NAME",
@@ -78,21 +93,6 @@
                 }
             ],
             "dependencies" : ["baz-service"]
-        }
-    ],
-    "structs": [
-        {
-            "name": "input_struct_name",
-            "fields": [
-                {
-                    "name": "a_field_name",
-                    "type": "int"
-                },
-                {
-                    "name": "another_field_name",
-                    "type": "string"
-                }
-            ]
         }
     ],
     "external_services": [

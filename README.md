@@ -84,6 +84,17 @@ The input consists of a JSON file with the following format
                     }
                 }
             ],
+            "structs": [
+                {
+                    "name": "input_struct_name",
+                    "fields": [
+                        {
+                            "name": "a_field_name",
+                            "type": "int"
+                        }
+                    ]
+                }
+            ],
             "env": [
                 {
                     "name": "ENV_VAR_NAME",
@@ -92,17 +103,6 @@ The input consists of a JSON file with the following format
                 }
             ],
             "dependencies" : ["baz-service"]
-        }
-    ],
-    "structs": [
-        {
-            "name": "input_struct_name",
-            "fields": [
-                {
-                    "name": "a_field_name",
-                    "type": "int"
-                }
-            ]
         }
     ],
     "external_services": [

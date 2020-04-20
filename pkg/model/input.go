@@ -4,7 +4,6 @@ type Spec struct {
 	Domain           string            `json:"domain"`
 	Subdomains       []Subdomain       `json:"subdomains"`
 	Services         []Service         `json:"services"`
-	Structs          []Struct          `json:"structs"`
 	ExternalServices []ExternalService `json:"external_services"`
 }
 
@@ -20,7 +19,8 @@ type Path struct {
 
 type Service struct {
 	serviceCommon
-	API []API `json:"api"`
+	API     []API    `json:"api"`
+	Structs []Struct `json:"structs"`
 }
 
 type APIMethodType string

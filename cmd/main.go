@@ -19,5 +19,8 @@ func main() {
 	}
 
 	g := &gengo.Generator{}
-	generator.Do(g, spec, outdir)
+	err = generator.Do(g, spec, outdir)
+	if err != nil {
+		log.Fatalf("saas-y error: %v", err)
+	}
 }

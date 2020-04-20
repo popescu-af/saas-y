@@ -6,6 +6,7 @@ import (
 	"os/exec"
 	"path"
 	"regexp"
+	"strconv"
 	"strings"
 
 	"github.com/popescu-af/saas-y/pkg/generator/go/templates"
@@ -77,4 +78,50 @@ func (g *Generator) CodeFormatter(path string) (err error) {
 	}
 
 	return ioutil.WriteFile(path, out.Bytes(), 0660)
+}
+
+// GenerateProject creates project-specific files.
+func (g *Generator) GenerateProject(name, path string) (err error) {
+	err = g.createGoModFile(name, path)
+
+	// TODO:
+	// Makefile
+	// Dockerfile
+
+	return
+}
+
+func (g *Generator) createGoModFile(name, path string) (err error) {
+	var out bytes.Buffer
+
+	cmd := exec.Command("go", "env")
+	cmd.Stdout = &out
+	if err = cmd.Run(); err != nil {
+		return
+	}
+
+	cmd = exec.Command("go", "mod", "init", name)
+	cmd.Env = []string{"GO111MODULE=on"}
+	cmd.Dir = path
+	cmd.Stderr = &out
+
+	neededVars := []string{"GOCACHE", "GOPATH"}
+	lines := strings.Split(out.String(), "\n")
+	for _, l := range lines {
+		tokens := strings.Split(l, "=")
+		for _, v := range neededVars {
+			if tokens[0] == v {
+				var unquoted string
+				if unquoted, err = strconv.Unquote(tokens[1]); err != nil {
+					return
+				}
+				cmd.Env = append(cmd.Env, v+"="+unquoted)
+				break
+			}
+		}
+	}
+	out.Reset()
+
+	err = cmd.Run()
+	return
 }
