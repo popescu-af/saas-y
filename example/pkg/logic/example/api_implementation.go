@@ -3,10 +3,10 @@ package example
 import (
 	"errors"
 
-	"github.com/popescu-af/saas-y/template/pkg/service"
-	"github.com/popescu-af/saas-y/template/pkg/service/structs"
-
 	"go.uber.org/zap"
+
+	"github.com/popescu-af/saas-y/example/pkg/service"
+	"github.com/popescu-af/saas-y/example/pkg/service/structs"
 )
 
 // API TODO.

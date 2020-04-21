@@ -23,6 +23,11 @@ type Service struct {
 	Structs []Struct `json:"structs"`
 }
 
+type API struct {
+	Path    string            `json:"path"`
+	Methods map[string]Method `json:"methods"`
+}
+
 type APIMethodType string
 
 const (
@@ -33,16 +38,12 @@ const (
 	OPTIONS APIMethodType = "options"
 )
 
-type API struct {
-	Path    string                   `json:"path"`
-	Methods map[APIMethodType]Method `json:"methods"`
-}
-
 type Method struct {
-	HeaderParams []Variable `json:"header_params"`
-	QueryParams  []Variable `json:"query_params"`
-	InputType    string     `json:"input_type"`
-	ReturnType   string     `json:"return_type"`
+	Type         APIMethodType `json:"type"`
+	HeaderParams []Variable    `json:"header_params"`
+	QueryParams  []Variable    `json:"query_params"`
+	InputType    string        `json:"input_type"`
+	ReturnType   string        `json:"return_type"`
 }
 
 type Variable struct {

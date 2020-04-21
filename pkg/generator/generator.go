@@ -44,9 +44,15 @@ func service(g Abstract, svc model.Service, outdir string) (err error) {
 		return
 	}
 
+	err = structs(g, svc.Structs, dirs[5])
+	if err != nil {
+		return
+	}
+
 	components := map[string]string{
-		"main": dirs[0],
-		"env":  dirs[2],
+		"api_example": dirs[3],
+		"main":        dirs[0],
+		"env":         dirs[2],
 	}
 
 	for component, outdir := range components {
@@ -56,13 +62,9 @@ func service(g Abstract, svc model.Service, outdir string) (err error) {
 		}
 	}
 
-	err = structs(g, svc.Structs, dirs[5])
-	if err != nil {
-		return
-	}
-
 	// TODO:
-	// - pkg/logic/api_implementation.go
+	// - structs() must update symbol table
+	// - use template actions instead of formatting code logic
 	// - pkg/service/api_definition.go
 	// - pkg/service/http_router.go
 	// - pkg/service/http_wrapper.go
@@ -118,8 +120,9 @@ type templateFillerFunction func(interface{}, string) error
 func templateFiller(templ string, codeFormatter func(string) error) templateFillerFunction {
 	loadedTempl := template.Must(template.New("templ").
 		Funcs(template.FuncMap{
-			"tolower": strings.ToLower,
-			"toupper": strings.ToUpper,
+			"toLower":    strings.ToLower,
+			"toUpper":    strings.ToUpper,
+			"symbolName": symbolName,
 		}).
 		Parse(templ))
 
@@ -134,4 +137,15 @@ func templateFiller(templ string, codeFormatter func(string) error) templateFill
 		err = codeFormatter(resultPath)
 		return
 	}
+}
+
+type symbolTable map[string]string
+
+var st symbolTable
+
+func symbolName(originalName string) string {
+	if translatedName, ok := st[originalName]; ok {
+		return translatedName
+	}
+	return originalName
 }

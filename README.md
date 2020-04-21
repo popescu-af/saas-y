@@ -37,7 +37,8 @@ The input consists of a JSON file with the following format
                 {
                     "path": "/foo",
                     "methods": {
-                        "get": {
+                        "method_name_0": {
+                            "type": "get",
                             "header_params": [
                                 {
                                     "name": "header_param_name",
@@ -54,11 +55,13 @@ The input consists of a JSON file with the following format
                             ],
                             "return_type": "return_struct_name"
                         },
-                        "post": {
+                        "method_name_1": {
+                            "type": "post",
                             "input_type": "input_struct_name",
                             "return_type": "return_struct_name"
                         },
-                        "options": {
+                        "method_name_2": {
+                            "type": "options",
                             "header_params": [
                                 {
                                     "name": "header_param_name",
@@ -71,13 +74,16 @@ The input consists of a JSON file with the following format
                 {
                     "path": "/bar/{param(type)}",
                     "methods": {
-                        "get": {
+                        "method_name_3": {
+                            "type": "get",
                             "return_type": "return_struct_name"
                         },
-                        "delete": {
+                        "method_name_4": {
+                            "type": "delete",
                             "return_type": "return_struct_name"
                         },
-                        "patch": {
+                        "method_name_5": {
+                            "type": "patch",
                             "input_type": "input_struct_name",
                             "return_type": "return_struct_name"
                         }
