@@ -24,12 +24,10 @@ func NewAPI(logger *zap.Logger) service.API {
 }
 
 {{range .API}}// {{.Path}}
-{{range $methodName, $method := .Methods}}
-{{with $mname := $methodName}}
+{{range $mname, $method := .Methods}}
 // {{$mname | capitalize}} example.
-func (s *API) {{$mname | capitalize}}({{if $method.InputType}}body structs.{{$method.InputType | capitalize | symbolName}}{{end}}) (interface{}, error) {
+func (s *API) {{$mname | capitalize}}({{if $method.InputType}}body structs.{{$method.InputType | capitalize | symbolize}}{{end}}) (interface{}, error) {
 	{{if $method.InputType}}s.logger.Info("{{$mname}}", zap.Any("body", body))
 	{{end}}return nil, errors.New("method '{{$mname}}' not implemented")
 }{{end}}
-{{end}}
 {{end}}`

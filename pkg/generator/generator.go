@@ -54,9 +54,10 @@ func service(g Abstract, svc model.Service, outdir string) (err error) {
 	}
 
 	components := map[string]string{
-		"api_example": dirs[3],
-		"main":        dirs[0],
-		"env":         dirs[2],
+		"api_example":    dirs[4],
+		"api_definition": dirs[3],
+		"main":           dirs[0],
+		"env":            dirs[2],
 	}
 
 	for component, outdir := range components {
@@ -81,6 +82,7 @@ func serviceDirs(g Abstract, basePath string) (dirs []string, err error) {
 		path.Join(basePath, g.CommandPath()),
 		path.Join(basePath, "deploy"),
 		path.Join(basePath, g.PackagePath(), "config"),
+		path.Join(basePath, g.PackagePath(), "logic"),
 		path.Join(basePath, g.PackagePath(), "logic", "example"),
 		path.Join(basePath, g.PackagePath(), "service"),
 		path.Join(basePath, g.PackagePath(), "structs"),
@@ -126,7 +128,7 @@ func templateFiller(templ string, codeFormatter func(string) (SymbolTable, error
 			"capitalize": func(s string) string { return strings.ToUpper(s[:1]) + s[1:] },
 			"toLower":    strings.ToLower,
 			"toUpper":    strings.ToUpper,
-			"symbolName": symbolName,
+			"symbolize":  symbolize,
 		}).
 		Parse(templ))
 
@@ -155,7 +157,7 @@ type SymbolTable map[string]string
 
 var st SymbolTable
 
-func symbolName(originalName string) string {
+func symbolize(originalName string) string {
 	if translatedName, ok := st[originalName]; ok {
 		return translatedName
 	}

@@ -36,6 +36,8 @@ func (g *Generator) PackagePath() string {
 // GetTemplate returns the named template for go code.
 func (g *Generator) GetTemplate(name string) string {
 	switch name {
+	case "api_definition":
+		return templates.APIDefinition
 	case "api_example":
 		return templates.APIExample
 	case "env":
