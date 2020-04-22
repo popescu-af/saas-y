@@ -44,6 +44,8 @@ func (g *Generator) GetTemplate(name string) string {
 		return templates.Env
 	case "http_router":
 		return templates.HTTPRouter
+	case "http_wrapper":
+		return templates.HTTPWrapper
 	case "main":
 		return templates.Main
 	case "struct":

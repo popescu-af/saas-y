@@ -1,6 +1,6 @@
 package templates
 
-// Main is a template for the main go file.
+// Main is the template for the main functionality in go code.
 const Main = `package main
 
 import (

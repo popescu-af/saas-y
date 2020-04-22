@@ -1,6 +1,6 @@
 package templates
 
-// Struct is a template for API structs.
+// Struct is the template for API structures in go code.
 const Struct = `package structs
 
 // {{.Name | capitalize}} - generated API structure

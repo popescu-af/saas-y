@@ -1,6 +1,6 @@
 package templates
 
-// HTTPRouter is a template for the HTTP router go file.
+// HTTPRouter is the template for the HTTP router in go code.
 const HTTPRouter = `package service
 
 import (

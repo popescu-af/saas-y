@@ -1,6 +1,6 @@
 package templates
 
-// APIExample is a template for an example of go implementation of the API.
+// APIExample is the template for an example of go implementation of the API.
 const APIExample = `package example
 
 import (

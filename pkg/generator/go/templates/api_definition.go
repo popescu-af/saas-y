@@ -1,6 +1,6 @@
 package templates
 
-// APIDefinition is a template for an example of go implementation of the API.
+// APIDefinition is the template for the go definition of the API.
 const APIDefinition = `package service
 
 import "{{.Name}}/pkg/structs"

@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	outdir := "/Users/alexandru/go/src/github.com/popescu-af/saas-y/gen_test"
+	outdir := "/Users/alexandru/go/src/github.com/popescu-af/saas-y/example/_gen_test"
 
 	p := &parser.JSON{}
 

@@ -59,6 +59,7 @@ func service(g Abstract, svc model.Service, outdir string) (err error) {
 		"main":           dirs[0],
 		"env":            dirs[2],
 		"http_router":    dirs[5],
+		"http_wrapper":   dirs[5],
 	}
 
 	for component, outdir := range components {

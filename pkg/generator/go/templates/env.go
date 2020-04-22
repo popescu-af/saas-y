@@ -1,6 +1,6 @@
 package templates
 
-// Env is a template for the environment config go file.
+// Env is the template for the environment config in go code.
 const Env = `package config
 
 import "github.com/kelseyhightower/envconfig"
