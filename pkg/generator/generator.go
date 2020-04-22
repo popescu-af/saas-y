@@ -67,8 +67,6 @@ func service(g Abstract, svc model.Service, outdir string) (err error) {
 	}
 
 	// TODO:
-	// - structs() must update symbol table
-	// - use template actions instead of formatting code logic
 	// - pkg/service/api_definition.go
 	// - pkg/service/http_router.go
 	// - pkg/service/http_wrapper.go
@@ -125,6 +123,7 @@ type templateFillerFunction func(interface{}, string) error
 func templateFiller(templ string, codeFormatter func(string) (SymbolTable, error)) templateFillerFunction {
 	loadedTempl := template.Must(template.New("templ").
 		Funcs(template.FuncMap{
+			"capitalize": func(s string) string { return strings.ToUpper(s[:1]) + s[1:] },
 			"toLower":    strings.ToLower,
 			"toUpper":    strings.ToUpper,
 			"symbolName": symbolName,

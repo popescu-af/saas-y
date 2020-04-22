@@ -78,7 +78,6 @@ func (g *Generator) CodeFormatter(path string) (st generator.SymbolTable, err er
 	for _, matchLint := range reLint.FindAllStringSubmatch(out.String(), -1) {
 		old := matchLint[2]
 		new := matchLint[3]
-		new = strings.ToUpper(new[:1]) + new[1:]
 
 		st[old] = new
 		reDefinition := regexp.MustCompile(old + `([\s\(])`)
