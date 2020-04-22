@@ -26,8 +26,8 @@ func NewAPI(logger *zap.Logger) service.API {
 {{range .API}}// {{.Path}}
 {{range $mname, $method := .Methods}}
 // {{$mname | capitalize}} example.
-func (s *API) {{$mname | capitalize}}({{if $method.InputType}}body structs.{{$method.InputType | capitalize | symbolize}}{{end}}) (interface{}, error) {
-	{{if $method.InputType}}s.logger.Info("{{$mname}}", zap.Any("body", body))
+func (a *API) {{$mname | capitalize}}({{if $method.InputType}}body structs.{{$method.InputType | capitalize | symbolize}}{{end}}) (interface{}, error) {
+	{{if $method.InputType}}a.logger.Info("{{$mname}}", zap.Any("body", body))
 	{{end}}return nil, errors.New("method '{{$mname}}' not implemented")
 }{{end}}
 {{end}}`

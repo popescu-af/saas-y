@@ -32,7 +32,7 @@ func Do(g Abstract, spec *model.Spec, outdir string) (err error) {
 		}
 	}
 
-	fmt.Println(st)
+	fmt.Println("Done.")
 	return
 }
 
@@ -53,25 +53,32 @@ func service(g Abstract, svc model.Service, outdir string) (err error) {
 		return
 	}
 
-	components := map[string]string{
-		"api_example":    dirs[4],
-		"api_definition": dirs[3],
-		"main":           dirs[0],
-		"env":            dirs[2],
-		"http_router":    dirs[5],
-		"http_wrapper":   dirs[5],
+	components := []struct {
+		template string
+		outdir   string
+	}{
+		{"api_example", dirs[4]},
+		{"api_definition", dirs[3]},
+		{"main", dirs[0]},
+		{"env", dirs[2]},
+		{"http_router", dirs[5]},
+		{"http_wrapper", dirs[5]},
 	}
 
-	for component, outdir := range components {
-		err = serviceComponent(g, svc, component, outdir)
+	for _, c := range components {
+		err = serviceComponent(g, svc, c.template, c.outdir)
 		if err != nil {
 			return
 		}
 	}
 
 	// TODO:
-	// - pkg/service/http_wrapper.go
 	// - unit tests
+	// - new format for path params 'name:type' instead of 'name(type)'
+	// - path params handling
+	// - header params handling
+	// - query params handling
+	// - params passing to inner API method
 	// - deploy/
 
 	return

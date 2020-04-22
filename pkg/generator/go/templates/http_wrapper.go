@@ -9,7 +9,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/popescu-af/saas-y/template/pkg/service/structs"
+	"{{.Name}}/pkg/structs"
 )
 
 // HTTPWrapper decorates the APIs with from/to HTTP code.
@@ -38,28 +38,31 @@ func parseIntParameter(param string) (int64, error) {
 }
 
 // Paths lists the paths that the API serves.
-func (s *HTTPWrapper) Paths() Paths {
+func (h *HTTPWrapper) Paths() Paths {
 	return Paths{
-		{
-			strings.ToUpper("POST"),
-			"/something",
-			s.addSomething,
+		{{range $a := .API}}{{range $mname, $method := $a.Methods}}{
+			strings.ToUpper("{{$method.Type}}"),
+			"{{$a.Path}}",
+			h.{{$mname | capitalize | symbolize}},
 		},
+		{{end}}{{end}}
 	}
 }
 
-func (s *HTTPWrapper) addSomething(w http.ResponseWriter, r *http.Request) {
-	body := &structs.Something{}
+{{range .API}}{{range $mname, $method := .Methods}}
+func (h *HTTPWrapper) {{$mname | capitalize | symbolize}}(w http.ResponseWriter, r *http.Request) {
+	{{if $method.InputType}}body := structs.{{$method.InputType | capitalize | symbolize}}{}
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 		w.WriteHeader(500)
 		return
 	}
 
-	result, err := s.api.AddSomething(*body)
+	{{end}}result, err := s.api.{{$mname | capitalize | symbolize}}({{if $method.InputType}}body{{end}})
 	if err != nil {
 		w.WriteHeader(500)
 		return
 	}
 
 	encodeJSONResponse(result, nil, w)
-}`
+}
+{{end}}{{end}}`
