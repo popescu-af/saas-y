@@ -42,6 +42,8 @@ func (g *Generator) GetTemplate(name string) string {
 		return templates.APIExample
 	case "env":
 		return templates.Env
+	case "http_router":
+		return templates.HTTPRouter
 	case "main":
 		return templates.Main
 	case "struct":

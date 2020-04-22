@@ -48,7 +48,7 @@ func service(g Abstract, svc model.Service, outdir string) (err error) {
 		return
 	}
 
-	err = structs(g, svc.Structs, dirs[5])
+	err = structs(g, svc.Structs, dirs[6])
 	if err != nil {
 		return
 	}
@@ -58,6 +58,7 @@ func service(g Abstract, svc model.Service, outdir string) (err error) {
 		"api_definition": dirs[3],
 		"main":           dirs[0],
 		"env":            dirs[2],
+		"http_router":    dirs[5],
 	}
 
 	for component, outdir := range components {
@@ -68,8 +69,6 @@ func service(g Abstract, svc model.Service, outdir string) (err error) {
 	}
 
 	// TODO:
-	// - pkg/service/api_definition.go
-	// - pkg/service/http_router.go
 	// - pkg/service/http_wrapper.go
 	// - unit tests
 	// - deploy/
