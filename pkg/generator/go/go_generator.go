@@ -10,6 +10,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/popescu-af/saas-y/pkg/generator"
 	"github.com/popescu-af/saas-y/pkg/generator/go/templates"
 )
 
@@ -50,17 +51,16 @@ func (g *Generator) GetTemplate(name string) string {
 }
 
 // CodeFormatter returns the code formatter for go code.
-func (g *Generator) CodeFormatter(path string) (err error) {
+func (g *Generator) CodeFormatter(path string) (st generator.SymbolTable, err error) {
 	fmt.Println("Formatting", path)
 
-	re := regexp.MustCompile(`(type|struct field) ([a-zA-Z0-9_]+) should be ([a-zA-Z0-9]+)`)
-	lint := exec.Command("golint", path)
-
 	var out, errout bytes.Buffer
-	lint.Stdout = &out
-	lint.Stderr = &errout
 
-	err = lint.Run()
+	cmd := exec.Command("golint", path)
+	cmd.Stdout = &out
+	cmd.Stderr = &errout
+
+	err = cmd.Run()
 	if err != nil {
 		fmt.Println(errout.String())
 		return
@@ -71,28 +71,39 @@ func (g *Generator) CodeFormatter(path string) (err error) {
 		return
 	}
 
+	st = make(generator.SymbolTable)
 	contents := string(b)
-	for _, subst := range re.FindAllStringSubmatch(out.String(), -1) {
-		old := subst[2] + " "
-		new := subst[3] + " "
+	reLint := regexp.MustCompile(`(method|struct field|type) ([a-zA-Z0-9_]+) should be ([a-zA-Z0-9]+)`)
+
+	for _, matchLint := range reLint.FindAllStringSubmatch(out.String(), -1) {
+		old := matchLint[2]
+		new := matchLint[3]
 		new = strings.ToUpper(new[:1]) + new[1:]
-		contents = strings.ReplaceAll(contents, old, new)
+
+		st[old] = new
+		reDefinition := regexp.MustCompile(old + `([\s\(])`)
+
+		for _, matchDefinition := range reDefinition.FindAllStringSubmatch(contents, -1) {
+			contents = strings.ReplaceAll(contents, old+matchDefinition[1], new+matchDefinition[1])
+		}
 	}
+
 	out.Reset()
 	errout.Reset()
 
-	format := exec.Command("gofmt")
-	format.Stdin = bytes.NewBufferString(contents)
-	format.Stdout = &out
-	format.Stderr = &errout
+	cmd = exec.Command("gofmt")
+	cmd.Stdin = bytes.NewBufferString(contents)
+	cmd.Stdout = &out
+	cmd.Stderr = &errout
 
-	err = format.Run()
+	err = cmd.Run()
 	if err != nil {
 		fmt.Printf("%s", errout.String())
 		return
 	}
 
-	return ioutil.WriteFile(path, out.Bytes(), 0660)
+	err = ioutil.WriteFile(path, out.Bytes(), 0660)
+	return
 }
 
 // GenerateProject creates project-specific files.

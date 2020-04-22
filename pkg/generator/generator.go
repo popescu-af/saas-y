@@ -1,6 +1,7 @@
 package generator
 
 import (
+	"fmt"
 	"html/template"
 	"os"
 	"path"
@@ -15,13 +16,15 @@ type Abstract interface {
 	CommandPath() string
 	PackagePath() string
 	GetTemplate(name string) string
-	CodeFormatter(path string) (err error)
+	CodeFormatter(path string) (st SymbolTable, err error)
 	GenerateProject(name, path string) (err error)
 }
 
 // Do generates code and infrastructure declaration for the given Spec
 // and dumps it in the specified output directory.
 func Do(g Abstract, spec *model.Spec, outdir string) (err error) {
+	st = make(SymbolTable)
+
 	for _, svc := range spec.Services {
 		err = service(g, svc, outdir)
 		if err != nil {
@@ -29,6 +32,7 @@ func Do(g Abstract, spec *model.Spec, outdir string) (err error) {
 		}
 	}
 
+	fmt.Println(st)
 	return
 }
 
@@ -68,6 +72,7 @@ func service(g Abstract, svc model.Service, outdir string) (err error) {
 	// - pkg/service/api_definition.go
 	// - pkg/service/http_router.go
 	// - pkg/service/http_wrapper.go
+	// - unit tests
 	// - deploy/
 
 	return
@@ -117,7 +122,7 @@ func structs(g Abstract, structs []model.Struct, outdir string) (err error) {
 
 type templateFillerFunction func(interface{}, string) error
 
-func templateFiller(templ string, codeFormatter func(string) error) templateFillerFunction {
+func templateFiller(templ string, codeFormatter func(string) (SymbolTable, error)) templateFillerFunction {
 	loadedTempl := template.Must(template.New("templ").
 		Funcs(template.FuncMap{
 			"toLower":    strings.ToLower,
@@ -134,14 +139,22 @@ func templateFiller(templ string, codeFormatter func(string) error) templateFill
 		}
 		loadedTempl.Execute(f, s)
 		f.Close()
-		err = codeFormatter(resultPath)
+
+		newSymTable, err := codeFormatter(resultPath)
+		if err == nil {
+			for k, v := range newSymTable {
+				st[k] = v
+			}
+		}
 		return
 	}
 }
 
-type symbolTable map[string]string
+// SymbolTable is a map translating original symbol names to symbol names
+// conforming to the naming style of the generated language.
+type SymbolTable map[string]string
 
-var st symbolTable
+var st SymbolTable
 
 func symbolName(originalName string) string {
 	if translatedName, ok := st[originalName]; ok {
