@@ -79,14 +79,14 @@ func (g *Generator) CodeFormatter(path string) (st generator.SymbolTable, err er
 
 	st = make(generator.SymbolTable)
 	contents := string(b)
-	reLint := regexp.MustCompile(`(method|struct field|type) ([a-zA-Z0-9_]+) should be ([a-zA-Z0-9]+)`)
+	reLint := regexp.MustCompile(`(var|method|struct field|type) ([a-zA-Z0-9_]+) should be ([a-zA-Z0-9]+)`)
 
 	for _, matchLint := range reLint.FindAllStringSubmatch(out.String(), -1) {
 		old := matchLint[2]
 		new := matchLint[3]
 
 		st[old] = new
-		reDefinition := regexp.MustCompile(old + `([\s\(])`)
+		reDefinition := regexp.MustCompile(old + `([,\s\(])`)
 
 		for _, matchDefinition := range reDefinition.FindAllStringSubmatch(contents, -1) {
 			contents = strings.ReplaceAll(contents, old+matchDefinition[1], new+matchDefinition[1])

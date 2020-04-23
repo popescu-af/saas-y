@@ -74,14 +74,13 @@ func service(g Abstract, svc model.Service, outdir string) (err error) {
 	}
 
 	// TODO:
-	// - header params handling
-	// - query params handling
 	// - method signature creation from body, parameters
 	// - different handling for options method
 	// - params passing to inner API method
 	// - unit tests
 	// - validate method type, combination of params
 	// - deploy/
+	//
 	// New features:
 	// - code/example for talking to well-known services/tools (redis, etc.)
 	// - linkage between saas-y generated services

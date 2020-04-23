@@ -51,14 +51,14 @@ func (h *HTTPWrapper) Paths() Paths {
 
 {{range $a := .API}}{{range $mname, $method := $a.Methods}}
 func (h *HTTPWrapper) {{$mname | capitalize | symbolize}}(w http.ResponseWriter, r *http.Request) {
-	{{if $method.InputType}}body := structs.{{$method.InputType | capitalize | symbolize}}{}
+	{{if $method.InputType}}// Body
+	body := structs.{{$method.InputType | capitalize | symbolize}}{}
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 		w.WriteHeader(500)
 		return
 	}
 
-	{{end}}{{if $a.Path | pathHasParameters}}
-	// Path params
+	{{end}}{{if $a.Path | pathHasParameters}}// Path params
 	pathParams := mux.Vars(r)
 	{{with $params := $a.Path | pathParameters}}
 	{{range $pnameidx := $params | indicesParameters}}
@@ -68,32 +68,24 @@ func (h *HTTPWrapper) {{$mname | capitalize | symbolize}}(w http.ResponseWriter,
 		w.WriteHeader(500)
 		return
 	}
-	{{end}}
-	{{end}}
-	{{end}}
-	{{end}}
 
-
-
-
-	// for query params
-	query := r.URL.Query()
-	status := strings.Split(query.Get("status"), ",")
-
-
-
-
-
-
-	// for header params
-	apiKey := r.Header.Get("apiKey")
-	result, err := c.service.DeletePet(petId, apiKey)
+	{{end}}{{end}}{{end}}{{end}}{{if $method.HeaderParams}}// Header params
+	{{range $method.HeaderParams}}{{if eq $method.Type "options"}}
+	{{/* TODO */}}
+	{{else}}{{.Name}}, err := parse{{.Type | capitalize}}Parameter(r.Header.Get("{{.Name}}"))
 	if err != nil {
 		w.WriteHeader(500)
 		return
 	}
 
+	{{end}}{{end}}{{end}}{{if $method.QueryParams}}// Query params
+	{{range $method.QueryParams}}{{.Name}}, err := parse{{.Type | capitalize}}Parameter(r.URL.Query.Get("{{.Name}}"))
+	if err != nil {
+		w.WriteHeader(500)
+		return
+	}
 
+	{{end}}{{end}}
 	result, err := s.api.{{$mname | capitalize | symbolize}}({{if $method.InputType}}body{{end}})
 	if err != nil {
 		w.WriteHeader(500)
