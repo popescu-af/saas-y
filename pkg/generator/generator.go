@@ -139,12 +139,15 @@ func structs(g Abstract, structs []model.Struct, outdir string) (err error) {
 type templateFillerFunction func(interface{}, string) error
 
 func templateFiller(templ string, codeFormatter func(string) (SymbolTable, error)) templateFillerFunction {
+	paramStack := ""
+
 	loadedTempl := template.Must(template.New("templ").
 		Funcs(template.FuncMap{
-			"capitalize": func(s string) string { return strings.ToUpper(s[:1]) + s[1:] },
-			"toLower":    strings.ToLower,
-			"toUpper":    strings.ToUpper,
-			"symbolize":  symbolize,
+			"decapitalize": func(s string) string { return strings.ToLower(s[:1]) + s[1:] },
+			"capitalize":   func(s string) string { return strings.ToUpper(s[:1]) + s[1:] },
+			"toLower":      strings.ToLower,
+			"toUpper":      strings.ToUpper,
+			"symbolize":    symbolize,
 			"pathHasParameters": func(s string) string {
 				ss := strings.Split(s, "/")
 				if strings.Contains(ss[len(ss)-1], "}") {
@@ -156,14 +159,14 @@ func templateFiller(templ string, codeFormatter func(string) (SymbolTable, error
 				paramMap := make(map[string]string)
 
 				ss := strings.Split(s, "/")
-				for i := len(ss) - 1; i >= 0; i-- {
-					if !strings.Contains(ss[i], "}") {
-						break
+				for _, p := range ss {
+					if !strings.Contains(p, "}") {
+						continue
 					}
 
-					tokens := strings.Split(ss[i], ":")
+					tokens := strings.Split(p, ":")
 					if len(tokens) != 2 {
-						log.Fatalf("invalid path parameter spec: %s (should be in the form name:type)", ss[i])
+						log.Fatalf("invalid path parameter spec: %s (should be in the form name:type)", p)
 					}
 
 					pName := tokens[0][1:]
@@ -194,6 +197,19 @@ func templateFiller(templ string, codeFormatter func(string) (SymbolTable, error
 			},
 			"inc": func(i int) int {
 				return i + 1
+			},
+			"pushParam": func(p string) string {
+				paramStack += p + ", "
+				return p
+			},
+			"printParamStack": func() string {
+				var temp string
+				paramStack, temp = temp, paramStack
+				l := len(temp)
+				if l > 0 {
+					return temp[:l-2]
+				}
+				return ""
 			},
 		}).
 		Parse(templ))

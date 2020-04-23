@@ -86,7 +86,7 @@ func (g *Generator) CodeFormatter(path string) (st generator.SymbolTable, err er
 		new := matchLint[3]
 
 		st[old] = new
-		reDefinition := regexp.MustCompile(old + `([,\s\(])`)
+		reDefinition := regexp.MustCompile(old + `([^"'])`)
 
 		for _, matchDefinition := range reDefinition.FindAllStringSubmatch(contents, -1) {
 			contents = strings.ReplaceAll(contents, old+matchDefinition[1], new+matchDefinition[1])
