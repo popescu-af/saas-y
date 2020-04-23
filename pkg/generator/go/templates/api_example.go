@@ -1,26 +1,25 @@
 package templates
 
 // APIExample is the template for an example of go implementation of the API.
-const APIExample = `package example
+const APIExample = `package logic
 
 import (
 	"errors"
 
 	"go.uber.org/zap"
 
-	"{{.Name}}/pkg/service"
 	"{{.Name}}/pkg/structs"
 )
 
-// API is an example implementation of the API interface.
-// It simply logs the request body.
-type API struct {
+// ExampleAPI is an example, trivial implementation of the API interface.
+// It simply logs the request name.
+type ExampleAPI struct {
 	logger *zap.Logger
 }
 
 // NewAPI creates an instance of the example API implementation.
-func NewAPI(logger *zap.Logger) service.API {
-	return &API{logger: logger}
+func NewAPI(logger *zap.Logger) API {
+	return &ExampleAPI{logger: logger}
 }
 
 {{range $a := .API}}// {{$a.Path}}
@@ -28,7 +27,7 @@ func NewAPI(logger *zap.Logger) service.API {
 {{/* NADA for options method */}}
 {{else}}
 // {{$mname | capitalize}} example.
-func (a *API) {{$mname | capitalize}}(
+func (a *ExampleAPI) {{$mname | capitalize}}(
 {{if $method.InputType}}*structs.{{$method.InputType | capitalize | symbolize}},
 {{end}}{{if $a.Path | pathHasParameters}}{{with $params := $a.Path | pathParameters}}{{range $pnameidx := $params | indicesParameters}}{{with $ptypeidx := inc $pnameidx}}{{index $params $ptypeidx | typeName}},
 {{end}}{{end}}{{end}}{{end}}{{if $method.HeaderParams}}{{range $method.HeaderParams}}{{.Type | typeName}},

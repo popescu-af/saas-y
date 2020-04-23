@@ -28,15 +28,13 @@
                             "header_params": [
                                 {
                                     "name": "header_param_name",
-                                    "type": "int",
-                                    "value": "value"
+                                    "type": "int"
                                 }
                             ],
                             "query_params": [
                                 {
                                     "name": "query_param_name",
-                                    "type": "string",
-                                    "value": "value"
+                                    "type": "string"
                                 }
                             ],
                             "return_type": "return_struct_name"
@@ -95,7 +93,7 @@
                 {
                     "name": "ENV_VAR_NAME",
                     "type": "int64",
-                    "value": "env_var_value"
+                    "value": "42"
                 }
             ],
             "dependencies" : ["baz-service"]
@@ -109,7 +107,7 @@
             "env": [
                 {
                     "name": "ENV_VAR_NAME",
-                    "type": "type",
+                    "type": "string",
                     "value": "env_var_value"
                 }
             ],

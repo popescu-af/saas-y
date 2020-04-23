@@ -49,7 +49,7 @@ func service(g Abstract, svc model.Service, outdir string) (err error) {
 		return
 	}
 
-	err = structs(g, svc.Structs, dirs[6])
+	err = structs(g, svc.Structs, dirs[5])
 	if err != nil {
 		return
 	}
@@ -58,12 +58,12 @@ func service(g Abstract, svc model.Service, outdir string) (err error) {
 		template string
 		outdir   string
 	}{
-		{"api_example", dirs[4]},
+		{"api_example", dirs[3]},
 		{"api_definition", dirs[3]},
 		{"main", dirs[0]},
 		{"env", dirs[2]},
-		{"http_router", dirs[5]},
-		{"http_wrapper", dirs[5]},
+		{"http_router", dirs[4]},
+		{"http_wrapper", dirs[4]},
 	}
 
 	for _, c := range components {
@@ -74,7 +74,7 @@ func service(g Abstract, svc model.Service, outdir string) (err error) {
 	}
 
 	// TODO:
-	// - unit tests
+	// - unit tests (fix bug with path params)
 	// - validate method type, combination of params
 	// - deploy/
 	//
@@ -96,7 +96,6 @@ func serviceDirs(g Abstract, basePath string) (dirs []string, err error) {
 		path.Join(basePath, "deploy"),
 		path.Join(basePath, g.PackagePath(), "config"),
 		path.Join(basePath, g.PackagePath(), "logic"),
-		path.Join(basePath, g.PackagePath(), "logic", "example"),
 		path.Join(basePath, g.PackagePath(), "service"),
 		path.Join(basePath, g.PackagePath(), "structs"),
 	}

@@ -42,15 +42,13 @@ The input consists of a JSON file with the following format
                             "header_params": [
                                 {
                                     "name": "header_param_name",
-                                    "type": "type",
-                                    "value": "value"
+                                    "type": "int"
                                 }
                             ],
                             "query_params": [
                                 {
                                     "name": "query_param_name",
-                                    "type": "type",
-                                    "value": "value"
+                                    "type": "string"
                                 }
                             ],
                             "return_type": "return_struct_name"
@@ -72,7 +70,7 @@ The input consists of a JSON file with the following format
                     }
                 },
                 {
-                    "path": "/bar/{param:type}",
+                    "path": "/bar/{rank:uint}/{price:float}",
                     "methods": {
                         "method_name_3": {
                             "type": "get",
@@ -97,6 +95,10 @@ The input consists of a JSON file with the following format
                         {
                             "name": "a_field_name",
                             "type": "int"
+                        },
+                        {
+                            "name": "another_field_name",
+                            "type": "string"
                         }
                     ]
                 }
@@ -104,8 +106,8 @@ The input consists of a JSON file with the following format
             "env": [
                 {
                     "name": "ENV_VAR_NAME",
-                    "type": "type",
-                    "value": "env_var_value"
+                    "type": "int64",
+                    "value": "42"
                 }
             ],
             "dependencies" : ["baz-service"]
@@ -119,7 +121,7 @@ The input consists of a JSON file with the following format
             "env": [
                 {
                     "name": "ENV_VAR_NAME",
-                    "type": "type",
+                    "type": "string",
                     "value": "env_var_value"
                 }
             ],

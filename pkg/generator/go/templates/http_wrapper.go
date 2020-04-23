@@ -11,16 +11,17 @@ import (
 
 	"github.com/gorilla/mux"
 
+	"{{.Name}}/pkg/logic"
 	"{{.Name}}/pkg/structs"
 )
 
 // HTTPWrapper decorates the APIs with from/to HTTP code.
 type HTTPWrapper struct {
-	api API
+	api logic.API
 }
 
 // NewHTTPWrapper creates an HTTP wrapper for the service API.
-func NewHTTPWrapper(api API) *HTTPWrapper {
+func NewHTTPWrapper(api logic.API) *HTTPWrapper {
 	return &HTTPWrapper{api: api}
 }
 
@@ -37,6 +38,14 @@ func encodeJSONResponse(i interface{}, status *int, w http.ResponseWriter) error
 
 func parseIntParameter(param string) (int64, error) {
 	return strconv.ParseInt(param, 10, 64)
+}
+
+func parseUintParameter(param string) (uint64, error) {
+	return strconv.ParseUint(param, 10, 64)
+}
+
+func parseFloatParameter(param string) (float64, error) {
+	return strconv.ParseFloat(param, 64)
 }
 
 // Paths lists the paths that the API serves.
@@ -61,34 +70,44 @@ func (h *HTTPWrapper) {{$mname | capitalize | symbolize}}(w http.ResponseWriter,
 	}
 
 	{{end}}{{if $a.Path | pathHasParameters}}// Path params
-	pathParams := mux.Vars(r)
-	{{with $params := $a.Path | pathParameters}}
-	{{range $pnameidx := $params | indicesParameters}}
-	{{with $ptypeidx := inc $pnameidx}}
-	{{index $params $pnameidx | decapitalize | pushParam}}, err := parse{{index $params $ptypeidx | capitalize}}Parameter(params["{{index $params $pnameidx}}"])
-	if err != nil {
-		w.WriteHeader(500)
-		return
-	}
+		pathParams := mux.Vars(r)
+		{{with $params := $a.Path | pathParameters}}
+			{{range $pnameidx := $params | indicesParameters}}
+				{{with $ptypeidx := inc $pnameidx}}
+					{{with $ptype := index $params $ptypeidx}}
+						{{if eq $ptype "string"}}
+							{{index $params $pnameidx | decapitalize | pushParam}} := pathParams["{{index $params $pnameidx}}"]
+						{{else}}
+							{{index $params $pnameidx | decapitalize | pushParam}}, err := parse{{index $params $ptypeidx | capitalize}}Parameter(pathParams["{{index $params $pnameidx}}"])
+							if err != nil {
+								w.WriteHeader(500)
+								return
+							}
 
-	{{end}}{{end}}{{end}}{{end}}{{if $method.HeaderParams}}{{if eq $method.Type "options"}}// Response headers
+						{{end}}
+					{{end}}
+				{{end}}
+			{{end}}
+		{{end}}
+	{{end}}{{if $method.HeaderParams}}{{if eq $method.Type "options"}}// Response headers
 	{{else}}// Header params
-	{{end}}{{range $method.HeaderParams}}{{if eq $method.Type "options"}}w.Header().Set("{{.Name}}", "{{.Value}}"){{else}}{{.Name | decapitalize | pushParam}}, err := parse{{.Type | capitalize}}Parameter(r.Header.Get("{{.Name}}"))
+	{{end}}{{range $method.HeaderParams}}{{if eq $method.Type "options"}}w.Header().Set("{{.Name}}", "{{.Value}}"){{else}}{{if eq .Type "string"}}{{.Name | decapitalize | pushParam}} := r.Header.Get("{{.Name}}"){{else}}{{.Name | decapitalize | pushParam}}, err := parse{{.Type | capitalize}}Parameter(r.Header.Get("{{.Name}}"))
 	if err != nil {
 		w.WriteHeader(500)
 		return
 	}
 
-	{{end}}{{end}}{{end}}{{if $method.QueryParams}}// Query params
-	{{range $method.QueryParams}}{{.Name | decapitalize | pushParam}}, err := parse{{.Type | capitalize}}Parameter(r.URL.Query.Get("{{.Name}}"))
+	{{end}}{{end}}{{end}}{{end}}{{if $method.QueryParams}}// Query params
+	query := r.URL.Query()
+	{{range $method.QueryParams}}{{if eq .Type "string"}}{{.Name | decapitalize | pushParam}} := query.Get("{{.Name}}"){{else}}{{.Name | decapitalize | pushParam}}, err := parse{{.Type | capitalize}}Parameter(query.Get("{{.Name}}"))
 	if err != nil {
 		w.WriteHeader(500)
 		return
 	}
 
-	{{end}}{{end}}{{if eq $method.Type "options"}}
+	{{end}}{{end}}{{end}}{{if eq $method.Type "options"}}
 	{{/* NADA for "options" method */}}{{else}}// Call implementation
-	result, err := s.api.{{$mname | capitalize | symbolize}}({{printParamStack}})
+	result, err := h.api.{{$mname | capitalize | symbolize}}({{printParamStack}})
 	if err != nil {
 		w.WriteHeader(500)
 		return

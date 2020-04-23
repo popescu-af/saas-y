@@ -1,7 +1,7 @@
 package templates
 
 // APIDefinition is the template for the go definition of the API.
-const APIDefinition = `package service
+const APIDefinition = `package logic
 
 import "{{.Name}}/pkg/structs"
 
