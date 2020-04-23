@@ -3,6 +3,7 @@ package generator
 import (
 	"fmt"
 	"html/template"
+	"log"
 	"os"
 	"path"
 	"strings"
@@ -73,13 +74,22 @@ func service(g Abstract, svc model.Service, outdir string) (err error) {
 	}
 
 	// TODO:
-	// - unit tests
-	// - new format for path params 'name:type' instead of 'name(type)'
-	// - path params handling
 	// - header params handling
 	// - query params handling
+	// - method signature creation from body, parameters
+	// - different handling for options method
 	// - params passing to inner API method
+	// - unit tests
+	// - validate method type, combination of params
 	// - deploy/
+	// New features:
+	// - code/example for talking to well-known services/tools (redis, etc.)
+	// - linkage between saas-y generated services
+	// - k8s yaml files for all good to have stuff:
+	//   - ingress
+	//   - cert-manager
+	//   - docker-register
+	// - unit tests for the generated service (everything excluding the pure logic)
 
 	return
 }
@@ -136,6 +146,56 @@ func templateFiller(templ string, codeFormatter func(string) (SymbolTable, error
 			"toLower":    strings.ToLower,
 			"toUpper":    strings.ToUpper,
 			"symbolize":  symbolize,
+			"pathHasParameters": func(s string) string {
+				ss := strings.Split(s, "/")
+				if strings.Contains(ss[len(ss)-1], "}") {
+					return "yes"
+				}
+				return "" // empty value means false in {{if $x}} template conditional
+			},
+			"pathParameters": func(s string) (result []string) {
+				paramMap := make(map[string]string)
+
+				ss := strings.Split(s, "/")
+				for i := len(ss) - 1; i >= 0; i-- {
+					if !strings.Contains(ss[i], "}") {
+						break
+					}
+
+					tokens := strings.Split(ss[i], ":")
+					if len(tokens) != 2 {
+						log.Fatalf("invalid path parameter spec: %s (should be in the form name:type)", ss[i])
+					}
+
+					pName := tokens[0][1:]
+					if _, ok := paramMap[pName]; ok {
+						log.Fatalf("path paramerter already defined: %s", pName)
+					}
+
+					pType := tokens[1][:len(tokens[1])-1]
+					for _, t := range []string{"int", "uint", "float", "string"} {
+						if t == pType {
+							result = append(result, pName)
+							result = append(result, pType)
+							paramMap[pName] = pType
+						}
+					}
+					if _, ok := paramMap[pName]; !ok {
+						log.Fatalf("invalid type for parameter '%s': '%s'", pName, pType)
+					}
+				}
+				return result
+			},
+			"indicesParameters": func(parameters []string) []int {
+				var indices []int
+				for i := 0; i < len(parameters); i += 2 {
+					indices = append(indices, i)
+				}
+				return indices
+			},
+			"inc": func(i int) int {
+				return i + 1
+			},
 		}).
 		Parse(templ))
 

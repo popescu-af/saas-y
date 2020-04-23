@@ -58,7 +58,7 @@
                     }
                 },
                 {
-                    "path": "/bar/{param(type)}",
+                    "path": "/bar/{rank:int}/{price:float}",
                     "methods": {
                         "method_name_3": {
                             "type": "get",

@@ -72,7 +72,7 @@ The input consists of a JSON file with the following format
                     }
                 },
                 {
-                    "path": "/bar/{param(type)}",
+                    "path": "/bar/{param:type}",
                     "methods": {
                         "method_name_3": {
                             "type": "get",

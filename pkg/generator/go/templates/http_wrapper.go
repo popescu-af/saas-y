@@ -49,7 +49,7 @@ func (h *HTTPWrapper) Paths() Paths {
 	}
 }
 
-{{range .API}}{{range $mname, $method := .Methods}}
+{{range $a := .API}}{{range $mname, $method := $a.Methods}}
 func (h *HTTPWrapper) {{$mname | capitalize | symbolize}}(w http.ResponseWriter, r *http.Request) {
 	{{if $method.InputType}}body := structs.{{$method.InputType | capitalize | symbolize}}{}
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
@@ -57,7 +57,44 @@ func (h *HTTPWrapper) {{$mname | capitalize | symbolize}}(w http.ResponseWriter,
 		return
 	}
 
-	{{end}}result, err := s.api.{{$mname | capitalize | symbolize}}({{if $method.InputType}}body{{end}})
+	{{end}}{{if $a.Path | pathHasParameters}}
+	// Path params
+	pathParams := mux.Vars(r)
+	{{with $params := $a.Path | pathParameters}}
+	{{range $pnameidx := $params | indicesParameters}}
+	{{with $ptypeidx := inc $pnameidx}}
+	{{index $params $pnameidx}}, err := parse{{index $params $ptypeidx | capitalize}}Parameter(params["{{index $params $pnameidx}}"])
+	if err != nil {
+		w.WriteHeader(500)
+		return
+	}
+	{{end}}
+	{{end}}
+	{{end}}
+	{{end}}
+
+
+
+
+	// for query params
+	query := r.URL.Query()
+	status := strings.Split(query.Get("status"), ",")
+
+
+
+
+
+
+	// for header params
+	apiKey := r.Header.Get("apiKey")
+	result, err := c.service.DeletePet(petId, apiKey)
+	if err != nil {
+		w.WriteHeader(500)
+		return
+	}
+
+
+	result, err := s.api.{{$mname | capitalize | symbolize}}({{if $method.InputType}}body{{end}})
 	if err != nil {
 		w.WriteHeader(500)
 		return
