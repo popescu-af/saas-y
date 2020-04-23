@@ -23,11 +23,19 @@ func NewAPI(logger *zap.Logger) service.API {
 	return &API{logger: logger}
 }
 
-{{range .API}}// {{.Path}}
-{{range $mname, $method := .Methods}}
+{{range $a := .API}}// {{$a.Path}}
+{{range $mname, $method := $a.Methods}}{{if eq $method.Type "options"}}
+{{/* NADA for options method */}}
+{{else}}
 // {{$mname | capitalize}} example.
-func (a *API) {{$mname | capitalize}}({{if $method.InputType}}body structs.{{$method.InputType | capitalize | symbolize}}{{end}}) (interface{}, error) {
-	{{if $method.InputType}}a.logger.Info("{{$mname}}", zap.Any("body", body))
-	{{end}}return nil, errors.New("method '{{$mname}}' not implemented")
-}{{end}}
-{{end}}`
+func (a *API) {{$mname | capitalize}}(
+{{if $method.InputType}}*structs.{{$method.InputType | capitalize | symbolize}},
+{{end}}{{if $a.Path | pathHasParameters}}{{with $params := $a.Path | pathParameters}}{{range $pnameidx := $params | indicesParameters}}{{with $ptypeidx := inc $pnameidx}}{{index $params $ptypeidx | typeName}},
+{{end}}{{end}}{{end}}{{end}}{{if $method.HeaderParams}}{{range $method.HeaderParams}}{{.Type | typeName}},
+{{end}}{{end}}{{if $method.QueryParams}}{{range $method.QueryParams}}{{.Type | typeName}},
+{{end}}{{end}}) (interface{}, error) {
+	a.logger.Info("called {{$mname}}")
+	return nil, errors.New("method '{{$mname}}' not implemented")
+}
+
+{{end}}{{end}}{{end}}`

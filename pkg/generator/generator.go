@@ -74,9 +74,6 @@ func service(g Abstract, svc model.Service, outdir string) (err error) {
 	}
 
 	// TODO:
-	// - method signature creation from body, parameters
-	// - different handling for options method
-	// - params passing to inner API method
 	// - unit tests
 	// - validate method type, combination of params
 	// - deploy/
@@ -209,6 +206,20 @@ func templateFiller(templ string, codeFormatter func(string) (SymbolTable, error
 				if l > 0 {
 					return temp[:l-2]
 				}
+				return ""
+			},
+			"typeName": func(t string) string {
+				switch t {
+				case "int":
+					return "int64"
+				case "uint":
+					return "uint64"
+				case "float":
+					return "float64"
+				case "string":
+					return "string"
+				}
+
 				return ""
 			},
 		}).

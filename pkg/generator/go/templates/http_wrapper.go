@@ -54,7 +54,7 @@ func (h *HTTPWrapper) Paths() Paths {
 {{range $a := .API}}{{range $mname, $method := $a.Methods}}// {{$mname | capitalize | symbolize}} HTTP wrapper.
 func (h *HTTPWrapper) {{$mname | capitalize | symbolize}}(w http.ResponseWriter, r *http.Request) {
 	{{if $method.InputType}}// Body
-	{{"body" | pushParam}} := structs.{{$method.InputType | capitalize | symbolize}}{}
+	{{"body" | pushParam}} := &structs.{{$method.InputType | capitalize | symbolize}}{}
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 		w.WriteHeader(500)
 		return

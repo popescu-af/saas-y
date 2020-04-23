@@ -28,14 +28,14 @@
                             "header_params": [
                                 {
                                     "name": "header_param_name",
-                                    "type": "type",
+                                    "type": "int",
                                     "value": "value"
                                 }
                             ],
                             "query_params": [
                                 {
                                     "name": "query_param_name",
-                                    "type": "type",
+                                    "type": "string",
                                     "value": "value"
                                 }
                             ],
@@ -58,7 +58,7 @@
                     }
                 },
                 {
-                    "path": "/bar/{rank:int}/{price:float}",
+                    "path": "/bar/{rank:uint}/{price:float}",
                     "methods": {
                         "method_name_3": {
                             "type": "get",
