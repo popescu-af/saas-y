@@ -76,6 +76,7 @@ func service(g Abstract, svc model.Service, outdir string) (err error) {
 
 	// TODO:
 	// - unit tests
+	//   -
 	// - validate method type (GET, POST, etc.), combination of params
 	// - deploy/
 	//
@@ -86,6 +87,10 @@ func service(g Abstract, svc model.Service, outdir string) (err error) {
 	//   - ingress
 	//   - cert-manager
 	//   - docker-register
+	// - simplify the templates
+	//   - use a template per input struct and not per output file
+	//   - generate intermediate files
+	//   - parse intermediate files to generate final files
 	// - unit tests for the generated service (everything excluding the pure logic)
 	// - idea: generate from docker-compose file?
 

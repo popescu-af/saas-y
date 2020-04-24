@@ -3,23 +3,14 @@ package main
 import (
 	"log"
 
-	"github.com/popescu-af/saas-y/pkg/generator"
-	gengo "github.com/popescu-af/saas-y/pkg/generator/go"
-	"github.com/popescu-af/saas-y/pkg/parser"
+	"github.com/popescu-af/saas-y/pkg/engine/golang"
 )
 
 func main() {
-	outdir := "/Users/alexandru/go/src/github.com/popescu-af/saas-y/example/_gen_test"
-
-	p := &parser.JSON{}
-
-	spec, err := p.Parse("/Users/alexandru/go/src/github.com/popescu-af/saas-y/example/spec.json")
-	if err != nil {
-		log.Fatalf("saas-y error: %v", err)
-	}
-
-	g := &gengo.Generator{}
-	err = generator.Do(g, spec, outdir)
+	err := golang.GenerateSourcesFromJSONSpec(
+		"/Users/alexandru/go/src/github.com/popescu-af/saas-y/example/spec.json",
+		"/Users/alexandru/go/src/github.com/popescu-af/saas-y/example/_gen_test",
+	)
 	if err != nil {
 		log.Fatalf("saas-y error: %v", err)
 	}
