@@ -76,8 +76,8 @@ func service(g Abstract, svc model.Service, outdir string) (err error) {
 
 	// TODO:
 	// - unit tests
-	//   -
 	// - validate method type (GET, POST, etc.), combination of params
+	// - add correct return type for API methods
 	// - deploy/
 	//
 	// New features:
