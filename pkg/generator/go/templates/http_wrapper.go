@@ -53,7 +53,7 @@ func (h *HTTPWrapper) Paths() Paths {
 	return Paths{
 		{{range $a := .API}}{{range $mname, $method := $a.Methods}}{
 			strings.ToUpper("{{$method.Type}}"),
-			"{{$a.Path}}",
+			"{{$a.Path | cleanPath}}",
 			h.{{$mname | capitalize | symbolize}},
 		},
 		{{end}}{{end}}

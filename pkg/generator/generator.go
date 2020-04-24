@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"path"
+	"regexp"
 	"strings"
 
 	"github.com/popescu-af/saas-y/pkg/model"
@@ -74,8 +75,8 @@ func service(g Abstract, svc model.Service, outdir string) (err error) {
 	}
 
 	// TODO:
-	// - unit tests (fix bug with path params)
-	// - validate method type, combination of params
+	// - unit tests
+	// - validate method type (GET, POST, etc.), combination of params
 	// - deploy/
 	//
 	// New features:
@@ -86,6 +87,7 @@ func service(g Abstract, svc model.Service, outdir string) (err error) {
 	//   - cert-manager
 	//   - docker-register
 	// - unit tests for the generated service (everything excluding the pure logic)
+	// - idea: generate from docker-compose file?
 
 	return
 }
@@ -220,6 +222,10 @@ func templateFiller(templ string, codeFormatter func(string) (SymbolTable, error
 				}
 
 				return ""
+			},
+			"cleanPath": func(p string) string {
+				re := regexp.MustCompile(`:(int|uint|float|string)`)
+				return re.ReplaceAllString(p, "")
 			},
 		}).
 		Parse(templ))
