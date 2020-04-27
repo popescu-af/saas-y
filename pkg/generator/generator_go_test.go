@@ -1,50 +1,68 @@
-package generator
+package generator_test
 
 import (
 	"os"
+	"path"
 	"testing"
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/popescu-af/saas-y/pkg/generator"
+	gengo "github.com/popescu-af/saas-y/pkg/generator/go"
+	"github.com/popescu-af/saas-y/pkg/model"
 	saasy_testing "github.com/popescu-af/saas-y/pkg/testing"
 )
 
-// env generation
-// body(input) generation
-// header params generation
-// query params generation
-// path params generation
-// combination of all types of params & body generation + parameter passing
-// path generation
-// method type validation
-// correct params for each method type validation
-// options method correctly generated
-// structs generation
+// 1. definition, example, wrapper tests
+// (from same svc specs, three content equality expectations, one for each file)
+// - body(input) generation
+// - header params generation
+// - query params generation
+// - path params generation
+// - combination of all types of params & body generation + parameter passing
+// - path generation
+// 2. options method correctly generated
+// 3. structs generation
+// 4. method type validation
+// - correct params for each method type validation
+
+func generateServiceFiles(svc model.Service, components []string) (pOutdir string, err error) {
+	pOutdir, err = saasy_testing.CreateOutdir()
+	if err != nil {
+		return
+	}
+
+	g := &gengo.Generator{}
+	for _, c := range components {
+		if err = generator.ServiceComponent(g, svc, c, pOutdir); err != nil {
+			os.RemoveAll(pOutdir)
+			return
+		}
+	}
+	return
+}
 
 func TestGeneratedEnv(t *testing.T) {
-	var spec = `
-    {
-        "services": [
-            {
-                "name": "foo-service",
-                "port": "80",
-                "env": [
-                    {
-                        "name": "ENV_VAR_NAME",
-                        "type": "int64",
-                        "value": "42"
-                    }
-                ]
-            }
-        ]
-    }
-    `
+	svc := model.Service{
+		ServiceCommon: model.ServiceCommon{
+			Name: "foo-service",
+			Port: "80",
+			Environment: []model.Variable{
+				{
+					Name:  "ENV_VAR_NAME",
+					Type:  "int64",
+					Value: "42",
+				},
+			},
+		},
+		API:     []model.API{},
+		Structs: []model.Struct{},
+	}
 
-	pSpec, pOutdir, err := saasy_testing.CreateJSONSpecFileAndOutdir(spec, ".", "spec.json")
+	pOutdir, err := generateServiceFiles(svc, []string{"env"})
 	require.NoError(t, err)
-
-	defer os.Remove(pSpec)
 	defer os.RemoveAll(pOutdir)
 
-	// TODO: test
+	referenceDir := path.Join(saasy_testing.GetTestingCommonDirectory(), "..", "generator", "go", "testing")
+	saasy_testing.CheckFilesInDirsEqual(t, pOutdir, referenceDir, []string{"env.go"})
 }

@@ -18,7 +18,7 @@ type Path struct {
 }
 
 type Service struct {
-	serviceCommon
+	ServiceCommon
 	API     []API    `json:"api"`
 	Structs []Struct `json:"structs"`
 }
@@ -58,11 +58,11 @@ type Struct struct {
 }
 
 type ExternalService struct {
-	serviceCommon
+	ServiceCommon
 	ImageURL string `json:"image_url"`
 }
 
-type serviceCommon struct {
+type ServiceCommon struct {
 	Name         string     `json:"name"`
 	Port         string     `json:"port"`
 	Environment  []Variable `json:"env"`

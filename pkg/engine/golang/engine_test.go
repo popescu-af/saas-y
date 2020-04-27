@@ -101,7 +101,8 @@ var fullSpec = `
 `
 
 func TestGeneratedServiceCompiles(t *testing.T) {
-	pSpec, pOutdir, err := saasy_testing.CreateJSONSpecFileAndOutdir(fullSpec, ".", "spec.json")
+	pSpec, err := saasy_testing.CreateJSONSpecFile(fullSpec, ".", "spec.json")
+	pOutdir, err := saasy_testing.CreateOutdir()
 	require.NoError(t, err)
 
 	defer os.Remove(pSpec)

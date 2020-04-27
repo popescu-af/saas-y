@@ -25,8 +25,6 @@ type Abstract interface {
 // Do generates code and infrastructure declaration for the given Spec
 // and dumps it in the specified output directory.
 func Do(g Abstract, spec *model.Spec, outdir string) (err error) {
-	st = make(SymbolTable)
-
 	for _, svc := range spec.Services {
 		err = service(g, svc, outdir)
 		if err != nil {
@@ -68,7 +66,7 @@ func service(g Abstract, svc model.Service, outdir string) (err error) {
 	}
 
 	for _, c := range components {
-		err = serviceComponent(g, svc, c.template, c.outdir)
+		err = ServiceComponent(g, svc, c.template, c.outdir)
 		if err != nil {
 			return
 		}
@@ -76,22 +74,24 @@ func service(g Abstract, svc model.Service, outdir string) (err error) {
 
 	// TODO:
 	// - unit tests
-	// - validate method type (GET, POST, etc.), combination of params
 	// - add correct return type for API methods
 	// - deploy/
 	//
 	// New features:
+	// - validate method type (GET, POST, etc.), combination of params
 	// - code/example for talking to well-known services/tools (redis, etc.)
 	// - linkage between saas-y generated services
 	// - k8s yaml files for all good to have stuff:
 	//   - ingress
 	//   - cert-manager
 	//   - docker-register
+	// - unit tests for the generated service (everything excluding the pure logic)
+	//
+	// Nice to have:
 	// - simplify the templates
 	//   - use a template per input struct and not per output file
 	//   - generate intermediate files
 	//   - parse intermediate files to generate final files
-	// - unit tests for the generated service (everything excluding the pure logic)
 	// - idea: generate from docker-compose file?
 
 	return
@@ -115,7 +115,11 @@ func serviceDirs(g Abstract, basePath string) (dirs []string, err error) {
 	return
 }
 
-func serviceComponent(g Abstract, svc model.Service, componentName, outdir string) (err error) {
+// ServiceComponent generates a service component by its given name.
+func ServiceComponent(g Abstract, svc model.Service, componentName, outdir string) (err error) {
+	if st == nil {
+		st = make(SymbolTable)
+	}
 	filler := templateFiller(g.GetTemplate(componentName), g.CodeFormatter)
 	fPath := path.Join(outdir, componentName+g.FileExtension())
 	err = filler(svc, fPath)
