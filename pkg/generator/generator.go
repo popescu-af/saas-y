@@ -84,10 +84,15 @@ func service(g Abstract, svc model.Service, outdir string) (err error) {
 	}
 
 	// TODO:
-	// - deploy/
+	// - Dockerfile
+	// - Makefile
+	//   - build
+	//   - deploy
 	// - proper HTTP status code returned
 	//   - input validation
 	//   - logic error -> proper HTTP code
+	//     - subclass of error -> HTTP error
+	//     - code that reflects on the subclass, extracts status code, otherwise 500
 	//
 	// - unit tests
 	//
