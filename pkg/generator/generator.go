@@ -9,6 +9,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/popescu-af/saas-y/pkg/generator/common/templates/k8s"
 	"github.com/popescu-af/saas-y/pkg/model"
 )
 
@@ -22,6 +23,7 @@ type Abstract interface {
 	GenerateProject(name, path string) (err error)
 }
 
+// Init initializes the generator.
 func Init() {
 	st = make(SymbolTable)
 }
@@ -49,6 +51,11 @@ func service(g Abstract, svc model.Service, outdir string) (err error) {
 	}
 
 	if err = g.GenerateProject(svc.Name, basePath); err != nil {
+		return
+	}
+
+	err = commonEntity(svc, k8s.DeplSvc, path.Join(dirs[6], svc.Name+".yaml"))
+	if err != nil {
 		return
 	}
 
@@ -112,6 +119,7 @@ func serviceDirs(g Abstract, basePath string) (dirs []string, err error) {
 		path.Join(basePath, g.PackagePath(), "logic"),
 		path.Join(basePath, g.PackagePath(), "service"),
 		path.Join(basePath, g.PackagePath(), "structs"),
+		path.Join(basePath, "deploy"),
 	}
 
 	for _, dir := range dirs {
@@ -140,6 +148,16 @@ func structs(g Abstract, structs []model.Struct, outdir string) (err error) {
 		}
 	}
 
+	return
+}
+
+func commonEntity(obj interface{}, templ string, resultPath string) (err error) {
+	loadedTempl := template.Must(template.New("templ").
+		Funcs(template.FuncMap{
+			"toUpper": strings.ToUpper,
+		}).
+		Parse(templ))
+	err = applyObjectToTemplateAndSaveToFile(obj, loadedTempl, resultPath)
 	return
 }
 
@@ -244,13 +262,10 @@ func templateFiller(templ string, codeFormatter func(string) (SymbolTable, error
 		Parse(templ))
 
 	return func(s interface{}, resultPath string) (err error) {
-		var f *os.File
-		f, err = os.Create(resultPath)
+		err = applyObjectToTemplateAndSaveToFile(s, loadedTempl, resultPath)
 		if err != nil {
 			return
 		}
-		loadedTempl.Execute(f, s)
-		f.Close()
 
 		newSymTable, err := codeFormatter(resultPath)
 		if err == nil {
@@ -260,6 +275,17 @@ func templateFiller(templ string, codeFormatter func(string) (SymbolTable, error
 		}
 		return
 	}
+}
+
+func applyObjectToTemplateAndSaveToFile(obj interface{}, loadedTempl *template.Template, resultPath string) (err error) {
+	var f *os.File
+	f, err = os.Create(resultPath)
+	if err != nil {
+		return
+	}
+	loadedTempl.Execute(f, obj)
+	f.Close()
+	return
 }
 
 // SymbolTable is a map translating original symbol names to symbol names
