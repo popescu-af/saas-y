@@ -9,6 +9,8 @@ import (
 // GenerateSourcesFromJSONSpec generates go code for the services from
 // a JSON specification, saving it under the specified path.
 func GenerateSourcesFromJSONSpec(jsonSpecFilePath, outdir string) (err error) {
+	generator.Init()
+
 	p := &parser.JSON{}
 	spec, err := p.Parse(jsonSpecFilePath)
 	if err != nil {

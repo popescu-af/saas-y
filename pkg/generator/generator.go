@@ -22,6 +22,10 @@ type Abstract interface {
 	GenerateProject(name, path string) (err error)
 }
 
+func Init() {
+	st = make(SymbolTable)
+}
+
 // Do generates code and infrastructure declaration for the given Spec
 // and dumps it in the specified output directory.
 func Do(g Abstract, spec *model.Spec, outdir string) (err error) {
@@ -73,18 +77,21 @@ func service(g Abstract, svc model.Service, outdir string) (err error) {
 	}
 
 	// TODO:
-	// - unit tests
-	// - add correct return type for API methods
 	// - deploy/
+	// - proper HTTP status code returned
+	//   - input validation
+	//   - logic error -> proper HTTP code
+	//
+	// - unit tests
 	//
 	// New features:
-	// - validate method type (GET, POST, etc.), combination of params
 	// - code/example for talking to well-known services/tools (redis, etc.)
 	// - linkage between saas-y generated services
 	// - k8s yaml files for all good to have stuff:
 	//   - ingress
 	//   - cert-manager
 	//   - docker-register
+	// - validate method type (GET, POST, etc.), combination of params
 	// - unit tests for the generated service (everything excluding the pure logic)
 	//
 	// Nice to have:
@@ -92,7 +99,7 @@ func service(g Abstract, svc model.Service, outdir string) (err error) {
 	//   - use a template per input struct and not per output file
 	//   - generate intermediate files
 	//   - parse intermediate files to generate final files
-	// - idea: generate from docker-compose file?
+	// - idea: generate from docker-compose file (yaml file)?
 
 	return
 }
@@ -117,9 +124,6 @@ func serviceDirs(g Abstract, basePath string) (dirs []string, err error) {
 
 // ServiceComponent generates a service component by its given name.
 func ServiceComponent(g Abstract, svc model.Service, componentName, outdir string) (err error) {
-	if st == nil {
-		st = make(SymbolTable)
-	}
 	filler := templateFiller(g.GetTemplate(componentName), g.CodeFormatter)
 	fPath := path.Join(outdir, componentName+g.FileExtension())
 	err = filler(svc, fPath)

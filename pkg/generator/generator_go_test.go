@@ -59,10 +59,12 @@ func TestGeneratedEnv(t *testing.T) {
 		Structs: []model.Struct{},
 	}
 
+	generator.Init()
+
 	pOutdir, err := generateServiceFiles(svc, []string{"env"})
 	require.NoError(t, err)
 	defer os.RemoveAll(pOutdir)
 
-	referenceDir := path.Join(saasy_testing.GetTestingCommonDirectory(), "..", "generator", "go", "testing")
+	referenceDir := path.Join(saasy_testing.GetTestingCommonDirectory(), "..", "generator", "go", "testing", "expected")
 	saasy_testing.CheckFilesInDirsEqual(t, pOutdir, referenceDir, []string{"env.go"})
 }

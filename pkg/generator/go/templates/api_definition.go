@@ -15,7 +15,7 @@ type API interface {
 	{{end}}{{if $a.Path | pathHasParameters}}{{with $params := $a.Path | pathParameters}}{{range $pnameidx := $params | indicesParameters}}{{with $ptypeidx := inc $pnameidx}}{{index $params $ptypeidx | typeName}},
 	{{end}}{{end}}{{end}}{{end}}{{if $method.HeaderParams}}{{range $method.HeaderParams}}{{.Type | typeName}},
 	{{end}}{{end}}{{if $method.QueryParams}}{{range $method.QueryParams}}{{.Type | typeName}},
-	{{end}}{{end}}) (interface{}, error)
+	{{end}}{{end}}) (*structs.{{$method.ReturnType | capitalize | symbolize}}, error)
 
 	{{end}}{{end}}{{end}}
 }`

@@ -86,6 +86,15 @@ var fullSpec = `
                             "type": "string"
                         }
                     ]
+                },
+                {
+                    "name": "return_struct_name",
+                    "fields": [
+                        {
+                            "name": "status",
+                            "type": "int"
+                        }
+                    ]
                 }
             ],
             "env": [
