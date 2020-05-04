@@ -28,4 +28,8 @@ publish: tag
 	docker tag {{.Name}}:${TAG_REVISION} localhost:5000/{{.Name}}:${TAG_REVISION}
 	docker tag {{.Name}}:latest localhost:5000/{{.Name}}:latest
 	docker push localhost:5000/{{.Name}}:${TAG_REVISION}
-	docker push localhost:5000/{{.Name}}:latest`
+	docker push localhost:5000/{{.Name}}:latest
+
+.PHONY: deploy
+deploy: publish
+	kubectl apply -f deploy/{{.Name}}.yaml`
