@@ -9,6 +9,7 @@ import (
 	"regexp"
 	"strings"
 
+	common_templ "github.com/popescu-af/saas-y/pkg/generator/common/templates"
 	"github.com/popescu-af/saas-y/pkg/generator/common/templates/k8s"
 	"github.com/popescu-af/saas-y/pkg/model"
 )
@@ -54,12 +55,23 @@ func service(g Abstract, svc model.Service, outdir string) (err error) {
 		return
 	}
 
-	err = commonEntity(svc, k8s.DeplSvc, path.Join(dirs[6], svc.Name+".yaml"))
-	if err != nil {
-		return
+	entities := []struct {
+		template string
+		outpath  string
+	}{
+		{common_templ.Dockerfile, path.Join(dirs[0], "Dockerfile.example")},
+		{common_templ.Makefile, path.Join(dirs[0], "Makefile.example")},
+		{k8s.DeplSvc, path.Join(dirs[2], svc.Name+".yaml")},
 	}
 
-	err = structs(g, svc.Structs, dirs[5])
+	for _, e := range entities {
+		err = commonEntity(svc, e.template, e.outpath)
+		if err != nil {
+			return
+		}
+	}
+
+	err = structs(g, svc.Structs, dirs[6])
 	if err != nil {
 		return
 	}
@@ -68,12 +80,12 @@ func service(g Abstract, svc model.Service, outdir string) (err error) {
 		template string
 		outdir   string
 	}{
-		{"api_example", dirs[3]},
-		{"api_definition", dirs[3]},
-		{"main", dirs[0]},
-		{"env", dirs[2]},
-		{"http_router", dirs[4]},
-		{"http_wrapper", dirs[4]},
+		{"api_example", dirs[4]},
+		{"api_definition", dirs[4]},
+		{"main", dirs[1]},
+		{"env", dirs[3]},
+		{"http_router", dirs[5]},
+		{"http_wrapper", dirs[5]},
 	}
 
 	for _, c := range components {
@@ -84,10 +96,7 @@ func service(g Abstract, svc model.Service, outdir string) (err error) {
 	}
 
 	// TODO:
-	// - Dockerfile
-	// - Makefile
-	//   - build
-	//   - deploy
+	// - README
 	// - proper HTTP status code returned
 	//   - input validation
 	//   - logic error -> proper HTTP code
@@ -118,13 +127,13 @@ func service(g Abstract, svc model.Service, outdir string) (err error) {
 
 func serviceDirs(g Abstract, basePath string) (dirs []string, err error) {
 	dirs = []string{
+		basePath,
 		path.Join(basePath, g.CommandPath()),
 		path.Join(basePath, "deploy"),
 		path.Join(basePath, g.PackagePath(), "config"),
 		path.Join(basePath, g.PackagePath(), "logic"),
 		path.Join(basePath, g.PackagePath(), "service"),
 		path.Join(basePath, g.PackagePath(), "structs"),
-		path.Join(basePath, "deploy"),
 	}
 
 	for _, dir := range dirs {
