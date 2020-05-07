@@ -65,7 +65,7 @@ func (h *HTTPWrapper) {{$mname | capitalize | symbolize}}(w http.ResponseWriter,
 	{{if $method.InputType}}// Body
 	{{"body" | pushParam}} := &structs.{{$method.InputType | capitalize | symbolize}}{}
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
-		w.WriteHeader(500)
+		w.WriteHeader(400)
 		return
 	}
 
@@ -80,7 +80,7 @@ func (h *HTTPWrapper) {{$mname | capitalize | symbolize}}(w http.ResponseWriter,
 						{{else}}
 							{{index $params $pnameidx | decapitalize | pushParam}}, err := parse{{index $params $ptypeidx | capitalize}}Parameter(pathParams["{{index $params $pnameidx}}"])
 							if err != nil {
-								w.WriteHeader(500)
+								w.WriteHeader(400)
 								return
 							}
 
@@ -93,23 +93,25 @@ func (h *HTTPWrapper) {{$mname | capitalize | symbolize}}(w http.ResponseWriter,
 	{{else}}// Header params
 	{{end}}{{range $method.HeaderParams}}{{if eq $method.Type "options"}}w.Header().Set("{{.Name}}", "{{.Value}}"){{else}}{{if eq .Type "string"}}{{.Name | decapitalize | pushParam}} := r.Header.Get("{{.Name}}"){{else}}{{.Name | decapitalize | pushParam}}, err := parse{{.Type | capitalize}}Parameter(r.Header.Get("{{.Name}}"))
 	if err != nil {
-		w.WriteHeader(500)
+		w.WriteHeader(400)
 		return
 	}
 
 	{{end}}{{end}}{{end}}{{end}}{{if $method.QueryParams}}// Query params
 	query := r.URL.Query()
-	{{range $method.QueryParams}}{{if eq .Type "string"}}{{.Name | decapitalize | pushParam}} := query.Get("{{.Name}}"){{else}}{{.Name | decapitalize | pushParam}}, err := parse{{.Type | capitalize}}Parameter(query.Get("{{.Name}}"))
+	{{range $method.QueryParams}}{{if eq .Type "string"}}{{.Name | decapitalize | pushParam}} := query.Get("{{.Name}}")
+	{{else}}{{.Name | decapitalize | pushParam}}, err := parse{{.Type | capitalize}}Parameter(query.Get("{{.Name}}"))
 	if err != nil {
-		w.WriteHeader(500)
+		w.WriteHeader(400)
 		return
 	}
 
 	{{end}}{{end}}{{end}}{{if eq $method.Type "options"}}
-	{{/* NADA for "options" method */}}{{else}}// Call implementation
+	{{/* NADA for "options" method */}}{{else}}
+	// Call implementation
 	result, err := h.api.{{$mname | capitalize | symbolize}}({{printParamStack}})
 	if err != nil {
-		w.WriteHeader(500)
+		writeErrorToHTTPResponse(err, w)
 		return
 	}
 

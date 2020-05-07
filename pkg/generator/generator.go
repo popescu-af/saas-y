@@ -83,10 +83,12 @@ func service(g Abstract, svc model.Service, outdir string) (err error) {
 	}{
 		{"api_example", dirs[4]},
 		{"api_definition", dirs[4]},
+		{"errors_example", dirs[4]},
 		{"main", dirs[1]},
 		{"env", dirs[3]},
 		{"http_router", dirs[5]},
 		{"http_wrapper", dirs[5]},
+		{"http_error_handler_example", dirs[5]},
 	}
 
 	for _, c := range components {
@@ -97,30 +99,21 @@ func service(g Abstract, svc model.Service, outdir string) (err error) {
 	}
 
 	// TODO:
-	// - proper HTTP status code returned
-	//   - input validation
-	//   - logic error -> proper HTTP code
-	//     - subclass of error -> HTTP error
-	//     - code that reflects on the subclass, extracts status code, otherwise 500
-	//
-	// - unit tests
-	//
-	// New features:
-	// - code/example for talking to well-known services/tools (redis, etc.)
-	// - linkage between saas-y generated services
 	// - k8s yaml files for all good to have stuff:
 	//   - ingress
 	//   - cert-manager
 	//   - docker-register
+	// - generate client code snippets
+	// - unit tests
+	//
+	// New features:
+	// - linkage between saas-y generated services
+	// - code/example for talking to well-known services/tools (redis, etc.)
 	// - validate method type (GET, POST, etc.), combination of params
 	// - unit tests for the generated service (everything excluding the pure logic)
 	//
-	// Nice to have:
-	// - simplify the templates
-	//   - use a template per input struct and not per output file
-	//   - generate intermediate files
-	//   - parse intermediate files to generate final files
-	// - idea: generate from docker-compose file (yaml file)?
+	// Ideas:
+	// - generate from docker-compose file (yaml file)?
 
 	return
 }
