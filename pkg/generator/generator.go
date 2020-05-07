@@ -123,7 +123,10 @@ func service(g Abstract, svc model.Service, outdir string) (err error) {
 	//   - docker-register
 	// - dockerfile and makefile are not common entities!!!
 	// - unit tests
+	//   - define the tests (see generator_go_tests.go)
 	// - generate client code snippets
+	//   - add env variable for connectivity to the dependencies
+	//   - generate wrapper over HTTP client code to be easily accessible by logic package
 	//
 	// New features:
 	// - linkage between saas-y generated services
