@@ -8,6 +8,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/popescu-af/saas-y/pkg/generator"
+	"github.com/popescu-af/saas-y/pkg/generator/common/templates/k8s"
 	gengo "github.com/popescu-af/saas-y/pkg/generator/go"
 	"github.com/popescu-af/saas-y/pkg/model"
 	saasy_testing "github.com/popescu-af/saas-y/pkg/testing"
@@ -66,4 +67,47 @@ func TestGeneratedEnv(t *testing.T) {
 
 	referenceDir := path.Join(saasy_testing.GetTestingCommonDirectory(), "..", "generator", "go", "testing", "expected")
 	saasy_testing.CheckFilesInDirsEqual(t, pOutdir, referenceDir, []string{"env.go"})
+}
+
+func TestGeneratedIngress(t *testing.T) {
+	spec := model.Spec{
+		Domain: "foo.bar",
+		Subdomains: []model.Subdomain{
+			{
+				Name: "api",
+				Paths: []model.Path{
+					{
+						Value:    "/",
+						Endpoint: "api-service",
+					},
+				},
+			},
+			{
+				Name: "baz",
+				Paths: []model.Path{
+					{
+						Value:    "/hakuna",
+						Endpoint: "baz0-service",
+					},
+					{
+						Value:    "/matata",
+						Endpoint: "baz1-service",
+					},
+				},
+			},
+		},
+	}
+
+	pOutdir, err := saasy_testing.CreateOutdir()
+	if err != nil {
+		return
+	}
+	require.NoError(t, err)
+	defer os.RemoveAll(pOutdir)
+
+	err = generator.CommonEntity(spec, k8s.Ingress, path.Join(pOutdir, "ingress.yaml"))
+	require.NoError(t, err)
+
+	referenceDir := path.Join(saasy_testing.GetTestingCommonDirectory(), "..", "generator", "testdata")
+	saasy_testing.CheckFilesInDirsEqual(t, pOutdir, referenceDir, []string{"ingress.yaml"})
 }

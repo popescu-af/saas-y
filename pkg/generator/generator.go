@@ -32,6 +32,25 @@ func Init() {
 // Do generates code and infrastructure declaration for the given Spec
 // and dumps it in the specified output directory.
 func Do(g Abstract, spec *model.Spec, outdir string) (err error) {
+	deployDir := path.Join(outdir, "deploy")
+	if err = os.MkdirAll(deployDir, 0770); err != nil {
+		return
+	}
+
+	entities := []struct {
+		template string
+		outpath  string
+	}{
+		{k8s.Ingress, path.Join(deployDir, "ingress.yaml")},
+	}
+
+	for _, e := range entities {
+		err = CommonEntity(spec, e.template, e.outpath)
+		if err != nil {
+			return
+		}
+	}
+
 	for _, svc := range spec.Services {
 		err = service(g, svc, outdir)
 		if err != nil {
@@ -66,7 +85,7 @@ func service(g Abstract, svc model.Service, outdir string) (err error) {
 	}
 
 	for _, e := range entities {
-		err = commonEntity(svc, e.template, e.outpath)
+		err = CommonEntity(svc, e.template, e.outpath)
 		if err != nil {
 			return
 		}
@@ -100,17 +119,20 @@ func service(g Abstract, svc model.Service, outdir string) (err error) {
 
 	// TODO:
 	// - k8s yaml files for all good to have stuff:
-	//   - ingress
 	//   - cert-manager
 	//   - docker-register
 	// - generate client code snippets
 	// - unit tests
+	// - dockerfile and makefile are not common entities!!!
 	//
 	// New features:
 	// - linkage between saas-y generated services
 	// - code/example for talking to well-known services/tools (redis, etc.)
 	// - validate method type (GET, POST, etc.), combination of params
 	// - unit tests for the generated service (everything excluding the pure logic)
+	//
+	// Backlog:
+	// - certmanager.k8s.io/issuer: "letsencrypt-prod" -> use some placeholder, configurable
 	//
 	// Ideas:
 	// - generate from docker-compose file (yaml file)?
@@ -158,19 +180,22 @@ func structs(g Abstract, structs []model.Struct, outdir string) (err error) {
 	return
 }
 
-func commonEntity(obj interface{}, templ string, resultPath string) (err error) {
+// CommonEntity generates an entity that is common to all languages.
+func CommonEntity(obj interface{}, templ string, resultPath string) (err error) {
 	loadedTempl := template.Must(template.New("templ").
 		Funcs(template.FuncMap{
 			"toUpper": strings.ToUpper,
+			"yamlify": func(s string) string {
+				for _, r := range []string{".", "_"} {
+					s = strings.ReplaceAll(s, r, "-")
+				}
+				return s
+			},
 		}).
 		Parse(templ))
 	err = applyObjectToTemplateAndSaveToFile(obj, loadedTempl, resultPath)
 	return
 }
-
-// TODO:
-// - ingress
-// - external services
 
 type templateFillerFunction func(interface{}, string) error
 
