@@ -23,9 +23,7 @@ func NewAPI(logger *zap.Logger) API {
 }
 
 {{range $a := .API}}// {{$a.Path}}
-{{range $mname, $method := $a.Methods}}{{if eq $method.Type "options"}}
-{{/* NADA for options method */}}
-{{else}}
+{{range $mname, $method := $a.Methods}}
 // {{$mname | capitalize}} example.
 func (a *ExampleAPI) {{$mname | capitalize}}(
 {{if $method.InputType}}*structs.{{$method.InputType | capitalize | symbolize}},
@@ -37,4 +35,4 @@ func (a *ExampleAPI) {{$mname | capitalize}}(
 	return nil, errors.New("method '{{$mname}}' not implemented")
 }
 
-{{end}}{{end}}{{end}}`
+{{end}}{{end}}`

@@ -89,15 +89,14 @@ func (h *HTTPWrapper) {{$mname | capitalize | symbolize}}(w http.ResponseWriter,
 				{{end}}
 			{{end}}
 		{{end}}
-	{{end}}{{if $method.HeaderParams}}{{if eq $method.Type "options"}}// Response headers
-	{{else}}// Header params
-	{{end}}{{range $method.HeaderParams}}{{if eq $method.Type "options"}}w.Header().Set("{{.Name}}", "{{.Value}}"){{else}}{{if eq .Type "string"}}{{.Name | decapitalize | pushParam}} := r.Header.Get("{{.Name}}"){{else}}{{.Name | decapitalize | pushParam}}, err := parse{{.Type | capitalize}}Parameter(r.Header.Get("{{.Name}}"))
+	{{end}}{{if $method.HeaderParams}}// Header params
+	{{range $method.HeaderParams}}{{if eq .Type "string"}}{{.Name | decapitalize | pushParam}} := r.Header.Get("{{.Name}}"){{else}}{{.Name | decapitalize | pushParam}}, err := parse{{.Type | capitalize}}Parameter(r.Header.Get("{{.Name}}"))
 	if err != nil {
 		w.WriteHeader(400)
 		return
 	}
 
-	{{end}}{{end}}{{end}}{{end}}{{if $method.QueryParams}}// Query params
+	{{end}}{{end}}{{end}}{{if $method.QueryParams}}// Query params
 	query := r.URL.Query()
 	{{range $method.QueryParams}}{{if eq .Type "string"}}{{.Name | decapitalize | pushParam}} := query.Get("{{.Name}}")
 	{{else}}{{.Name | decapitalize | pushParam}}, err := parse{{.Type | capitalize}}Parameter(query.Get("{{.Name}}"))
@@ -106,8 +105,7 @@ func (h *HTTPWrapper) {{$mname | capitalize | symbolize}}(w http.ResponseWriter,
 		return
 	}
 
-	{{end}}{{end}}{{end}}{{if eq $method.Type "options"}}
-	{{/* NADA for "options" method */}}{{else}}
+	{{end}}{{end}}{{end}}
 	// Call implementation
 	result, err := h.api.{{$mname | capitalize | symbolize}}({{printParamStack}})
 	if err != nil {
@@ -115,6 +113,6 @@ func (h *HTTPWrapper) {{$mname | capitalize | symbolize}}(w http.ResponseWriter,
 		return
 	}
 
-	encodeJSONResponse(result, nil, w){{end}}
+	encodeJSONResponse(result, nil, w)
 }
 {{end}}{{end}}`

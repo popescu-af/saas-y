@@ -43,30 +43,21 @@
                             "type": "post",
                             "input_type": "input_struct_name",
                             "return_type": "return_struct_name"
-                        },
-                        "method_name_2": {
-                            "type": "options",
-                            "header_params": [
-                                {
-                                    "name": "header_param_name",
-                                    "value": "value"
-                                }
-                            ]
                         }
                     }
                 },
                 {
                     "path": "/bar/{rank:uint}/{price:float}",
                     "methods": {
-                        "method_name_3": {
+                        "method_name_2": {
                             "type": "get",
                             "return_type": "return_struct_name"
                         },
-                        "method_name_4": {
+                        "method_name_3": {
                             "type": "delete",
                             "return_type": "return_struct_name"
                         },
-                        "method_name_5": {
+                        "method_name_4": {
                             "type": "patch",
                             "input_type": "input_struct_name",
                             "return_type": "return_struct_name"

@@ -42,15 +42,6 @@ var fullSpec = `
                             "type": "post",
                             "input_type": "input_struct_name",
                             "return_type": "return_struct_name"
-                        },
-                        "method_name_2": {
-                            "type": "options",
-                            "header_params": [
-                                {
-                                    "name": "header_param_name",
-                                    "value": "value"
-                                }
-                            ]
                         }
                     }
                 },

@@ -31,11 +31,10 @@ type API struct {
 type APIMethodType string
 
 const (
-	GET     APIMethodType = "get"
-	POST    APIMethodType = "post"
-	PATCH   APIMethodType = "patch"
-	DELETE  APIMethodType = "delete"
-	OPTIONS APIMethodType = "options"
+	GET    APIMethodType = "get"
+	POST   APIMethodType = "post"
+	PATCH  APIMethodType = "patch"
+	DELETE APIMethodType = "delete"
 )
 
 type Method struct {

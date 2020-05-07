@@ -21,9 +21,8 @@ import (
 // - path params generation
 // - combination of all types of params & body generation + parameter passing
 // - path generation
-// 2. options method correctly generated
-// 3. structs generation
-// 4. method type validation
+// 2. structs generation
+// 3. method type validation
 // - correct params for each method type validation
 
 func generateServiceFiles(svc model.Service, components []string) (pOutdir string, err error) {
