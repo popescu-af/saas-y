@@ -121,9 +121,9 @@ func service(g Abstract, svc model.Service, outdir string) (err error) {
 	// - k8s yaml files for all good to have stuff:
 	//   - cert-manager
 	//   - docker-register
-	// - generate client code snippets
-	// - unit tests
 	// - dockerfile and makefile are not common entities!!!
+	// - unit tests
+	// - generate client code snippets
 	//
 	// New features:
 	// - linkage between saas-y generated services
