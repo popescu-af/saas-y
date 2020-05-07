@@ -65,7 +65,7 @@ func TestGeneratedEnv(t *testing.T) {
 	require.NoError(t, err)
 	defer os.RemoveAll(pOutdir)
 
-	referenceDir := path.Join(saasy_testing.GetTestingCommonDirectory(), "..", "generator", "go", "testing", "expected")
+	referenceDir := path.Join(saasy_testing.GetTestingCommonDirectory(), "..", "generator", "testdata")
 	saasy_testing.CheckFilesInDirsEqual(t, pOutdir, referenceDir, []string{"env.go"})
 }
 
