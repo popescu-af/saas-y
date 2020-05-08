@@ -228,6 +228,7 @@ func (h *HTTPWrapper) MethodNoPathParams3(w http.ResponseWriter, r *http.Request
 func (h *HTTPWrapper) MethodNoPathParams4(w http.ResponseWriter, r *http.Request) {
 	// Query params
 	query := r.URL.Query()
+
 	queryParam0, err := parseIntParameter(query.Get("query_param_0"))
 	if err != nil {
 		w.WriteHeader(400)
@@ -263,6 +264,7 @@ func (h *HTTPWrapper) MethodNoPathParams5(w http.ResponseWriter, r *http.Request
 
 	// Query params
 	query := r.URL.Query()
+
 	queryParam0, err := parseIntParameter(query.Get("query_param_0"))
 	if err != nil {
 		w.WriteHeader(400)
@@ -289,6 +291,23 @@ func (h *HTTPWrapper) MethodNoPathParams5(w http.ResponseWriter, r *http.Request
 
 // MethodNoPathParams6 HTTP wrapper.
 func (h *HTTPWrapper) MethodNoPathParams6(w http.ResponseWriter, r *http.Request) {
+	// Query params
+	query := r.URL.Query()
+
+	queryParam0, err := parseIntParameter(query.Get("query_param_0"))
+	if err != nil {
+		w.WriteHeader(400)
+		return
+	}
+
+	queryParam1, err := parseFloatParameter(query.Get("query_param_1"))
+	if err != nil {
+		w.WriteHeader(400)
+		return
+	}
+
+	queryParam2 := query.Get("query_param_2")
+
 	// Header params
 	headerParam0 := r.Header.Get("header_param_0")
 
@@ -304,24 +323,8 @@ func (h *HTTPWrapper) MethodNoPathParams6(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	// Query params
-	query := r.URL.Query()
-	queryParam0, err := parseIntParameter(query.Get("query_param_0"))
-	if err != nil {
-		w.WriteHeader(400)
-		return
-	}
-
-	queryParam1, err := parseFloatParameter(query.Get("query_param_1"))
-	if err != nil {
-		w.WriteHeader(400)
-		return
-	}
-
-	queryParam2 := query.Get("query_param_2")
-
 	// Call implementation
-	result, err := h.api.MethodNoPathParams6(headerParam0, headerParam1, headerParam2, queryParam0, queryParam1, queryParam2)
+	result, err := h.api.MethodNoPathParams6(queryParam0, queryParam1, queryParam2, headerParam0, headerParam1, headerParam2)
 	if err != nil {
 		writeErrorToHTTPResponse(err, w)
 		return
@@ -339,6 +342,23 @@ func (h *HTTPWrapper) MethodNoPathParams7(w http.ResponseWriter, r *http.Request
 		return
 	}
 
+	// Query params
+	query := r.URL.Query()
+
+	queryParam0, err := parseIntParameter(query.Get("query_param_0"))
+	if err != nil {
+		w.WriteHeader(400)
+		return
+	}
+
+	queryParam1, err := parseFloatParameter(query.Get("query_param_1"))
+	if err != nil {
+		w.WriteHeader(400)
+		return
+	}
+
+	queryParam2 := query.Get("query_param_2")
+
 	// Header params
 	headerParam0 := r.Header.Get("header_param_0")
 
@@ -354,24 +374,8 @@ func (h *HTTPWrapper) MethodNoPathParams7(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	// Query params
-	query := r.URL.Query()
-	queryParam0, err := parseIntParameter(query.Get("query_param_0"))
-	if err != nil {
-		w.WriteHeader(400)
-		return
-	}
-
-	queryParam1, err := parseFloatParameter(query.Get("query_param_1"))
-	if err != nil {
-		w.WriteHeader(400)
-		return
-	}
-
-	queryParam2 := query.Get("query_param_2")
-
 	// Call implementation
-	result, err := h.api.MethodNoPathParams7(body, headerParam0, headerParam1, headerParam2, queryParam0, queryParam1, queryParam2)
+	result, err := h.api.MethodNoPathParams7(body, queryParam0, queryParam1, queryParam2, headerParam0, headerParam1, headerParam2)
 	if err != nil {
 		writeErrorToHTTPResponse(err, w)
 		return
@@ -531,6 +535,7 @@ func (h *HTTPWrapper) Method4(w http.ResponseWriter, r *http.Request) {
 
 	// Query params
 	query := r.URL.Query()
+
 	queryParam0, err := parseIntParameter(query.Get("query_param_0"))
 	if err != nil {
 		w.WriteHeader(400)
@@ -577,6 +582,7 @@ func (h *HTTPWrapper) Method5(w http.ResponseWriter, r *http.Request) {
 
 	// Query params
 	query := r.URL.Query()
+
 	queryParam0, err := parseIntParameter(query.Get("query_param_0"))
 	if err != nil {
 		w.WriteHeader(400)
@@ -614,6 +620,23 @@ func (h *HTTPWrapper) Method6(w http.ResponseWriter, r *http.Request) {
 
 	pathParam1 := pathParams["path_param_1"]
 
+	// Query params
+	query := r.URL.Query()
+
+	queryParam0, err := parseIntParameter(query.Get("query_param_0"))
+	if err != nil {
+		w.WriteHeader(400)
+		return
+	}
+
+	queryParam1, err := parseFloatParameter(query.Get("query_param_1"))
+	if err != nil {
+		w.WriteHeader(400)
+		return
+	}
+
+	queryParam2 := query.Get("query_param_2")
+
 	// Header params
 	headerParam0 := r.Header.Get("header_param_0")
 
@@ -629,24 +652,8 @@ func (h *HTTPWrapper) Method6(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Query params
-	query := r.URL.Query()
-	queryParam0, err := parseIntParameter(query.Get("query_param_0"))
-	if err != nil {
-		w.WriteHeader(400)
-		return
-	}
-
-	queryParam1, err := parseFloatParameter(query.Get("query_param_1"))
-	if err != nil {
-		w.WriteHeader(400)
-		return
-	}
-
-	queryParam2 := query.Get("query_param_2")
-
 	// Call implementation
-	result, err := h.api.Method6(pathParam0, pathParam1, headerParam0, headerParam1, headerParam2, queryParam0, queryParam1, queryParam2)
+	result, err := h.api.Method6(pathParam0, pathParam1, queryParam0, queryParam1, queryParam2, headerParam0, headerParam1, headerParam2)
 	if err != nil {
 		writeErrorToHTTPResponse(err, w)
 		return
@@ -675,6 +682,23 @@ func (h *HTTPWrapper) Method7(w http.ResponseWriter, r *http.Request) {
 
 	pathParam1 := pathParams["path_param_1"]
 
+	// Query params
+	query := r.URL.Query()
+
+	queryParam0, err := parseIntParameter(query.Get("query_param_0"))
+	if err != nil {
+		w.WriteHeader(400)
+		return
+	}
+
+	queryParam1, err := parseFloatParameter(query.Get("query_param_1"))
+	if err != nil {
+		w.WriteHeader(400)
+		return
+	}
+
+	queryParam2 := query.Get("query_param_2")
+
 	// Header params
 	headerParam0 := r.Header.Get("header_param_0")
 
@@ -690,24 +714,8 @@ func (h *HTTPWrapper) Method7(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Query params
-	query := r.URL.Query()
-	queryParam0, err := parseIntParameter(query.Get("query_param_0"))
-	if err != nil {
-		w.WriteHeader(400)
-		return
-	}
-
-	queryParam1, err := parseFloatParameter(query.Get("query_param_1"))
-	if err != nil {
-		w.WriteHeader(400)
-		return
-	}
-
-	queryParam2 := query.Get("query_param_2")
-
 	// Call implementation
-	result, err := h.api.Method7(body, pathParam0, pathParam1, headerParam0, headerParam1, headerParam2, queryParam0, queryParam1, queryParam2)
+	result, err := h.api.Method7(body, pathParam0, pathParam1, queryParam0, queryParam1, queryParam2, headerParam0, headerParam1, headerParam2)
 	if err != nil {
 		writeErrorToHTTPResponse(err, w)
 		return

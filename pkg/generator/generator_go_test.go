@@ -11,7 +11,7 @@ import (
 	"github.com/popescu-af/saas-y/pkg/generator/common/templates/k8s"
 	gengo "github.com/popescu-af/saas-y/pkg/generator/go"
 	"github.com/popescu-af/saas-y/pkg/model"
-	saasy_testing "github.com/popescu-af/saas-y/pkg/testing"
+	saasytesting "github.com/popescu-af/saas-y/pkg/testing"
 )
 
 // 1. structs generation
@@ -19,7 +19,7 @@ import (
 // - correct params for each method type validation
 
 func generateServiceFiles(svc model.Service) (pOutdir string, err error) {
-	pOutdir, err = saasy_testing.CreateOutdir()
+	pOutdir, err = saasytesting.CreateOutdir()
 	if err != nil {
 		return
 	}
@@ -52,8 +52,8 @@ func TestGeneratedEnv(t *testing.T) {
 	defer os.RemoveAll(pOutdir)
 
 	pOutdir = path.Join(pOutdir, "services", svc.Name)
-	referenceDir := path.Join(saasy_testing.GetTestingCommonDirectory(), "..", "generator", "testdata", "generated_env")
-	saasy_testing.CheckFilesInDirsEqual(t, path.Join(pOutdir, "pkg", "config"), referenceDir, []string{"env.go"})
+	referenceDir := path.Join(saasytesting.GetTestingCommonDirectory(), "..", "generator", "testdata", "generated_env")
+	saasytesting.CheckFilesInDirsEqual(t, path.Join(pOutdir, "pkg", "config"), referenceDir, []string{"env.go"})
 }
 
 func TestGeneratedIngress(t *testing.T) {
@@ -85,7 +85,7 @@ func TestGeneratedIngress(t *testing.T) {
 		},
 	}
 
-	pOutdir, err := saasy_testing.CreateOutdir()
+	pOutdir, err := saasytesting.CreateOutdir()
 	if err != nil {
 		return
 	}
@@ -95,8 +95,8 @@ func TestGeneratedIngress(t *testing.T) {
 	err = generator.CommonEntity(spec, k8s.Ingress, path.Join(pOutdir, "ingress.yaml"))
 	require.NoError(t, err)
 
-	referenceDir := path.Join(saasy_testing.GetTestingCommonDirectory(), "..", "generator", "testdata")
-	saasy_testing.CheckFilesInDirsEqual(t, pOutdir, referenceDir, []string{"ingress.yaml"})
+	referenceDir := path.Join(saasytesting.GetTestingCommonDirectory(), "..", "generator", "testdata")
+	saasytesting.CheckFilesInDirsEqual(t, pOutdir, referenceDir, []string{"ingress.yaml"})
 }
 
 func TestGeneratedMethods(t *testing.T) {
@@ -174,7 +174,7 @@ func TestGeneratedMethods(t *testing.T) {
 	defer os.RemoveAll(pOutdir)
 
 	pOutdir = path.Join(pOutdir, "services", svc.Name)
-	referenceDir := path.Join(saasy_testing.GetTestingCommonDirectory(), "..", "generator", "testdata", "generated_methods")
-	saasy_testing.CheckFilesInDirsEqual(t, path.Join(pOutdir, "pkg", "logic"), referenceDir, []string{"api_definition.go", "api_example.go"})
-	saasy_testing.CheckFilesInDirsEqual(t, path.Join(pOutdir, "pkg", "service"), referenceDir, []string{"http_wrapper.go"})
+	referenceDir := path.Join(saasytesting.GetTestingCommonDirectory(), "..", "generator", "testdata", "generated_methods")
+	saasytesting.CheckFilesInDirsEqual(t, path.Join(pOutdir, "pkg", "logic"), referenceDir, []string{"api_definition.go", "api_example.go"})
+	saasytesting.CheckFilesInDirsEqual(t, path.Join(pOutdir, "pkg", "service"), referenceDir, []string{"http_wrapper.go"})
 }

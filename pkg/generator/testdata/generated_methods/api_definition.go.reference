@@ -38,22 +38,22 @@ type API interface {
 	) (*structs.ReturnType, error)
 
 	MethodNoPathParams6(
-		string,
-		float64,
-		int64,
 		int64,
 		float64,
 		string,
+		string,
+		float64,
+		int64,
 	) (*structs.ReturnType, error)
 
 	MethodNoPathParams7(
 		*structs.BodyType,
-		string,
-		float64,
-		int64,
 		int64,
 		float64,
 		string,
+		string,
+		float64,
+		int64,
 	) (*structs.ReturnType, error)
 
 	// /method/{path_param_0:int}/{path_param_1:string}
@@ -105,23 +105,23 @@ type API interface {
 	Method6(
 		int64,
 		string,
-		string,
-		float64,
-		int64,
 		int64,
 		float64,
 		string,
+		string,
+		float64,
+		int64,
 	) (*structs.ReturnType, error)
 
 	Method7(
 		*structs.BodyType,
 		int64,
 		string,
-		string,
-		float64,
-		int64,
 		int64,
 		float64,
 		string,
+		string,
+		float64,
+		int64,
 	) (*structs.ReturnType, error)
 }

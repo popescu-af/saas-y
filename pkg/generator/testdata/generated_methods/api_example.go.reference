@@ -79,12 +79,12 @@ func (a *ExampleAPI) MethodNoPathParams5(
 
 // MethodNoPathParams6 example.
 func (a *ExampleAPI) MethodNoPathParams6(
-	string,
-	float64,
-	int64,
 	int64,
 	float64,
 	string,
+	string,
+	float64,
+	int64,
 ) (*structs.ReturnType, error) {
 	a.logger.Info("called method_no_path_params_6")
 	return nil, errors.New("method 'method_no_path_params_6' not implemented")
@@ -93,12 +93,12 @@ func (a *ExampleAPI) MethodNoPathParams6(
 // MethodNoPathParams7 example.
 func (a *ExampleAPI) MethodNoPathParams7(
 	*structs.BodyType,
-	string,
-	float64,
-	int64,
 	int64,
 	float64,
 	string,
+	string,
+	float64,
+	int64,
 ) (*structs.ReturnType, error) {
 	a.logger.Info("called method_no_path_params_7")
 	return nil, errors.New("method 'method_no_path_params_7' not implemented")
@@ -179,12 +179,12 @@ func (a *ExampleAPI) Method5(
 func (a *ExampleAPI) Method6(
 	int64,
 	string,
-	string,
-	float64,
-	int64,
 	int64,
 	float64,
 	string,
+	string,
+	float64,
+	int64,
 ) (*structs.ReturnType, error) {
 	a.logger.Info("called method_6")
 	return nil, errors.New("method 'method_6' not implemented")
@@ -195,12 +195,12 @@ func (a *ExampleAPI) Method7(
 	*structs.BodyType,
 	int64,
 	string,
-	string,
-	float64,
-	int64,
 	int64,
 	float64,
 	string,
+	string,
+	float64,
+	int64,
 ) (*structs.ReturnType, error) {
 	a.logger.Info("called method_7")
 	return nil, errors.New("method 'method_7' not implemented")

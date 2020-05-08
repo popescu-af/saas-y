@@ -1,4 +1,4 @@
-package saasy_testing
+package saasytesting
 
 import (
 	"io/ioutil"
@@ -45,7 +45,7 @@ func CheckFilesInDirsEqual(t *testing.T, outDir string, referenceDir string, fil
 	for _, fname := range filenames {
 		bActual, err := ioutil.ReadFile(path.Join(outDir, fname))
 		require.NoError(t, err)
-		bExpected, err := ioutil.ReadFile(path.Join(referenceDir, fname))
+		bExpected, err := ioutil.ReadFile(path.Join(referenceDir, fname+".reference"))
 		require.NoError(t, err)
 		require.Equal(t, bExpected, bActual)
 	}

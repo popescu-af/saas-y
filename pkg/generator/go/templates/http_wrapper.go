@@ -90,20 +90,21 @@ func (h *HTTPWrapper) {{$mname | capitalize | symbolize}}(w http.ResponseWriter,
 				{{end}}
 			{{end}}
 		{{end}}
-	{{end}}{{if $method.HeaderParams}}// Header params
-	{{range $method.HeaderParams}}{{if eq .Type "string"}}{{.Name | decapitalize | pushParam}} := r.Header.Get("{{.Name}}")
+	{{end}}{{if $method.QueryParams}}// Query params
+	query := r.URL.Query()
 
-	{{else}}{{.Name | decapitalize | pushParam}}, err := parse{{.Type | capitalize}}Parameter(r.Header.Get("{{.Name}}"))
+	{{range $method.QueryParams}}{{if eq .Type "string"}}{{.Name | decapitalize | pushParam}} := query.Get("{{.Name}}")
+
+	{{else}}{{.Name | decapitalize | pushParam}}, err := parse{{.Type | capitalize}}Parameter(query.Get("{{.Name}}"))
 	if err != nil {
 		w.WriteHeader(400)
 		return
 	}
 
-	{{end}}{{end}}{{end}}{{if $method.QueryParams}}// Query params
-	query := r.URL.Query()
-	{{range $method.QueryParams}}{{if eq .Type "string"}}{{.Name | decapitalize | pushParam}} := query.Get("{{.Name}}")
+	{{end}}{{end}}{{end}}{{if $method.HeaderParams}}// Header params
+	{{range $method.HeaderParams}}{{if eq .Type "string"}}{{.Name | decapitalize | pushParam}} := r.Header.Get("{{.Name}}")
 
-	{{else}}{{.Name | decapitalize | pushParam}}, err := parse{{.Type | capitalize}}Parameter(query.Get("{{.Name}}"))
+	{{else}}{{.Name | decapitalize | pushParam}}, err := parse{{.Type | capitalize}}Parameter(r.Header.Get("{{.Name}}"))
 	if err != nil {
 		w.WriteHeader(400)
 		return
