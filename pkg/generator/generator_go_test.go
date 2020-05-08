@@ -14,31 +14,17 @@ import (
 	saasy_testing "github.com/popescu-af/saas-y/pkg/testing"
 )
 
-// 1. definition, example, wrapper tests
-// (from same svc specs, three content equality expectations, one for each file)
-// - body(input) generation
-// - header params generation
-// - query params generation
-// - path params generation
-// - combination of all types of params & body generation + parameter passing
-// - path generation
-// 2. structs generation
-// 3. method type validation
+// 1. structs generation
+// 2. method type validation
 // - correct params for each method type validation
 
-func generateServiceFiles(svc model.Service, components []string) (pOutdir string, err error) {
+func generateServiceFiles(svc model.Service) (pOutdir string, err error) {
 	pOutdir, err = saasy_testing.CreateOutdir()
 	if err != nil {
 		return
 	}
 
-	g := &gengo.Generator{}
-	for _, c := range components {
-		if err = generator.ServiceComponent(g, svc, c, pOutdir); err != nil {
-			os.RemoveAll(pOutdir)
-			return
-		}
-	}
+	err = generator.Service(&gengo.Generator{}, svc, pOutdir)
 	return
 }
 
@@ -61,12 +47,13 @@ func TestGeneratedEnv(t *testing.T) {
 
 	generator.Init()
 
-	pOutdir, err := generateServiceFiles(svc, []string{"env"})
+	pOutdir, err := generateServiceFiles(svc)
 	require.NoError(t, err)
 	defer os.RemoveAll(pOutdir)
 
-	referenceDir := path.Join(saasy_testing.GetTestingCommonDirectory(), "..", "generator", "testdata")
-	saasy_testing.CheckFilesInDirsEqual(t, pOutdir, referenceDir, []string{"env.go"})
+	pOutdir = path.Join(pOutdir, "services", svc.Name)
+	referenceDir := path.Join(saasy_testing.GetTestingCommonDirectory(), "..", "generator", "testdata", "generated_env")
+	saasy_testing.CheckFilesInDirsEqual(t, path.Join(pOutdir, "pkg", "config"), referenceDir, []string{"env.go"})
 }
 
 func TestGeneratedIngress(t *testing.T) {
@@ -110,4 +97,84 @@ func TestGeneratedIngress(t *testing.T) {
 
 	referenceDir := path.Join(saasy_testing.GetTestingCommonDirectory(), "..", "generator", "testdata")
 	saasy_testing.CheckFilesInDirsEqual(t, pOutdir, referenceDir, []string{"ingress.yaml"})
+}
+
+func TestGeneratedMethods(t *testing.T) {
+	qParams := []model.Variable{
+		{Name: "query_param_0", Type: "int"},
+		{Name: "query_param_1", Type: "float"},
+		{Name: "query_param_2", Type: "string"},
+	}
+
+	hParams := []model.Variable{
+		{Name: "header_param_0", Type: "string"},
+		{Name: "header_param_1", Type: "float"},
+		{Name: "header_param_2", Type: "int"},
+	}
+
+	bType := "body_type"
+
+	svc := model.Service{
+		ServiceCommon: model.ServiceCommon{
+			Name: "foo-service",
+			Port: "80",
+		},
+		API: []model.API{
+			{
+				Path: "/method_no_path_params",
+				Methods: map[string]model.Method{
+					"method_no_path_params_0": {Type: model.POST, QueryParams: nil, HeaderParams: nil, InputType: "", ReturnType: "return_type"},
+					"method_no_path_params_1": {Type: model.POST, QueryParams: nil, HeaderParams: nil, InputType: bType, ReturnType: "return_type"},
+					"method_no_path_params_2": {Type: model.POST, QueryParams: nil, HeaderParams: hParams, InputType: "", ReturnType: "return_type"},
+					"method_no_path_params_3": {Type: model.POST, QueryParams: nil, HeaderParams: hParams, InputType: bType, ReturnType: "return_type"},
+					"method_no_path_params_4": {Type: model.POST, QueryParams: qParams, HeaderParams: nil, InputType: "", ReturnType: "return_type"},
+					"method_no_path_params_5": {Type: model.POST, QueryParams: qParams, HeaderParams: nil, InputType: bType, ReturnType: "return_type"},
+					"method_no_path_params_6": {Type: model.POST, QueryParams: qParams, HeaderParams: hParams, InputType: "", ReturnType: "return_type"},
+					"method_no_path_params_7": {Type: model.POST, QueryParams: qParams, HeaderParams: hParams, InputType: bType, ReturnType: "return_type"},
+				},
+			},
+			{
+				Path: "/method/{path_param_0:int}/{path_param_1:string}",
+				Methods: map[string]model.Method{
+					"method_0": {Type: model.POST, QueryParams: nil, HeaderParams: nil, InputType: "", ReturnType: "return_type"},
+					"method_1": {Type: model.POST, QueryParams: nil, HeaderParams: nil, InputType: bType, ReturnType: "return_type"},
+					"method_2": {Type: model.POST, QueryParams: nil, HeaderParams: hParams, InputType: "", ReturnType: "return_type"},
+					"method_3": {Type: model.POST, QueryParams: nil, HeaderParams: hParams, InputType: bType, ReturnType: "return_type"},
+					"method_4": {Type: model.POST, QueryParams: qParams, HeaderParams: nil, InputType: "", ReturnType: "return_type"},
+					"method_5": {Type: model.POST, QueryParams: qParams, HeaderParams: nil, InputType: bType, ReturnType: "return_type"},
+					"method_6": {Type: model.POST, QueryParams: qParams, HeaderParams: hParams, InputType: "", ReturnType: "return_type"},
+					"method_7": {Type: model.POST, QueryParams: qParams, HeaderParams: hParams, InputType: bType, ReturnType: "return_type"},
+				},
+			},
+		},
+		Structs: []model.Struct{
+			{
+				Name: "body_type",
+				Fields: []model.Variable{
+					{Name: "variable_0", Type: "int"},
+					{Name: "variable_1", Type: "string"},
+					{Name: "variable_2", Type: "float"},
+				},
+			},
+			{
+				Name: "return_type",
+				Fields: []model.Variable{
+					{Name: "return_variable_0", Type: "string"},
+					{Name: "return_variable_1", Type: "string"},
+					{Name: "return_variable_2", Type: "float"},
+				},
+			},
+		},
+	}
+
+	generator.Init()
+
+	pOutdir, err := generateServiceFiles(svc)
+	require.NoError(t, err)
+	defer os.RemoveAll(pOutdir)
+
+	pOutdir = path.Join(pOutdir, "services", svc.Name)
+	referenceDir := path.Join(saasy_testing.GetTestingCommonDirectory(), "..", "generator", "testdata", "generated_methods")
+	saasy_testing.CheckFilesInDirsEqual(t, path.Join(pOutdir, "pkg", "logic"), referenceDir, []string{"api_definition.go", "api_example.go"})
+	saasy_testing.CheckFilesInDirsEqual(t, path.Join(pOutdir, "pkg", "service"), referenceDir, []string{"http_wrapper.go"})
 }

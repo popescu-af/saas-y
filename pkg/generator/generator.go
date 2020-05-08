@@ -55,7 +55,7 @@ func Do(g Abstract, spec *model.Spec, outdir string) (err error) {
 	}
 
 	for _, svc := range spec.Services {
-		err = service(g, svc, outdir)
+		err = Service(g, svc, outdir)
 		if err != nil {
 			return
 		}
@@ -65,7 +65,8 @@ func Do(g Abstract, spec *model.Spec, outdir string) (err error) {
 	return
 }
 
-func service(g Abstract, svc model.Service, outdir string) (err error) {
+// Service generates all files for a service entity.
+func Service(g Abstract, svc model.Service, outdir string) (err error) {
 	basePath := path.Join(outdir, "services", svc.Name)
 
 	dirs, err := serviceDirs(g, basePath)
@@ -114,7 +115,7 @@ func service(g Abstract, svc model.Service, outdir string) (err error) {
 	}
 
 	for _, c := range components {
-		err = ServiceComponent(g, svc, c.template, c.outdir)
+		err = serviceComponent(g, svc, c.template, c.outdir)
 		if err != nil {
 			return
 		}
@@ -123,6 +124,8 @@ func service(g Abstract, svc model.Service, outdir string) (err error) {
 	// TODO:
 	// - TDD
 	//   - define the tests (see generator_go_tests.go)
+	// - support [] of data (POD or struct) as structure member attribute
+	// - support null return from API
 	// - generate client code snippets
 	//   - add env variable for connectivity to the dependencies
 	//   - generate wrapper over HTTP client code to be easily accessible by logic package
@@ -161,8 +164,7 @@ func serviceDirs(g Abstract, basePath string) (dirs []string, err error) {
 	return
 }
 
-// ServiceComponent generates a service component by its given name.
-func ServiceComponent(g Abstract, svc model.Service, componentName, outdir string) (err error) {
+func serviceComponent(g Abstract, svc model.Service, componentName, outdir string) (err error) {
 	filler := templateFiller(g.GetTemplate(componentName), g.CodeFormatter)
 	fPath := path.Join(outdir, componentName+g.FileExtension())
 	err = filler(svc, fPath)

@@ -1,0 +1,717 @@
+package service
+
+import (
+	"encoding/json"
+	"net/http"
+	"strconv"
+	"strings"
+
+	"github.com/gorilla/mux"
+
+	"foo-service/pkg/logic"
+	"foo-service/pkg/structs"
+)
+
+// HTTPWrapper decorates the APIs with from/to HTTP code.
+type HTTPWrapper struct {
+	api logic.API
+}
+
+// NewHTTPWrapper creates an HTTP wrapper for the service API.
+func NewHTTPWrapper(api logic.API) *HTTPWrapper {
+	return &HTTPWrapper{api: api}
+}
+
+func encodeJSONResponse(i interface{}, status *int, w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	if status != nil {
+		w.WriteHeader(*status)
+	} else {
+		w.WriteHeader(http.StatusOK)
+	}
+
+	return json.NewEncoder(w).Encode(i)
+}
+
+func parseIntParameter(param string) (int64, error) {
+	return strconv.ParseInt(param, 10, 64)
+}
+
+func parseUintParameter(param string) (uint64, error) {
+	return strconv.ParseUint(param, 10, 64)
+}
+
+func parseFloatParameter(param string) (float64, error) {
+	return strconv.ParseFloat(param, 64)
+}
+
+// Paths lists the paths that the API serves.
+func (h *HTTPWrapper) Paths() Paths {
+	return Paths{
+		{
+			strings.ToUpper("post"),
+			"/method_no_path_params",
+			h.MethodNoPathParams0,
+		},
+		{
+			strings.ToUpper("post"),
+			"/method_no_path_params",
+			h.MethodNoPathParams1,
+		},
+		{
+			strings.ToUpper("post"),
+			"/method_no_path_params",
+			h.MethodNoPathParams2,
+		},
+		{
+			strings.ToUpper("post"),
+			"/method_no_path_params",
+			h.MethodNoPathParams3,
+		},
+		{
+			strings.ToUpper("post"),
+			"/method_no_path_params",
+			h.MethodNoPathParams4,
+		},
+		{
+			strings.ToUpper("post"),
+			"/method_no_path_params",
+			h.MethodNoPathParams5,
+		},
+		{
+			strings.ToUpper("post"),
+			"/method_no_path_params",
+			h.MethodNoPathParams6,
+		},
+		{
+			strings.ToUpper("post"),
+			"/method_no_path_params",
+			h.MethodNoPathParams7,
+		},
+		{
+			strings.ToUpper("post"),
+			"/method/{pathParam0}/{pathParam1}",
+			h.Method0,
+		},
+		{
+			strings.ToUpper("post"),
+			"/method/{pathParam0}/{pathParam1}",
+			h.Method1,
+		},
+		{
+			strings.ToUpper("post"),
+			"/method/{pathParam0}/{pathParam1}",
+			h.Method2,
+		},
+		{
+			strings.ToUpper("post"),
+			"/method/{pathParam0}/{pathParam1}",
+			h.Method3,
+		},
+		{
+			strings.ToUpper("post"),
+			"/method/{pathParam0}/{pathParam1}",
+			h.Method4,
+		},
+		{
+			strings.ToUpper("post"),
+			"/method/{pathParam0}/{pathParam1}",
+			h.Method5,
+		},
+		{
+			strings.ToUpper("post"),
+			"/method/{pathParam0}/{pathParam1}",
+			h.Method6,
+		},
+		{
+			strings.ToUpper("post"),
+			"/method/{pathParam0}/{pathParam1}",
+			h.Method7,
+		},
+	}
+}
+
+// MethodNoPathParams0 HTTP wrapper.
+func (h *HTTPWrapper) MethodNoPathParams0(w http.ResponseWriter, r *http.Request) {
+
+	// Call implementation
+	result, err := h.api.MethodNoPathParams0()
+	if err != nil {
+		writeErrorToHTTPResponse(err, w)
+		return
+	}
+
+	encodeJSONResponse(result, nil, w)
+}
+
+// MethodNoPathParams1 HTTP wrapper.
+func (h *HTTPWrapper) MethodNoPathParams1(w http.ResponseWriter, r *http.Request) {
+	// Body
+	body := &structs.BodyType{}
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		w.WriteHeader(400)
+		return
+	}
+
+	// Call implementation
+	result, err := h.api.MethodNoPathParams1(body)
+	if err != nil {
+		writeErrorToHTTPResponse(err, w)
+		return
+	}
+
+	encodeJSONResponse(result, nil, w)
+}
+
+// MethodNoPathParams2 HTTP wrapper.
+func (h *HTTPWrapper) MethodNoPathParams2(w http.ResponseWriter, r *http.Request) {
+	// Header params
+	headerParam0 := r.Header.Get("header_param_0")
+
+	headerParam1, err := parseFloatParameter(r.Header.Get("header_param_1"))
+	if err != nil {
+		w.WriteHeader(400)
+		return
+	}
+
+	headerParam2, err := parseIntParameter(r.Header.Get("header_param_2"))
+	if err != nil {
+		w.WriteHeader(400)
+		return
+	}
+
+	// Call implementation
+	result, err := h.api.MethodNoPathParams2(headerParam0, headerParam1, headerParam2)
+	if err != nil {
+		writeErrorToHTTPResponse(err, w)
+		return
+	}
+
+	encodeJSONResponse(result, nil, w)
+}
+
+// MethodNoPathParams3 HTTP wrapper.
+func (h *HTTPWrapper) MethodNoPathParams3(w http.ResponseWriter, r *http.Request) {
+	// Body
+	body := &structs.BodyType{}
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		w.WriteHeader(400)
+		return
+	}
+
+	// Header params
+	headerParam0 := r.Header.Get("header_param_0")
+
+	headerParam1, err := parseFloatParameter(r.Header.Get("header_param_1"))
+	if err != nil {
+		w.WriteHeader(400)
+		return
+	}
+
+	headerParam2, err := parseIntParameter(r.Header.Get("header_param_2"))
+	if err != nil {
+		w.WriteHeader(400)
+		return
+	}
+
+	// Call implementation
+	result, err := h.api.MethodNoPathParams3(body, headerParam0, headerParam1, headerParam2)
+	if err != nil {
+		writeErrorToHTTPResponse(err, w)
+		return
+	}
+
+	encodeJSONResponse(result, nil, w)
+}
+
+// MethodNoPathParams4 HTTP wrapper.
+func (h *HTTPWrapper) MethodNoPathParams4(w http.ResponseWriter, r *http.Request) {
+	// Query params
+	query := r.URL.Query()
+	queryParam0, err := parseIntParameter(query.Get("query_param_0"))
+	if err != nil {
+		w.WriteHeader(400)
+		return
+	}
+
+	queryParam1, err := parseFloatParameter(query.Get("query_param_1"))
+	if err != nil {
+		w.WriteHeader(400)
+		return
+	}
+
+	queryParam2 := query.Get("query_param_2")
+
+	// Call implementation
+	result, err := h.api.MethodNoPathParams4(queryParam0, queryParam1, queryParam2)
+	if err != nil {
+		writeErrorToHTTPResponse(err, w)
+		return
+	}
+
+	encodeJSONResponse(result, nil, w)
+}
+
+// MethodNoPathParams5 HTTP wrapper.
+func (h *HTTPWrapper) MethodNoPathParams5(w http.ResponseWriter, r *http.Request) {
+	// Body
+	body := &structs.BodyType{}
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		w.WriteHeader(400)
+		return
+	}
+
+	// Query params
+	query := r.URL.Query()
+	queryParam0, err := parseIntParameter(query.Get("query_param_0"))
+	if err != nil {
+		w.WriteHeader(400)
+		return
+	}
+
+	queryParam1, err := parseFloatParameter(query.Get("query_param_1"))
+	if err != nil {
+		w.WriteHeader(400)
+		return
+	}
+
+	queryParam2 := query.Get("query_param_2")
+
+	// Call implementation
+	result, err := h.api.MethodNoPathParams5(body, queryParam0, queryParam1, queryParam2)
+	if err != nil {
+		writeErrorToHTTPResponse(err, w)
+		return
+	}
+
+	encodeJSONResponse(result, nil, w)
+}
+
+// MethodNoPathParams6 HTTP wrapper.
+func (h *HTTPWrapper) MethodNoPathParams6(w http.ResponseWriter, r *http.Request) {
+	// Header params
+	headerParam0 := r.Header.Get("header_param_0")
+
+	headerParam1, err := parseFloatParameter(r.Header.Get("header_param_1"))
+	if err != nil {
+		w.WriteHeader(400)
+		return
+	}
+
+	headerParam2, err := parseIntParameter(r.Header.Get("header_param_2"))
+	if err != nil {
+		w.WriteHeader(400)
+		return
+	}
+
+	// Query params
+	query := r.URL.Query()
+	queryParam0, err := parseIntParameter(query.Get("query_param_0"))
+	if err != nil {
+		w.WriteHeader(400)
+		return
+	}
+
+	queryParam1, err := parseFloatParameter(query.Get("query_param_1"))
+	if err != nil {
+		w.WriteHeader(400)
+		return
+	}
+
+	queryParam2 := query.Get("query_param_2")
+
+	// Call implementation
+	result, err := h.api.MethodNoPathParams6(headerParam0, headerParam1, headerParam2, queryParam0, queryParam1, queryParam2)
+	if err != nil {
+		writeErrorToHTTPResponse(err, w)
+		return
+	}
+
+	encodeJSONResponse(result, nil, w)
+}
+
+// MethodNoPathParams7 HTTP wrapper.
+func (h *HTTPWrapper) MethodNoPathParams7(w http.ResponseWriter, r *http.Request) {
+	// Body
+	body := &structs.BodyType{}
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		w.WriteHeader(400)
+		return
+	}
+
+	// Header params
+	headerParam0 := r.Header.Get("header_param_0")
+
+	headerParam1, err := parseFloatParameter(r.Header.Get("header_param_1"))
+	if err != nil {
+		w.WriteHeader(400)
+		return
+	}
+
+	headerParam2, err := parseIntParameter(r.Header.Get("header_param_2"))
+	if err != nil {
+		w.WriteHeader(400)
+		return
+	}
+
+	// Query params
+	query := r.URL.Query()
+	queryParam0, err := parseIntParameter(query.Get("query_param_0"))
+	if err != nil {
+		w.WriteHeader(400)
+		return
+	}
+
+	queryParam1, err := parseFloatParameter(query.Get("query_param_1"))
+	if err != nil {
+		w.WriteHeader(400)
+		return
+	}
+
+	queryParam2 := query.Get("query_param_2")
+
+	// Call implementation
+	result, err := h.api.MethodNoPathParams7(body, headerParam0, headerParam1, headerParam2, queryParam0, queryParam1, queryParam2)
+	if err != nil {
+		writeErrorToHTTPResponse(err, w)
+		return
+	}
+
+	encodeJSONResponse(result, nil, w)
+}
+
+// Method0 HTTP wrapper.
+func (h *HTTPWrapper) Method0(w http.ResponseWriter, r *http.Request) {
+	// Path params
+	pathParams := mux.Vars(r)
+
+	pathParam0, err := parseIntParameter(pathParams["path_param_0"])
+	if err != nil {
+		w.WriteHeader(400)
+		return
+	}
+
+	pathParam1 := pathParams["path_param_1"]
+
+	// Call implementation
+	result, err := h.api.Method0(pathParam0, pathParam1)
+	if err != nil {
+		writeErrorToHTTPResponse(err, w)
+		return
+	}
+
+	encodeJSONResponse(result, nil, w)
+}
+
+// Method1 HTTP wrapper.
+func (h *HTTPWrapper) Method1(w http.ResponseWriter, r *http.Request) {
+	// Body
+	body := &structs.BodyType{}
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		w.WriteHeader(400)
+		return
+	}
+
+	// Path params
+	pathParams := mux.Vars(r)
+
+	pathParam0, err := parseIntParameter(pathParams["path_param_0"])
+	if err != nil {
+		w.WriteHeader(400)
+		return
+	}
+
+	pathParam1 := pathParams["path_param_1"]
+
+	// Call implementation
+	result, err := h.api.Method1(body, pathParam0, pathParam1)
+	if err != nil {
+		writeErrorToHTTPResponse(err, w)
+		return
+	}
+
+	encodeJSONResponse(result, nil, w)
+}
+
+// Method2 HTTP wrapper.
+func (h *HTTPWrapper) Method2(w http.ResponseWriter, r *http.Request) {
+	// Path params
+	pathParams := mux.Vars(r)
+
+	pathParam0, err := parseIntParameter(pathParams["path_param_0"])
+	if err != nil {
+		w.WriteHeader(400)
+		return
+	}
+
+	pathParam1 := pathParams["path_param_1"]
+
+	// Header params
+	headerParam0 := r.Header.Get("header_param_0")
+
+	headerParam1, err := parseFloatParameter(r.Header.Get("header_param_1"))
+	if err != nil {
+		w.WriteHeader(400)
+		return
+	}
+
+	headerParam2, err := parseIntParameter(r.Header.Get("header_param_2"))
+	if err != nil {
+		w.WriteHeader(400)
+		return
+	}
+
+	// Call implementation
+	result, err := h.api.Method2(pathParam0, pathParam1, headerParam0, headerParam1, headerParam2)
+	if err != nil {
+		writeErrorToHTTPResponse(err, w)
+		return
+	}
+
+	encodeJSONResponse(result, nil, w)
+}
+
+// Method3 HTTP wrapper.
+func (h *HTTPWrapper) Method3(w http.ResponseWriter, r *http.Request) {
+	// Body
+	body := &structs.BodyType{}
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		w.WriteHeader(400)
+		return
+	}
+
+	// Path params
+	pathParams := mux.Vars(r)
+
+	pathParam0, err := parseIntParameter(pathParams["path_param_0"])
+	if err != nil {
+		w.WriteHeader(400)
+		return
+	}
+
+	pathParam1 := pathParams["path_param_1"]
+
+	// Header params
+	headerParam0 := r.Header.Get("header_param_0")
+
+	headerParam1, err := parseFloatParameter(r.Header.Get("header_param_1"))
+	if err != nil {
+		w.WriteHeader(400)
+		return
+	}
+
+	headerParam2, err := parseIntParameter(r.Header.Get("header_param_2"))
+	if err != nil {
+		w.WriteHeader(400)
+		return
+	}
+
+	// Call implementation
+	result, err := h.api.Method3(body, pathParam0, pathParam1, headerParam0, headerParam1, headerParam2)
+	if err != nil {
+		writeErrorToHTTPResponse(err, w)
+		return
+	}
+
+	encodeJSONResponse(result, nil, w)
+}
+
+// Method4 HTTP wrapper.
+func (h *HTTPWrapper) Method4(w http.ResponseWriter, r *http.Request) {
+	// Path params
+	pathParams := mux.Vars(r)
+
+	pathParam0, err := parseIntParameter(pathParams["path_param_0"])
+	if err != nil {
+		w.WriteHeader(400)
+		return
+	}
+
+	pathParam1 := pathParams["path_param_1"]
+
+	// Query params
+	query := r.URL.Query()
+	queryParam0, err := parseIntParameter(query.Get("query_param_0"))
+	if err != nil {
+		w.WriteHeader(400)
+		return
+	}
+
+	queryParam1, err := parseFloatParameter(query.Get("query_param_1"))
+	if err != nil {
+		w.WriteHeader(400)
+		return
+	}
+
+	queryParam2 := query.Get("query_param_2")
+
+	// Call implementation
+	result, err := h.api.Method4(pathParam0, pathParam1, queryParam0, queryParam1, queryParam2)
+	if err != nil {
+		writeErrorToHTTPResponse(err, w)
+		return
+	}
+
+	encodeJSONResponse(result, nil, w)
+}
+
+// Method5 HTTP wrapper.
+func (h *HTTPWrapper) Method5(w http.ResponseWriter, r *http.Request) {
+	// Body
+	body := &structs.BodyType{}
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		w.WriteHeader(400)
+		return
+	}
+
+	// Path params
+	pathParams := mux.Vars(r)
+
+	pathParam0, err := parseIntParameter(pathParams["path_param_0"])
+	if err != nil {
+		w.WriteHeader(400)
+		return
+	}
+
+	pathParam1 := pathParams["path_param_1"]
+
+	// Query params
+	query := r.URL.Query()
+	queryParam0, err := parseIntParameter(query.Get("query_param_0"))
+	if err != nil {
+		w.WriteHeader(400)
+		return
+	}
+
+	queryParam1, err := parseFloatParameter(query.Get("query_param_1"))
+	if err != nil {
+		w.WriteHeader(400)
+		return
+	}
+
+	queryParam2 := query.Get("query_param_2")
+
+	// Call implementation
+	result, err := h.api.Method5(body, pathParam0, pathParam1, queryParam0, queryParam1, queryParam2)
+	if err != nil {
+		writeErrorToHTTPResponse(err, w)
+		return
+	}
+
+	encodeJSONResponse(result, nil, w)
+}
+
+// Method6 HTTP wrapper.
+func (h *HTTPWrapper) Method6(w http.ResponseWriter, r *http.Request) {
+	// Path params
+	pathParams := mux.Vars(r)
+
+	pathParam0, err := parseIntParameter(pathParams["path_param_0"])
+	if err != nil {
+		w.WriteHeader(400)
+		return
+	}
+
+	pathParam1 := pathParams["path_param_1"]
+
+	// Header params
+	headerParam0 := r.Header.Get("header_param_0")
+
+	headerParam1, err := parseFloatParameter(r.Header.Get("header_param_1"))
+	if err != nil {
+		w.WriteHeader(400)
+		return
+	}
+
+	headerParam2, err := parseIntParameter(r.Header.Get("header_param_2"))
+	if err != nil {
+		w.WriteHeader(400)
+		return
+	}
+
+	// Query params
+	query := r.URL.Query()
+	queryParam0, err := parseIntParameter(query.Get("query_param_0"))
+	if err != nil {
+		w.WriteHeader(400)
+		return
+	}
+
+	queryParam1, err := parseFloatParameter(query.Get("query_param_1"))
+	if err != nil {
+		w.WriteHeader(400)
+		return
+	}
+
+	queryParam2 := query.Get("query_param_2")
+
+	// Call implementation
+	result, err := h.api.Method6(pathParam0, pathParam1, headerParam0, headerParam1, headerParam2, queryParam0, queryParam1, queryParam2)
+	if err != nil {
+		writeErrorToHTTPResponse(err, w)
+		return
+	}
+
+	encodeJSONResponse(result, nil, w)
+}
+
+// Method7 HTTP wrapper.
+func (h *HTTPWrapper) Method7(w http.ResponseWriter, r *http.Request) {
+	// Body
+	body := &structs.BodyType{}
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		w.WriteHeader(400)
+		return
+	}
+
+	// Path params
+	pathParams := mux.Vars(r)
+
+	pathParam0, err := parseIntParameter(pathParams["path_param_0"])
+	if err != nil {
+		w.WriteHeader(400)
+		return
+	}
+
+	pathParam1 := pathParams["path_param_1"]
+
+	// Header params
+	headerParam0 := r.Header.Get("header_param_0")
+
+	headerParam1, err := parseFloatParameter(r.Header.Get("header_param_1"))
+	if err != nil {
+		w.WriteHeader(400)
+		return
+	}
+
+	headerParam2, err := parseIntParameter(r.Header.Get("header_param_2"))
+	if err != nil {
+		w.WriteHeader(400)
+		return
+	}
+
+	// Query params
+	query := r.URL.Query()
+	queryParam0, err := parseIntParameter(query.Get("query_param_0"))
+	if err != nil {
+		w.WriteHeader(400)
+		return
+	}
+
+	queryParam1, err := parseFloatParameter(query.Get("query_param_1"))
+	if err != nil {
+		w.WriteHeader(400)
+		return
+	}
+
+	queryParam2 := query.Get("query_param_2")
+
+	// Call implementation
+	result, err := h.api.Method7(body, pathParam0, pathParam1, headerParam0, headerParam1, headerParam2, queryParam0, queryParam1, queryParam2)
+	if err != nil {
+		writeErrorToHTTPResponse(err, w)
+		return
+	}
+
+	encodeJSONResponse(result, nil, w)
+}
