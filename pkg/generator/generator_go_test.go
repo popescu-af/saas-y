@@ -14,10 +14,6 @@ import (
 	saasytesting "github.com/popescu-af/saas-y/pkg/testing"
 )
 
-// 1. structs generation
-// 2. method type validation
-// - correct params for each method type validation
-
 func generateServiceFiles(svc model.Service) (pOutdir string, err error) {
 	pOutdir, err = saasytesting.CreateOutdir()
 	if err != nil {
