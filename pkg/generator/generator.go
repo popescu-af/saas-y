@@ -42,6 +42,9 @@ func Do(g Abstract, spec *model.Spec, outdir string) (err error) {
 		outpath  string
 	}{
 		{k8s.Ingress, path.Join(deployDir, "ingress.yaml")},
+		{k8s.ClusterIssuer, path.Join(deployDir, "letsencrypt-issuer.yaml")},
+		{k8s.Certificate, path.Join(deployDir, "letsencrypt-certificate.yaml")},
+		{k8s.Registry, path.Join(deployDir, "docker-registry.yaml")},
 	}
 
 	for _, e := range entities {
@@ -118,9 +121,6 @@ func service(g Abstract, svc model.Service, outdir string) (err error) {
 	}
 
 	// TODO:
-	// - k8s yaml files for all good to have stuff:
-	//   - cert-manager
-	//   - docker-register
 	// - dockerfile and makefile are not common entities!!!
 	// - unit tests
 	//   - define the tests (see generator_go_tests.go)

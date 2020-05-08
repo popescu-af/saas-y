@@ -7,7 +7,7 @@ metadata:
   name: {{$spec.Domain | yamlify}}-ingress
   annotations:
     kubernetes.io/ingress.class: "traefik"
-    certmanager.k8s.io/issuer: "letsencrypt-prod"
+    certmanager.k8s.io/issuer: "letsencrypt"
     ingress.kubernetes.io/auth-tls-insecure: "false"
     ingress.kubernetes.io/ssl-redirect: "true"
 spec:
