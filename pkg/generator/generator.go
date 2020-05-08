@@ -81,7 +81,7 @@ func service(g Abstract, svc model.Service, outdir string) (err error) {
 		template string
 		outpath  string
 	}{
-		{common_templ.Dockerfile, path.Join(dirs[0], "Dockerfile.example")},
+		{g.GetTemplate("dockerfile"), path.Join(dirs[0], "Dockerfile.example")},
 		{common_templ.Makefile, path.Join(dirs[0], "Makefile.example")},
 		{common_templ.Readme, path.Join(dirs[0], "README-example.md")},
 		{k8s.DeplSvc, path.Join(dirs[2], svc.Name+".yaml")},
@@ -121,7 +121,6 @@ func service(g Abstract, svc model.Service, outdir string) (err error) {
 	}
 
 	// TODO:
-	// - dockerfile and makefile are not common entities!!!
 	// - unit tests
 	//   - define the tests (see generator_go_tests.go)
 	// - generate client code snippets

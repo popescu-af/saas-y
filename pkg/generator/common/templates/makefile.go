@@ -7,14 +7,6 @@ const Makefile = `TAG_REVISION=$(shell git rev-parse HEAD)
 build:
 	docker build -t {{.Name}}:${TAG_REVISION} .
 
-.PHONY: test
-test: 
-	go test ./...
-
-.PHONY: clean
-clean: 
-	go clean ./...
-
 .PHONY: tag
 tag: build
 	docker tag {{.Name}}:${TAG_REVISION} {{.Name}}:latest
