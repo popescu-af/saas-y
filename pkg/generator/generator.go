@@ -121,7 +121,7 @@ func service(g Abstract, svc model.Service, outdir string) (err error) {
 	}
 
 	// TODO:
-	// - unit tests
+	// - TDD
 	//   - define the tests (see generator_go_tests.go)
 	// - generate client code snippets
 	//   - add env variable for connectivity to the dependencies
