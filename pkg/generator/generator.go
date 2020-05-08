@@ -127,6 +127,7 @@ func Service(g Abstract, svc model.Service, outdir string) (err error) {
 	//   - input validation (validator_test.go)
 	//     - method type validation
 	//     - correct params for each method type validation
+	// - validate method type (GET, POST, etc.), combination of params
 	// - support [] of data (POD or struct) as structure member attribute
 	// - support null return from API
 	// - generate client code snippets
@@ -136,11 +137,9 @@ func Service(g Abstract, svc model.Service, outdir string) (err error) {
 	// New features:
 	// - linkage between saas-y generated services
 	// - code/example for talking to well-known services/tools (redis, etc.)
-	// - validate method type (GET, POST, etc.), combination of params
+	// - CORS
+	// - authentication
 	// - unit tests for the generated service (everything excluding the pure logic)
-	//
-	// Backlog:
-	// - certmanager.k8s.io/issuer: "letsencrypt-prod" -> use some placeholder, configurable
 	//
 	// Ideas:
 	// - generate from docker-compose file (yaml file)?
