@@ -122,18 +122,18 @@ func Service(g Abstract, svc model.Service, outdir string) (err error) {
 	}
 
 	// TODO:
-	// - TDD
-	//   - input validation (validator_test.go)
-	//     - method type validation
-	//     - correct params for each method type validation
-	// - validate method type (GET, POST, etc.), combination of params
+	// - TDD: finish validation
+	// - README.md on how to use saas-y
+	//   - test the usage of readme
+	// - other files for github (contributors, license, etc.)
+	// - open source and post on several channels (+donate?)
+	//
+	// New features:
 	// - support [] of data (POD or struct) as structure member attribute
 	// - support null return from API
 	// - generate client code snippets
 	//   - add env variable for connectivity to the dependencies
 	//   - generate wrapper over HTTP client code to be easily accessible by logic package
-	//
-	// New features:
 	// - linkage between saas-y generated services
 	// - code/example for talking to well-known services/tools (redis, etc.)
 	// - CORS
