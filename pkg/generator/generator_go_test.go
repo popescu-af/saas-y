@@ -174,3 +174,42 @@ func TestGeneratedMethods(t *testing.T) {
 	saasytesting.CheckFilesInDirsEqual(t, path.Join(pOutdir, "pkg", "logic"), referenceDir, []string{"api_definition.go", "api_example.go"})
 	saasytesting.CheckFilesInDirsEqual(t, path.Join(pOutdir, "pkg", "service"), referenceDir, []string{"http_wrapper.go"})
 }
+
+func TestGeneratedStruct(t *testing.T) {
+	svc := model.Service{
+		ServiceCommon: model.ServiceCommon{
+			Name: "foo-service",
+			Port: "80",
+		},
+		API: []model.API{},
+		Structs: []model.Struct{
+			{
+				Name: "hakuna_matata",
+				Fields: []model.Variable{
+					{
+						Name: "whatever_int",
+						Type: "int",
+					},
+					{
+						Name: "whatever_float",
+						Type: "float",
+					},
+					{
+						Name: "whatever_string",
+						Type: "string",
+					},
+				},
+			},
+		},
+	}
+
+	generator.Init()
+
+	pOutdir, err := generateServiceFiles(svc)
+	require.NoError(t, err)
+	defer os.RemoveAll(pOutdir)
+
+	pOutdir = path.Join(pOutdir, "services", svc.Name)
+	referenceDir := path.Join(saasytesting.GetTestingCommonDirectory(), "..", "generator", "testdata", "generated_structs")
+	saasytesting.CheckFilesInDirsEqual(t, path.Join(pOutdir, "pkg", "structs"), referenceDir, []string{"hakuna_matata.go"})
+}

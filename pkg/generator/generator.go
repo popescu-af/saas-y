@@ -123,7 +123,6 @@ func Service(g Abstract, svc model.Service, outdir string) (err error) {
 
 	// TODO:
 	// - TDD
-	//   - structs generation (generator_go_test.go)
 	//   - input validation (validator_test.go)
 	//     - method type validation
 	//     - correct params for each method type validation

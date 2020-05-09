@@ -1,0 +1,8 @@
+package structs
+
+// HakunaMatata - generated API structure
+type HakunaMatata struct {
+	WhateverInt    int64   `json:"whatever_int"`
+	WhateverFloat  float64 `json:"whatever_float"`
+	WhateverString string  `json:"whatever_string"`
+}
