@@ -2,6 +2,8 @@ package model
 
 import (
 	"fmt"
+	"regexp"
+	"strings"
 )
 
 // Spec is the saas-y specification.
@@ -43,9 +45,19 @@ type Subdomain struct {
 	Paths []Path `json:"paths"`
 }
 
+var compiledSubdomainNameRegex *regexp.Regexp
+
 // Validate checks a subdomain.
 func (s *Subdomain) Validate(knownServices []string) (err error) {
-	// TODO: Name validation
+	_, err = validateWithRegex(
+		s.Name,
+		"subdomain name",
+		&compiledSubdomainNameRegex,
+		`([a-z0-9]([a-z0-9-]*[a-z0-9])?)`,
+	)
+	if err != nil {
+		return
+	}
 
 	for _, p := range s.Paths {
 		if err = p.Validate(s, knownServices); err != nil {
@@ -65,7 +77,10 @@ type Path struct {
 // ends up at a known service, which is defined in the spec
 // as a new service or as an external service.
 func (p *Path) Validate(parent *Subdomain, knownServices []string) (err error) {
-	// TODO: Value validation
+	_, err = ValidatePathValue(p.Value)
+	if err != nil {
+		return
+	}
 
 	for _, s := range knownServices {
 		if p.Endpoint == s {
@@ -73,8 +88,20 @@ func (p *Path) Validate(parent *Subdomain, knownServices []string) (err error) {
 		}
 	}
 
-	err = fmt.Errorf("cannot validate path %s, unknown endpoint %s", p.Value, p.Endpoint)
+	err = fmt.Errorf("cannot validate path %s from subdomain %s, unknown endpoint %s", parent.Name, p.Value, p.Endpoint)
 	return
+}
+
+var compiledPathRegex *regexp.Regexp
+
+// ValidatePathValue validates a HTTP path.
+func ValidatePathValue(pathValue string) (int, error) {
+	return validateWithRegex(
+		pathValue,
+		"path",
+		&compiledPathRegex,
+		`(/([A-Za-z0-9_]+|\{[A-Za-z0-9_]+:(int|float|string)\}))*/?`,
+	)
 }
 
 // Service represents a saas-y defined service.
@@ -246,4 +273,32 @@ func (s *ServiceCommon) Validate() (err error) {
 	// TODO: validation
 
 	return
+}
+
+// validateWithRegex validates a value with the given regex.
+func validateWithRegex(value, valueType string, re **regexp.Regexp, regexpValue string) (int, error) {
+	if *re == nil {
+		*re = regexp.MustCompile(regexpValue)
+	}
+
+	matches := (*re).FindAllString(value, -1)
+
+	if matches == nil || len(matches[0]) == 0 {
+		return 0, fmt.Errorf("cannot parse %s, error at position 0", valueType)
+	}
+
+	parsed := len(matches[0])
+	if len(matches) > 1 {
+		return parsed, fmt.Errorf("cannot parse %s, error at position %d", valueType, parsed)
+	}
+
+	if matches[0] != value {
+		matchAt := strings.Index(value, matches[0])
+		if matchAt > 0 {
+			parsed = 0
+		}
+		return parsed, fmt.Errorf("cannot parse %s, error at position %d", valueType, parsed)
+	}
+
+	return parsed, nil
 }
