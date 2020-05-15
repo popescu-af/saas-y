@@ -28,7 +28,7 @@ func (s *Spec) Validate() (err error) {
 		}
 	}
 	for _, esvc := range s.ExternalServices {
-		if err = esvc.Validate(); err != nil {
+		if err = esvc.Validate(knownServices); err != nil {
 			return
 		}
 	}
@@ -289,10 +289,20 @@ type ExternalService struct {
 	ImageURL string `json:"image_url"`
 }
 
-// Validate checks if the external service is well defined.
-func (s *ExternalService) Validate() (err error) {
-	// TODO: validation
+var compiledImageURLRegex *regexp.Regexp
 
+// Validate checks if the external service is well defined.
+func (s *ExternalService) Validate(knownServices []string) (err error) {
+	if err = s.ServiceCommon.Validate(knownServices); err != nil {
+		return
+	}
+
+	_, err = validateWithRegex(
+		s.ImageURL,
+		"image URL",
+		&compiledImageURLRegex,
+		`(https?://)?(([a-z0-9]([a-z0-9-]*[a-z0-9])?\.)*[a-z0-9]([a-z0-9-]*[a-z0-9])?)(:[0-9]+)?(/[a-z0-9]([a-z0-9-]*[a-z0-9])?)+(:((v?[0-9]+(\.[0-9]+(\.[0-9]+)?)?)|[0-9a-f]+|latest|master))?`,
+	)
 	return
 }
 
@@ -305,9 +315,34 @@ type ServiceCommon struct {
 }
 
 // Validate checks if the service core attributes are well defined.
-func (s *ServiceCommon) Validate() (err error) {
-	// TODO: validation
+func (s *ServiceCommon) Validate(knownServices []string) (err error) {
+	if err = ValidateName(s.Name, "service name"); err != nil {
+		return
+	}
 
+	port, err := strconv.ParseInt(s.Port, 10, 32)
+	if err != nil || int(port) > 65535 {
+		return fmt.Errorf("invalid port value %s", s.Port)
+	}
+
+	for _, v := range s.Environment {
+		if err = v.Validate(); err != nil {
+			return
+		}
+	}
+
+	for _, d := range s.Dependencies {
+		found := false
+		for _, s := range knownServices {
+			if d == s {
+				found = true
+				break
+			}
+		}
+		if !found {
+			return fmt.Errorf("unknown dependency %s", d)
+		}
+	}
 	return
 }
 

@@ -129,6 +129,7 @@ func Service(g Abstract, svc model.Service, outdir string) (err error) {
 	// - open source and post on several channels (+donate?)
 	//
 	// New features:
+	// - move code to internal, put client code into pkg
 	// - support [] of data (POD or struct) as structure member attribute
 	// - support null return from API
 	// - generate client code snippets

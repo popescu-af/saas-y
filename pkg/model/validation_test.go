@@ -8,9 +8,6 @@ import (
 	"github.com/popescu-af/saas-y/pkg/model"
 )
 
-// ServiceCommon
-// ExternalService
-
 // API
 // Service
 
@@ -239,16 +236,17 @@ func TestVariableValid(t *testing.T) {
 	}
 }
 
-func TestStructValid(t *testing.T) {
-	goodVariables := []model.Variable{
-		{Name: "good_name_42", Type: "string", Value: "dummy_value"},
-		{Name: "good_name_42", Type: "string", Value: ""},
-	}
-	badVariables := []model.Variable{
-		{Name: "good_name_42", Type: "float", Value: "1000000000"},
-		{Name: "good_name_42", Type: "bad_type", Value: "dummy_value"},
-	}
+var goodVariables = []model.Variable{
+	{Name: "good_name_42", Type: "string", Value: "dummy_value"},
+	{Name: "good_name_42", Type: "string", Value: ""},
+}
 
+var badVariables = []model.Variable{
+	{Name: "good_name_42", Type: "float", Value: "1000000000"},
+	{Name: "good_name_42", Type: "bad_type", Value: "dummy_value"},
+}
+
+func TestStructValid(t *testing.T) {
 	tests := []struct {
 		s     *model.Struct
 		valid bool
@@ -261,6 +259,88 @@ func TestStructValid(t *testing.T) {
 
 	for _, tt := range tests {
 		err := tt.s.Validate()
+		if tt.valid {
+			require.NoError(t, err)
+		} else {
+			require.Error(t, err)
+		}
+	}
+}
+
+func TestServiceCommonValid(t *testing.T) {
+	knownDependencies := []string{"dep_1", "dep_2", "dep_3"}
+	goodDependencies := []string{"dep_1", "dep_2"}
+	badDependencies := []string{"dep_3", "dep_4"}
+
+	tests := []struct {
+		svcCommon *model.ServiceCommon
+		valid     bool
+	}{
+		{&model.ServiceCommon{Name: "bad_service_name_", Port: "80000", Environment: badVariables, Dependencies: badDependencies}, false},
+		{&model.ServiceCommon{Name: "bad_service_name_", Port: "80000", Environment: badVariables, Dependencies: goodDependencies}, false},
+		{&model.ServiceCommon{Name: "bad_service_name_", Port: "80000", Environment: goodVariables, Dependencies: badDependencies}, false},
+		{&model.ServiceCommon{Name: "bad_service_name_", Port: "80000", Environment: goodVariables, Dependencies: goodDependencies}, false},
+		{&model.ServiceCommon{Name: "bad_service_name_", Port: "30000", Environment: badVariables, Dependencies: badDependencies}, false},
+		{&model.ServiceCommon{Name: "bad_service_name_", Port: "30000", Environment: badVariables, Dependencies: goodDependencies}, false},
+		{&model.ServiceCommon{Name: "bad_service_name_", Port: "30000", Environment: goodVariables, Dependencies: badDependencies}, false},
+		{&model.ServiceCommon{Name: "bad_service_name_", Port: "30000", Environment: goodVariables, Dependencies: goodDependencies}, false},
+		{&model.ServiceCommon{Name: "good_service_name", Port: "80000", Environment: badVariables, Dependencies: badDependencies}, false},
+		{&model.ServiceCommon{Name: "good_service_name", Port: "80000", Environment: badVariables, Dependencies: goodDependencies}, false},
+		{&model.ServiceCommon{Name: "good_service_name", Port: "80000", Environment: goodVariables, Dependencies: badDependencies}, false},
+		{&model.ServiceCommon{Name: "good_service_name", Port: "80000", Environment: goodVariables, Dependencies: goodDependencies}, false},
+		{&model.ServiceCommon{Name: "good_service_name", Port: "30000", Environment: badVariables, Dependencies: badDependencies}, false},
+		{&model.ServiceCommon{Name: "good_service_name", Port: "30000", Environment: badVariables, Dependencies: goodDependencies}, false},
+		{&model.ServiceCommon{Name: "good_service_name", Port: "30000", Environment: goodVariables, Dependencies: badDependencies}, false},
+		{&model.ServiceCommon{Name: "good_service_name", Port: "30000", Environment: goodVariables, Dependencies: goodDependencies}, true},
+	}
+
+	for _, tt := range tests {
+		err := tt.svcCommon.Validate(knownDependencies)
+		if tt.valid {
+			require.NoError(t, err)
+		} else {
+			require.Error(t, err)
+		}
+	}
+}
+
+func TestExternalServiceValid(t *testing.T) {
+	validSvcCommon := model.ServiceCommon{Name: "good_name", Port: "80"}
+
+	tests := []struct {
+		extSvc *model.ExternalService
+		valid  bool
+	}{
+		{&model.ExternalService{ServiceCommon: validSvcCommon, ImageURL: "bad_url"}, false},
+		{&model.ExternalService{ServiceCommon: validSvcCommon, ImageURL: "/a/b/c"}, false},
+		{&model.ExternalService{ServiceCommon: validSvcCommon, ImageURL: ":/a/b/c"}, false},
+		{&model.ExternalService{ServiceCommon: validSvcCommon, ImageURL: "http//a/b/c"}, false},
+		{&model.ExternalService{ServiceCommon: validSvcCommon, ImageURL: "http:/a/b/c"}, false},
+		{&model.ExternalService{ServiceCommon: validSvcCommon, ImageURL: "docker/whalesay"}, true},
+		{&model.ExternalService{ServiceCommon: validSvcCommon, ImageURL: "docker/whalesay:"}, false},
+		{&model.ExternalService{ServiceCommon: validSvcCommon, ImageURL: "docker/whalesay:lates"}, false},
+		{&model.ExternalService{ServiceCommon: validSvcCommon, ImageURL: "docker/whalesay:latest"}, true},
+		{&model.ExternalService{ServiceCommon: validSvcCommon, ImageURL: "docker/whalesay:masta"}, false},
+		{&model.ExternalService{ServiceCommon: validSvcCommon, ImageURL: "docker/whalesay:master"}, true},
+		{&model.ExternalService{ServiceCommon: validSvcCommon, ImageURL: "docker/whalesay:v2"}, true},
+		{&model.ExternalService{ServiceCommon: validSvcCommon, ImageURL: "docker/whalesay:v2."}, false},
+		{&model.ExternalService{ServiceCommon: validSvcCommon, ImageURL: "docker/whalesay:v2.3"}, true},
+		{&model.ExternalService{ServiceCommon: validSvcCommon, ImageURL: "docker/whalesay:v2.3."}, false},
+		{&model.ExternalService{ServiceCommon: validSvcCommon, ImageURL: "docker/whalesay:v2.3.255"}, true},
+		{&model.ExternalService{ServiceCommon: validSvcCommon, ImageURL: "docker/whalesay:2"}, true},
+		{&model.ExternalService{ServiceCommon: validSvcCommon, ImageURL: "docker/whalesay:2."}, false},
+		{&model.ExternalService{ServiceCommon: validSvcCommon, ImageURL: "docker/whalesay:2.3"}, true},
+		{&model.ExternalService{ServiceCommon: validSvcCommon, ImageURL: "docker/whalesay:2.3."}, false},
+		{&model.ExternalService{ServiceCommon: validSvcCommon, ImageURL: "docker/whalesay:2.3.255"}, true},
+		{&model.ExternalService{ServiceCommon: validSvcCommon, ImageURL: "docker.com/whalesay:v2.3"}, true},
+		{&model.ExternalService{ServiceCommon: validSvcCommon, ImageURL: "hub.docker.com/whalesay:v2.3"}, true},
+		{&model.ExternalService{ServiceCommon: validSvcCommon, ImageURL: "http://hub.docker.com:8080/whalesay:v2.3"}, true},
+		{&model.ExternalService{ServiceCommon: validSvcCommon, ImageURL: "https://hub.docker.com/whalesay:v2.3"}, true},
+		{&model.ExternalService{ServiceCommon: validSvcCommon, ImageURL: "localhost:32000/whalesay:v2.3"}, true},
+	}
+
+	for _, tt := range tests {
+		err := tt.extSvc.Validate([]string{})
 		if tt.valid {
 			require.NoError(t, err)
 		} else {

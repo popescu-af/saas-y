@@ -17,6 +17,11 @@ func GenerateSourcesFromJSONSpec(jsonSpecFilePath, outdir string) (err error) {
 		return
 	}
 
+	err = spec.Validate()
+	if err != nil {
+		return
+	}
+
 	g := &gengo.Generator{}
 	err = generator.Do(g, spec, outdir)
 	return
