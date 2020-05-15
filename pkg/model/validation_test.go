@@ -8,9 +8,6 @@ import (
 	"github.com/popescu-af/saas-y/pkg/model"
 )
 
-// Variable
-// Struct
-
 // ServiceCommon
 // ExternalService
 
@@ -174,6 +171,96 @@ func TestSubdomainValid(t *testing.T) {
 
 	for _, tt := range tests {
 		err := tt.subdomain.Validate([]string{"some_known_endpoint"})
+		if tt.valid {
+			require.NoError(t, err)
+		} else {
+			require.Error(t, err)
+		}
+	}
+}
+
+func TestNameValid(t *testing.T) {
+	tests := []struct {
+		name  string
+		valid bool
+	}{
+		{"badName69", false},
+		{"bad-name-69", false},
+		{"bad+name&&", false},
+		{"_bad_name_66", false},
+		{"bad__name_66", false},
+		{"1_bad_name", false},
+		{"bad_name_", false},
+		{"good_name_42", true},
+	}
+
+	for _, tt := range tests {
+		err := model.ValidateName(tt.name, "dummy type")
+		if tt.valid {
+			require.NoError(t, err)
+		} else {
+			require.Error(t, err)
+		}
+	}
+}
+
+func TestVariableValid(t *testing.T) {
+	tests := []struct {
+		variable *model.Variable
+		valid    bool
+	}{
+		{&model.Variable{Name: "good_name_42", Type: "bad_type", Value: "dummy_value"}, false},
+		{&model.Variable{Name: "good_name_42", Type: "string", Value: "dummy_value"}, true},
+		{&model.Variable{Name: "good_name_42", Type: "string", Value: ""}, true},
+		{&model.Variable{Name: "good_name_42", Type: "float", Value: "dummy_value"}, false},
+		{&model.Variable{Name: "good_name_42", Type: "float", Value: "3.14f"}, false},
+		{&model.Variable{Name: "good_name_42", Type: "float", Value: "a3.14"}, false},
+		{&model.Variable{Name: "good_name_42", Type: "float", Value: "3e14"}, true},
+		{&model.Variable{Name: "good_name_42", Type: "float", Value: "3.14"}, true},
+		{&model.Variable{Name: "good_name_42", Type: "float", Value: "1000000000"}, true},
+		{&model.Variable{Name: "good_name_42", Type: "float", Value: ""}, true},
+		{&model.Variable{Name: "good_name_42", Type: "int", Value: "dummy_value"}, false},
+		{&model.Variable{Name: "good_name_42", Type: "int", Value: "3.14f"}, false},
+		{&model.Variable{Name: "good_name_42", Type: "int", Value: "a3.14"}, false},
+		{&model.Variable{Name: "good_name_42", Type: "int", Value: "3e14"}, false},
+		{&model.Variable{Name: "good_name_42", Type: "int", Value: "3.14"}, false},
+		{&model.Variable{Name: "good_name_42", Type: "int", Value: "1000000000"}, true},
+		{&model.Variable{Name: "good_name_42", Type: "int", Value: "37"}, true},
+		{&model.Variable{Name: "good_name_42", Type: "int", Value: ""}, true},
+	}
+
+	for _, tt := range tests {
+		err := tt.variable.Validate()
+		if tt.valid {
+			require.NoError(t, err)
+		} else {
+			require.Error(t, err)
+		}
+	}
+}
+
+func TestStructValid(t *testing.T) {
+	goodVariables := []model.Variable{
+		{Name: "good_name_42", Type: "string", Value: "dummy_value"},
+		{Name: "good_name_42", Type: "string", Value: ""},
+	}
+	badVariables := []model.Variable{
+		{Name: "good_name_42", Type: "float", Value: "1000000000"},
+		{Name: "good_name_42", Type: "bad_type", Value: "dummy_value"},
+	}
+
+	tests := []struct {
+		s     *model.Struct
+		valid bool
+	}{
+		{&model.Struct{Name: "_bad_name", Fields: badVariables}, false},
+		{&model.Struct{Name: "good_name", Fields: badVariables}, false},
+		{&model.Struct{Name: "_bad_name", Fields: goodVariables}, false},
+		{&model.Struct{Name: "good_name", Fields: goodVariables}, true},
+	}
+
+	for _, tt := range tests {
+		err := tt.s.Validate()
 		if tt.valid {
 			require.NoError(t, err)
 		} else {

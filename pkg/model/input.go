@@ -3,6 +3,7 @@ package model
 import (
 	"fmt"
 	"regexp"
+	"strconv"
 	"strings"
 )
 
@@ -227,11 +228,39 @@ type Variable struct {
 	Value string `json:"value"`
 }
 
+var compiledNameRegex *regexp.Regexp
+
+// ValidateName validates a name.
+func ValidateName(name, typeName string) (err error) {
+	_, err = validateWithRegex(
+		name,
+		typeName,
+		&compiledNameRegex,
+		`[a-z][a-z0-9]*(_[a-z0-9]+)*`,
+	)
+	return
+}
+
 // Validate checks if the variable is well defined.
 func (v *Variable) Validate() (err error) {
-	// TODO: validation
+	if len(v.Value) > 0 {
+		switch v.Type {
+		case "int":
+			if _, err = strconv.ParseInt(v.Value, 10, 64); err != nil {
+				return fmt.Errorf("invalid int value %s", v.Value)
+			}
+		case "float":
+			if _, err = strconv.ParseFloat(v.Value, 64); err != nil {
+				return fmt.Errorf("invalid float value %s", v.Value)
+			}
+		case "string":
+			// any value is good
+		default:
+			return fmt.Errorf("invalid type %s", v.Type)
+		}
+	}
 
-	return
+	return ValidateName(v.Name, "variable name")
 }
 
 // Struct represents an API struct.
@@ -242,8 +271,15 @@ type Struct struct {
 
 // Validate checks if the struct is well defined.
 func (s *Struct) Validate() (err error) {
-	// TODO: validation
+	if err = ValidateName(s.Name, "struct name"); err != nil {
+		return
+	}
 
+	for _, v := range s.Fields {
+		if err = v.Validate(); err != nil {
+			return
+		}
+	}
 	return
 }
 
