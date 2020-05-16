@@ -8,11 +8,6 @@ import (
 	"github.com/popescu-af/saas-y/pkg/model"
 )
 
-// API
-// Service
-
-// Spec
-
 func TestMethodTypeValid(t *testing.T) {
 	tests := []struct {
 		method *model.Method
@@ -221,9 +216,19 @@ func TestVariableValid(t *testing.T) {
 		{&model.Variable{Name: "good_name_42", Type: "int", Value: "a3.14"}, false},
 		{&model.Variable{Name: "good_name_42", Type: "int", Value: "3e14"}, false},
 		{&model.Variable{Name: "good_name_42", Type: "int", Value: "3.14"}, false},
+		{&model.Variable{Name: "good_name_42", Type: "int", Value: "-1000000000"}, true},
 		{&model.Variable{Name: "good_name_42", Type: "int", Value: "1000000000"}, true},
 		{&model.Variable{Name: "good_name_42", Type: "int", Value: "37"}, true},
 		{&model.Variable{Name: "good_name_42", Type: "int", Value: ""}, true},
+		{&model.Variable{Name: "good_name_42", Type: "int", Value: "dummy_value"}, false},
+		{&model.Variable{Name: "good_name_42", Type: "int", Value: "3.14f"}, false},
+		{&model.Variable{Name: "good_name_42", Type: "int", Value: "a3.14"}, false},
+		{&model.Variable{Name: "good_name_42", Type: "int", Value: "3e14"}, false},
+		{&model.Variable{Name: "good_name_42", Type: "int", Value: "3.14"}, false},
+		{&model.Variable{Name: "good_name_42", Type: "uint", Value: "-1000000000"}, false},
+		{&model.Variable{Name: "good_name_42", Type: "uint", Value: "1000000000"}, true},
+		{&model.Variable{Name: "good_name_42", Type: "uint", Value: "37"}, true},
+		{&model.Variable{Name: "good_name_42", Type: "uint", Value: ""}, true},
 	}
 
 	for _, tt := range tests {

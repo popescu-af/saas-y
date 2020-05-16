@@ -19,21 +19,28 @@ type Spec struct {
 func (s *Spec) Validate() (err error) {
 	// TODO: Domain validation
 
-	// TODO: list of knonw services
 	var knownServices []string
-
 	for _, svc := range s.Services {
-		if err = svc.Validate(); err != nil {
-			return
-		}
+		knownServices = append(knownServices, svc.Name)
 	}
 	for _, esvc := range s.ExternalServices {
-		if err = esvc.Validate(knownServices); err != nil {
+		knownServices = append(knownServices, esvc.Name)
+	}
+
+	for _, subd := range s.Subdomains {
+		if err = subd.Validate(knownServices); err != nil {
 			return
 		}
 	}
-	for _, subd := range s.Subdomains {
-		if err = subd.Validate(knownServices); err != nil {
+
+	for _, svc := range s.Services {
+		if err = svc.Validate(knownServices); err != nil {
+			return
+		}
+	}
+
+	for _, esvc := range s.ExternalServices {
+		if err = esvc.Validate(knownServices); err != nil {
 			return
 		}
 	}
@@ -101,7 +108,7 @@ func ValidatePathValue(pathValue string) (int, error) {
 		pathValue,
 		"path",
 		&compiledPathRegex,
-		`(/([A-Za-z0-9_]+|\{[A-Za-z0-9_]+:(int|float|string)\}))*/?`,
+		`(/([A-Za-z0-9_]+|\{[A-Za-z0-9_]+:(u?int|float|string)\}))*/?`,
 	)
 }
 
@@ -113,9 +120,24 @@ type Service struct {
 }
 
 // Validate checks if the service is well defined.
-func (s *Service) Validate() (err error) {
-	// TODO: validation
+func (s *Service) Validate(knownServices []string) (err error) {
+	if err = s.ServiceCommon.Validate(knownServices); err != nil {
+		return
+	}
 
+	var knownTypes []string
+	for _, s := range s.Structs {
+		if err = s.Validate(); err != nil {
+			return
+		}
+		knownTypes = append(knownTypes, s.Name)
+	}
+
+	for _, a := range s.API {
+		if err = a.Validate(knownTypes); err != nil {
+			return
+		}
+	}
 	return
 }
 
@@ -126,9 +148,17 @@ type API struct {
 }
 
 // Validate checks if the API is well defined.
-func (a *API) Validate() (err error) {
-	// TODO: validation
+func (a *API) Validate(knownTypes []string) (err error) {
+	_, err = ValidatePathValue(a.Path)
+	if err != nil {
+		return
+	}
 
+	for _, m := range a.Methods {
+		if err = m.Validate(knownTypes); err != nil {
+			return
+		}
+	}
 	return
 }
 
@@ -249,6 +279,10 @@ func (v *Variable) Validate() (err error) {
 			if _, err = strconv.ParseInt(v.Value, 10, 64); err != nil {
 				return fmt.Errorf("invalid int value %s", v.Value)
 			}
+		case "uint":
+			if _, err = strconv.ParseUint(v.Value, 10, 64); err != nil {
+				return fmt.Errorf("invalid int value %s", v.Value)
+			}
 		case "float":
 			if _, err = strconv.ParseFloat(v.Value, 64); err != nil {
 				return fmt.Errorf("invalid float value %s", v.Value)
@@ -316,7 +350,9 @@ type ServiceCommon struct {
 
 // Validate checks if the service core attributes are well defined.
 func (s *ServiceCommon) Validate(knownServices []string) (err error) {
-	if err = ValidateName(s.Name, "service name"); err != nil {
+	// also allow dashes in service names
+	name := strings.ReplaceAll(s.Name, "-", "_")
+	if err = ValidateName(name, "service name"); err != nil {
 		return
 	}
 

@@ -90,8 +90,8 @@ var fullSpec = `
             ],
             "env": [
                 {
-                    "name": "ENV_VAR_NAME",
-                    "type": "int64",
+                    "name": "env_var_name",
+                    "type": "int",
                     "value": "42"
                 }
             ]
