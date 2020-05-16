@@ -122,7 +122,6 @@ func Service(g Abstract, svc model.Service, outdir string) (err error) {
 	}
 
 	// TODO:
-	// - TDD: finish validation
 	// - README.md on how to use saas-y
 	//   - test the usage of readme
 	// - other files for github (contributors, license, etc.)
