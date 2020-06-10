@@ -17,7 +17,7 @@ func writeErrorToHTTPResponse(err error, w http.ResponseWriter) {
 
 	switch err.(type) {
 	case *logic.NotFoundError:
-		w.WriteHeader(404)
+		w.WriteHeader(http.StatusNotFound)
 	}
 
 	w.Write([]byte(err.Error()))
