@@ -1,4 +1,4 @@
-package structs
+package exports
 
 // HakunaMatata - generated API structure
 type HakunaMatata struct {

@@ -8,17 +8,16 @@ import (
 
 	"github.com/gorilla/mux"
 
-	"foo-service/pkg/logic"
-	"foo-service/pkg/structs"
+	"foo-service/pkg/exports"
 )
 
 // HTTPWrapper decorates the APIs with from/to HTTP code.
 type HTTPWrapper struct {
-	api logic.API
+	api exports.API
 }
 
 // NewHTTPWrapper creates an HTTP wrapper for the service API.
-func NewHTTPWrapper(api logic.API) *HTTPWrapper {
+func NewHTTPWrapper(api exports.API) *HTTPWrapper {
 	return &HTTPWrapper{api: api}
 }
 
@@ -147,7 +146,7 @@ func (h *HTTPWrapper) MethodNoPathParams0(w http.ResponseWriter, r *http.Request
 // MethodNoPathParams1 HTTP wrapper.
 func (h *HTTPWrapper) MethodNoPathParams1(w http.ResponseWriter, r *http.Request) {
 	// Body
-	body := &structs.BodyType{}
+	body := &exports.BodyType{}
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 		w.WriteHeader(400)
 		return
@@ -193,7 +192,7 @@ func (h *HTTPWrapper) MethodNoPathParams2(w http.ResponseWriter, r *http.Request
 // MethodNoPathParams3 HTTP wrapper.
 func (h *HTTPWrapper) MethodNoPathParams3(w http.ResponseWriter, r *http.Request) {
 	// Body
-	body := &structs.BodyType{}
+	body := &exports.BodyType{}
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 		w.WriteHeader(400)
 		return
@@ -256,7 +255,7 @@ func (h *HTTPWrapper) MethodNoPathParams4(w http.ResponseWriter, r *http.Request
 // MethodNoPathParams5 HTTP wrapper.
 func (h *HTTPWrapper) MethodNoPathParams5(w http.ResponseWriter, r *http.Request) {
 	// Body
-	body := &structs.BodyType{}
+	body := &exports.BodyType{}
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 		w.WriteHeader(400)
 		return
@@ -336,7 +335,7 @@ func (h *HTTPWrapper) MethodNoPathParams6(w http.ResponseWriter, r *http.Request
 // MethodNoPathParams7 HTTP wrapper.
 func (h *HTTPWrapper) MethodNoPathParams7(w http.ResponseWriter, r *http.Request) {
 	// Body
-	body := &structs.BodyType{}
+	body := &exports.BodyType{}
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 		w.WriteHeader(400)
 		return
@@ -410,7 +409,7 @@ func (h *HTTPWrapper) Method0(w http.ResponseWriter, r *http.Request) {
 // Method1 HTTP wrapper.
 func (h *HTTPWrapper) Method1(w http.ResponseWriter, r *http.Request) {
 	// Body
-	body := &structs.BodyType{}
+	body := &exports.BodyType{}
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 		w.WriteHeader(400)
 		return
@@ -478,7 +477,7 @@ func (h *HTTPWrapper) Method2(w http.ResponseWriter, r *http.Request) {
 // Method3 HTTP wrapper.
 func (h *HTTPWrapper) Method3(w http.ResponseWriter, r *http.Request) {
 	// Body
-	body := &structs.BodyType{}
+	body := &exports.BodyType{}
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 		w.WriteHeader(400)
 		return
@@ -563,7 +562,7 @@ func (h *HTTPWrapper) Method4(w http.ResponseWriter, r *http.Request) {
 // Method5 HTTP wrapper.
 func (h *HTTPWrapper) Method5(w http.ResponseWriter, r *http.Request) {
 	// Body
-	body := &structs.BodyType{}
+	body := &exports.BodyType{}
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 		w.WriteHeader(400)
 		return
@@ -665,7 +664,7 @@ func (h *HTTPWrapper) Method6(w http.ResponseWriter, r *http.Request) {
 // Method7 HTTP wrapper.
 func (h *HTTPWrapper) Method7(w http.ResponseWriter, r *http.Request) {
 	// Body
-	body := &structs.BodyType{}
+	body := &exports.BodyType{}
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 		w.WriteHeader(400)
 		return

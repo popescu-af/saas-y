@@ -18,6 +18,7 @@ import (
 type Abstract interface {
 	FileExtension() string
 	CommandPath() string
+	InternalPath() string
 	PackagePath() string
 	GetTemplate(name string) string
 	CodeFormatter(path string) (st SymbolTable, err error)
@@ -105,7 +106,7 @@ func Service(g Abstract, svc model.Service, outdir string) (err error) {
 		outdir   string
 	}{
 		{"api_example", dirs[4]},
-		{"api_definition", dirs[4]},
+		{"api_definition", dirs[6]},
 		{"errors_example", dirs[4]},
 		{"main", dirs[1]},
 		{"env", dirs[3]},
@@ -122,6 +123,9 @@ func Service(g Abstract, svc model.Service, outdir string) (err error) {
 	}
 
 	// TODO:
+	// - app arguments for input & output
+	// - line number when validation error occurs (save originating line number when parsing JSON)
+	//
 	// - README.md on how to use saas-y
 	//   - test the usage of readme
 	// - other files for github (contributors, license, etc.)
@@ -151,10 +155,10 @@ func serviceDirs(g Abstract, basePath string) (dirs []string, err error) {
 		basePath,
 		path.Join(basePath, g.CommandPath()),
 		path.Join(basePath, "deploy"),
-		path.Join(basePath, g.PackagePath(), "config"),
-		path.Join(basePath, g.PackagePath(), "logic"),
-		path.Join(basePath, g.PackagePath(), "service"),
-		path.Join(basePath, g.PackagePath(), "structs"),
+		path.Join(basePath, g.InternalPath(), "config"),
+		path.Join(basePath, g.InternalPath(), "logic"),
+		path.Join(basePath, g.InternalPath(), "service"),
+		path.Join(basePath, g.PackagePath(), "exports"),
 	}
 
 	for _, dir := range dirs {

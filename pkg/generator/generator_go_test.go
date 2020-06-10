@@ -49,7 +49,7 @@ func TestGeneratedEnv(t *testing.T) {
 
 	pOutdir = path.Join(pOutdir, "services", svc.Name)
 	referenceDir := path.Join(saasytesting.GetTestingCommonDirectory(), "..", "generator", "testdata", "generated_env")
-	saasytesting.CheckFilesInDirsEqual(t, path.Join(pOutdir, "pkg", "config"), referenceDir, []string{"env.go"})
+	saasytesting.CheckFilesInDirsEqual(t, path.Join(pOutdir, "internal", "config"), referenceDir, []string{"env.go"})
 }
 
 func TestGeneratedIngress(t *testing.T) {
@@ -171,8 +171,9 @@ func TestGeneratedMethods(t *testing.T) {
 
 	pOutdir = path.Join(pOutdir, "services", svc.Name)
 	referenceDir := path.Join(saasytesting.GetTestingCommonDirectory(), "..", "generator", "testdata", "generated_methods")
-	saasytesting.CheckFilesInDirsEqual(t, path.Join(pOutdir, "pkg", "logic"), referenceDir, []string{"api_definition.go", "api_example.go"})
-	saasytesting.CheckFilesInDirsEqual(t, path.Join(pOutdir, "pkg", "service"), referenceDir, []string{"http_wrapper.go"})
+	saasytesting.CheckFilesInDirsEqual(t, path.Join(pOutdir, "internal", "logic"), referenceDir, []string{"api_example.go"})
+	saasytesting.CheckFilesInDirsEqual(t, path.Join(pOutdir, "internal", "service"), referenceDir, []string{"http_wrapper.go"})
+	saasytesting.CheckFilesInDirsEqual(t, path.Join(pOutdir, "pkg", "exports"), referenceDir, []string{"api_definition.go"})
 }
 
 func TestGeneratedStruct(t *testing.T) {
@@ -211,5 +212,5 @@ func TestGeneratedStruct(t *testing.T) {
 
 	pOutdir = path.Join(pOutdir, "services", svc.Name)
 	referenceDir := path.Join(saasytesting.GetTestingCommonDirectory(), "..", "generator", "testdata", "generated_structs")
-	saasytesting.CheckFilesInDirsEqual(t, path.Join(pOutdir, "pkg", "structs"), referenceDir, []string{"hakuna_matata.go"})
+	saasytesting.CheckFilesInDirsEqual(t, path.Join(pOutdir, "pkg", "exports"), referenceDir, []string{"hakuna_matata.go"})
 }

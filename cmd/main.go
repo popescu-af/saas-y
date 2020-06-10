@@ -8,8 +8,8 @@ import (
 
 func main() {
 	err := golang.GenerateSourcesFromJSONSpec(
-		"/Users/alexandru/go/src/github.com/popescu-af/saas-y/example/spec.json",
-		"/Users/alexandru/go/src/github.com/popescu-af/saas-y/example/_gen_test",
+		"/Users/alexandru/dev/development/saas-y/example/spec.json",
+		"/Users/alexandru/dev/development/saas-y/example/_gen_test",
 	)
 	if err != nil {
 		log.Fatalf("saas-y error: %v", err)

@@ -10,9 +10,9 @@ import (
 
 	"go.uber.org/zap"
 
-	"{{.Name}}/pkg/config"
-	"{{.Name}}/pkg/logic"
-	"{{.Name}}/pkg/service"
+	"{{.Name}}/internal/config"
+	"{{.Name}}/internal/logic"
+	"{{.Name}}/internal/service"
 )
 
 func main() {

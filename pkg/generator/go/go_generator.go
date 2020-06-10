@@ -28,6 +28,11 @@ func (g *Generator) CommandPath() string {
 	return path.Join("cmd")
 }
 
+// InternalPath returns the package path for go code.
+func (g *Generator) InternalPath() string {
+	return path.Join("internal")
+}
+
 // PackagePath returns the package path for go code.
 func (g *Generator) PackagePath() string {
 	return path.Join("pkg")

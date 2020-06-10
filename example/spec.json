@@ -7,10 +7,6 @@
                 {
                     "value": "/f/o/o",
                     "endpoint": "foo-service"
-                },
-                {
-                    "value": "/b/a/r",
-                    "endpoint": "bar-service"
                 }
             ]
         }
@@ -91,12 +87,12 @@
             ],
             "env": [
                 {
-                    "name": "ENV_VAR_NAME",
-                    "type": "int64",
+                    "name": "env_var_name",
+                    "type": "int",
                     "value": "42"
                 }
             ],
-            "dependencies" : ["baz-service"]
+            "dependencies" : []
         }
     ],
     "external_services": [
@@ -106,12 +102,12 @@
             "image_url": "localhost:5000/external-service:latest",
             "env": [
                 {
-                    "name": "ENV_VAR_NAME",
+                    "name": "env_var_name",
                     "type": "string",
                     "value": "env_var_value"
                 }
             ],
-            "dependencies" : ["yet-another-external-service"]
+            "dependencies" : []
         }
     ]
 }

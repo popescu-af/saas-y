@@ -11,17 +11,16 @@ import (
 
 	"github.com/gorilla/mux"
 
-	"{{.Name}}/pkg/logic"
-	"{{.Name}}/pkg/structs"
+	"{{.Name}}/pkg/exports"
 )
 
 // HTTPWrapper decorates the APIs with from/to HTTP code.
 type HTTPWrapper struct {
-	api logic.API
+	api exports.API
 }
 
 // NewHTTPWrapper creates an HTTP wrapper for the service API.
-func NewHTTPWrapper(api logic.API) *HTTPWrapper {
+func NewHTTPWrapper(api exports.API) *HTTPWrapper {
 	return &HTTPWrapper{api: api}
 }
 
@@ -63,7 +62,7 @@ func (h *HTTPWrapper) Paths() Paths {
 {{range $a := .API}}{{range $mname, $method := $a.Methods}}// {{$mname | capitalize | symbolize}} HTTP wrapper.
 func (h *HTTPWrapper) {{$mname | capitalize | symbolize}}(w http.ResponseWriter, r *http.Request) {
 	{{if $method.InputType}}// Body
-	{{"body" | pushParam}} := &structs.{{$method.InputType | capitalize | symbolize}}{}
+	{{"body" | pushParam}} := &exports.{{$method.InputType | capitalize | symbolize}}{}
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 		w.WriteHeader(400)
 		return
