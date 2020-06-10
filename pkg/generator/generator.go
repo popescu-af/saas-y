@@ -38,20 +38,22 @@ func Do(g Abstract, spec *model.Spec, outdir string) (err error) {
 		return
 	}
 
-	entities := []struct {
-		template string
-		outpath  string
-	}{
-		{k8s.Ingress, path.Join(deployDir, "ingress.yaml")},
-		{k8s.ClusterIssuer, path.Join(deployDir, "letsencrypt-issuer.yaml")},
-		{k8s.Certificate, path.Join(deployDir, "letsencrypt-certificate.yaml")},
-		{k8s.Registry, path.Join(deployDir, "docker-registry.yaml")},
-	}
+	if spec.Domain != "" && len(spec.Subdomains) > 0 {
+		entities := []struct {
+			template string
+			outpath  string
+		}{
+			{k8s.Ingress, path.Join(deployDir, "ingress.yaml")},
+			{k8s.ClusterIssuer, path.Join(deployDir, "letsencrypt-issuer.yaml")},
+			{k8s.Certificate, path.Join(deployDir, "letsencrypt-certificate.yaml")},
+			{k8s.Registry, path.Join(deployDir, "docker-registry.yaml")},
+		}
 
-	for _, e := range entities {
-		err = CommonEntity(spec, e.template, e.outpath)
-		if err != nil {
-			return
+		for _, e := range entities {
+			err = CommonEntity(spec, e.template, e.outpath)
+			if err != nil {
+				return
+			}
 		}
 	}
 
@@ -123,6 +125,7 @@ func Service(g Abstract, svc model.Service, outdir string) (err error) {
 	}
 
 	// TODO:
+	// - proper error when some field is missing (e.g. return_type)
 	// - README.md on how to use saas-y
 	//   - test the usage of readme
 	// - other files for github (contributors, license, etc.)
