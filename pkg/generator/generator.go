@@ -123,8 +123,6 @@ func Service(g Abstract, svc model.Service, outdir string) (err error) {
 	}
 
 	// TODO:
-	// - line number when validation error occurs (save originating line number when parsing JSON)
-	//
 	// - README.md on how to use saas-y
 	//   - test the usage of readme
 	// - other files for github (contributors, license, etc.)

@@ -1,6 +1,7 @@
 package model
 
 import (
+	"errors"
 	"fmt"
 	"regexp"
 	"strconv"
@@ -57,6 +58,8 @@ var compiledSubdomainNameRegex *regexp.Regexp
 
 // Validate checks a subdomain.
 func (s *Subdomain) Validate(knownServices []string) (err error) {
+	errPrefix := "failed to validate subdomain " + s.Name + ": "
+
 	_, err = validateWithRegex(
 		s.Name,
 		"subdomain name",
@@ -64,12 +67,12 @@ func (s *Subdomain) Validate(knownServices []string) (err error) {
 		`([a-z0-9]([a-z0-9-]*[a-z0-9])?)`,
 	)
 	if err != nil {
-		return
+		return errors.New(errPrefix + err.Error())
 	}
 
 	for _, p := range s.Paths {
 		if err = p.Validate(s, knownServices); err != nil {
-			return
+			return errors.New(errPrefix + err.Error())
 		}
 	}
 	return
@@ -121,21 +124,23 @@ type Service struct {
 
 // Validate checks if the service is well defined.
 func (s *Service) Validate(knownServices []string) (err error) {
+	errPrefix := "failed to validate service " + s.Name + ": "
+
 	if err = s.ServiceCommon.Validate(knownServices); err != nil {
-		return
+		return errors.New(errPrefix + err.Error())
 	}
 
 	var knownTypes []string
 	for _, s := range s.Structs {
 		if err = s.Validate(); err != nil {
-			return
+			return errors.New(errPrefix + err.Error())
 		}
 		knownTypes = append(knownTypes, s.Name)
 	}
 
 	for _, a := range s.API {
 		if err = a.Validate(knownTypes); err != nil {
-			return
+			return errors.New(errPrefix + err.Error())
 		}
 	}
 	return
@@ -149,14 +154,16 @@ type API struct {
 
 // Validate checks if the API is well defined.
 func (a *API) Validate(knownTypes []string) (err error) {
+	errPrefix := "failed to validate API " + a.Path + ": "
+
 	_, err = ValidatePathValue(a.Path)
 	if err != nil {
-		return
+		return errors.New(errPrefix + err.Error())
 	}
 
 	for _, m := range a.Methods {
 		if err = m.Validate(knownTypes); err != nil {
-			return
+			return errors.New(errPrefix + err.Error())
 		}
 	}
 	return
@@ -305,13 +312,15 @@ type Struct struct {
 
 // Validate checks if the struct is well defined.
 func (s *Struct) Validate() (err error) {
+	errPrefix := "failed to validate struct " + s.Name + ": "
+
 	if err = ValidateName(s.Name, "struct name"); err != nil {
-		return
+		return errors.New(errPrefix + err.Error())
 	}
 
 	for _, v := range s.Fields {
 		if err = v.Validate(); err != nil {
-			return
+			return errors.New(errPrefix + err.Error())
 		}
 	}
 	return
@@ -327,8 +336,10 @@ var compiledImageURLRegex *regexp.Regexp
 
 // Validate checks if the external service is well defined.
 func (s *ExternalService) Validate(knownServices []string) (err error) {
+	errPrefix := "failed to validate external service " + s.Name + ": "
+
 	if err = s.ServiceCommon.Validate(knownServices); err != nil {
-		return
+		return errors.New(errPrefix + err.Error())
 	}
 
 	_, err = validateWithRegex(
@@ -337,7 +348,11 @@ func (s *ExternalService) Validate(knownServices []string) (err error) {
 		&compiledImageURLRegex,
 		`(https?://)?(([a-z0-9]([a-z0-9-]*[a-z0-9])?\.)*[a-z0-9]([a-z0-9-]*[a-z0-9])?)(:[0-9]+)?(/[a-z0-9]([a-z0-9-]*[a-z0-9])?)+(:((v?[0-9]+(\.[0-9]+(\.[0-9]+)?)?)|[0-9a-f]+|latest|master))?`,
 	)
-	return
+	if err != nil {
+		return errors.New(errPrefix + "invalid image URL: " + err.Error())
+	}
+
+	return nil
 }
 
 // ServiceCommon contains the core attributes of both saas-y and external services.

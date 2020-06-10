@@ -92,7 +92,7 @@
                     "value": "42"
                 }
             ],
-            "dependencies" : []
+            "dependencies" : ["external-service"]
         }
     ],
     "external_services": [
