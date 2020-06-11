@@ -57,7 +57,7 @@ func (g *Generator) GetTemplate(name string) string {
 		return templates.HTTPRouter
 	case "http_wrapper":
 		return templates.HTTPWrapper
-	case "main":
+	case "main_example":
 		return templates.Main
 	case "struct":
 		return templates.Struct

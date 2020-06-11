@@ -13,6 +13,7 @@ First thing to do after generating a saas-y service is to rename all example gen
 mv Dockerfile.example Dockerfile
 mv Makefile.example Makefile
 mv README-example.md README.md
+mv cmd/main_example.go cmd/main.go
 # maybe others...
 ` + "```" + `
 

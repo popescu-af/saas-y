@@ -110,7 +110,7 @@ func Service(g Abstract, svc model.Service, outdir string) (err error) {
 		{"api_example", dirs[4]},
 		{"api_definition", dirs[6]},
 		{"errors_example", dirs[4]},
-		{"main", dirs[1]},
+		{"main_example", dirs[1]},
 		{"env", dirs[3]},
 		{"http_router", dirs[5]},
 		{"http_wrapper", dirs[5]},
