@@ -5,10 +5,9 @@ const Main = `package main
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 
-	"go.uber.org/zap"
+	"github.com/popescu-af/saas-y/pkg/logutil"
 
 	"{{.Name}}/internal/config"
 	"{{.Name}}/internal/logic"
@@ -16,22 +15,18 @@ import (
 )
 
 func main() {
-	logger, err := zap.NewProduction()
-	if err != nil {
-		log.Fatalf("can't initialize zap logger: %v", err)
-	}
-	defer logger.Sync()
+	defer logutil.Sync()
 
-	logger.Info("{{.Name}} started")
+	logutil.Info("{{.Name}} started")
 
 	env, err := config.ProcessEnv()
 	if err != nil {
-		log.Fatal(err.Error())
+		logutil.Fatal(err.Error())
 	}
 
-	api := logic.NewAPI(logger)
+	api := logic.NewAPI()
 	httpWrapper := service.NewHTTPWrapper(api)
-	router := service.NewRouter(httpWrapper.Paths(), logger)
+	router := service.NewRouter(httpWrapper.Paths())
 
-	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", env.Port), router))
+	logutil.Fatal(fmt.Sprintf("error serving - %v", http.ListenAndServe(fmt.Sprintf(":%s", env.Port), router)))
 }`

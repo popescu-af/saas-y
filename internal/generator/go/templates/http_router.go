@@ -8,6 +8,8 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
+	"github.com/popescu-af/saas-y/pkg/logutil"
+
 	"go.uber.org/zap"
 )
 
@@ -22,20 +24,20 @@ type PathDefinition struct {
 type Paths []PathDefinition
 
 // NewRouter creates a new router for the given paths.
-func NewRouter(paths Paths, logger *zap.Logger) *mux.Router {
+func NewRouter(paths Paths) *mux.Router {
 	router := mux.NewRouter().StrictSlash(true)
 	for _, p := range paths {
 		router.
 			Methods(p.Method).
 			Path(p.Path).
-			Handler(apiLogger(p.Handler, logger))
+			Handler(apiLogger(p.Handler))
 	}
 	return router
 }
 
-func apiLogger(handler http.Handler, logger *zap.Logger) http.Handler {
+func apiLogger(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		logger.Info(
+		logutil.Info(
 			"serving",
 			zap.String("method", r.Method),
 			zap.String("path", r.RequestURI),
@@ -44,7 +46,7 @@ func apiLogger(handler http.Handler, logger *zap.Logger) http.Handler {
 		start := time.Now()
 		handler.ServeHTTP(w, r)
 
-		logger.Info(
+		logutil.Info(
 			"served",
 			zap.String("method", r.Method),
 			zap.String("path", r.RequestURI),

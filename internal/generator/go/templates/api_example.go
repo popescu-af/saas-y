@@ -6,7 +6,7 @@ const APIExample = `package logic
 import (
 	"errors"
 
-	"go.uber.org/zap"
+	"github.com/popescu-af/saas-y/pkg/logutil"
 
 	"{{.Name}}/pkg/exports"
 )
@@ -14,12 +14,11 @@ import (
 // ExampleAPI is an example, trivial implementation of the API interface.
 // It simply logs the request name.
 type ExampleAPI struct {
-	logger *zap.Logger
 }
 
 // NewAPI creates an instance of the example API implementation.
-func NewAPI(logger *zap.Logger) exports.API {
-	return &ExampleAPI{logger: logger}
+func NewAPI() exports.API {
+	return &ExampleAPI{}
 }
 
 {{range $a := .API}}
@@ -48,7 +47,7 @@ func NewAPI(logger *zap.Logger) exports.API {
 				{{- end -}}
 			{{- end -}}
 		) (*exports.{{$method.ReturnType | capitalize | symbolize}}, error) {
-			a.logger.Info("called {{$mname}}")
+			logutil.Info("called {{$mname}}")
 			return nil, errors.New("method '{{$mname}}' not implemented")
 		}
 	{{- end -}}
