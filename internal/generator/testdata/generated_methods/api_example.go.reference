@@ -3,7 +3,7 @@ package logic
 import (
 	"errors"
 
-	"go.uber.org/zap"
+	"github.com/popescu-af/saas-y/pkg/logutil"
 
 	"foo-service/pkg/exports"
 )
@@ -11,61 +11,60 @@ import (
 // ExampleAPI is an example, trivial implementation of the API interface.
 // It simply logs the request name.
 type ExampleAPI struct {
-	logger *zap.Logger
 }
 
 // NewAPI creates an instance of the example API implementation.
-func NewAPI(logger *zap.Logger) exports.API {
-	return &ExampleAPI{logger: logger}
+func NewAPI() exports.API {
+	return &ExampleAPI{}
 }
 
 // /method_no_path_params
 
 // MethodNoPathParams0 example.
 func (a *ExampleAPI) MethodNoPathParams0() (*exports.ReturnType, error) {
-	a.logger.Info("called method_no_path_params_0")
+	logutil.Info("called method_no_path_params_0")
 	return nil, errors.New("method 'method_no_path_params_0' not implemented")
 }
 
 // MethodNoPathParams1 example.
 func (a *ExampleAPI) MethodNoPathParams1(input *exports.BodyType) (*exports.ReturnType, error) {
-	a.logger.Info("called method_no_path_params_1")
+	logutil.Info("called method_no_path_params_1")
 	return nil, errors.New("method 'method_no_path_params_1' not implemented")
 }
 
 // MethodNoPathParams2 example.
 func (a *ExampleAPI) MethodNoPathParams2(headerParam0 string, headerParam1 float64, headerParam2 int64) (*exports.ReturnType, error) {
-	a.logger.Info("called method_no_path_params_2")
+	logutil.Info("called method_no_path_params_2")
 	return nil, errors.New("method 'method_no_path_params_2' not implemented")
 }
 
 // MethodNoPathParams3 example.
 func (a *ExampleAPI) MethodNoPathParams3(input *exports.BodyType, headerParam0 string, headerParam1 float64, headerParam2 int64) (*exports.ReturnType, error) {
-	a.logger.Info("called method_no_path_params_3")
+	logutil.Info("called method_no_path_params_3")
 	return nil, errors.New("method 'method_no_path_params_3' not implemented")
 }
 
 // MethodNoPathParams4 example.
 func (a *ExampleAPI) MethodNoPathParams4(queryParam0 int64, queryParam1 float64, queryParam2 string) (*exports.ReturnType, error) {
-	a.logger.Info("called method_no_path_params_4")
+	logutil.Info("called method_no_path_params_4")
 	return nil, errors.New("method 'method_no_path_params_4' not implemented")
 }
 
 // MethodNoPathParams5 example.
 func (a *ExampleAPI) MethodNoPathParams5(input *exports.BodyType, queryParam0 int64, queryParam1 float64, queryParam2 string) (*exports.ReturnType, error) {
-	a.logger.Info("called method_no_path_params_5")
+	logutil.Info("called method_no_path_params_5")
 	return nil, errors.New("method 'method_no_path_params_5' not implemented")
 }
 
 // MethodNoPathParams6 example.
 func (a *ExampleAPI) MethodNoPathParams6(queryParam0 int64, queryParam1 float64, queryParam2 string, headerParam0 string, headerParam1 float64, headerParam2 int64) (*exports.ReturnType, error) {
-	a.logger.Info("called method_no_path_params_6")
+	logutil.Info("called method_no_path_params_6")
 	return nil, errors.New("method 'method_no_path_params_6' not implemented")
 }
 
 // MethodNoPathParams7 example.
 func (a *ExampleAPI) MethodNoPathParams7(input *exports.BodyType, queryParam0 int64, queryParam1 float64, queryParam2 string, headerParam0 string, headerParam1 float64, headerParam2 int64) (*exports.ReturnType, error) {
-	a.logger.Info("called method_no_path_params_7")
+	logutil.Info("called method_no_path_params_7")
 	return nil, errors.New("method 'method_no_path_params_7' not implemented")
 }
 
@@ -73,48 +72,48 @@ func (a *ExampleAPI) MethodNoPathParams7(input *exports.BodyType, queryParam0 in
 
 // Method0 example.
 func (a *ExampleAPI) Method0(pathParam0 int64, pathParam1 string) (*exports.ReturnType, error) {
-	a.logger.Info("called method_0")
+	logutil.Info("called method_0")
 	return nil, errors.New("method 'method_0' not implemented")
 }
 
 // Method1 example.
 func (a *ExampleAPI) Method1(input *exports.BodyType, pathParam0 int64, pathParam1 string) (*exports.ReturnType, error) {
-	a.logger.Info("called method_1")
+	logutil.Info("called method_1")
 	return nil, errors.New("method 'method_1' not implemented")
 }
 
 // Method2 example.
 func (a *ExampleAPI) Method2(pathParam0 int64, pathParam1 string, headerParam0 string, headerParam1 float64, headerParam2 int64) (*exports.ReturnType, error) {
-	a.logger.Info("called method_2")
+	logutil.Info("called method_2")
 	return nil, errors.New("method 'method_2' not implemented")
 }
 
 // Method3 example.
 func (a *ExampleAPI) Method3(input *exports.BodyType, pathParam0 int64, pathParam1 string, headerParam0 string, headerParam1 float64, headerParam2 int64) (*exports.ReturnType, error) {
-	a.logger.Info("called method_3")
+	logutil.Info("called method_3")
 	return nil, errors.New("method 'method_3' not implemented")
 }
 
 // Method4 example.
 func (a *ExampleAPI) Method4(pathParam0 int64, pathParam1 string, queryParam0 int64, queryParam1 float64, queryParam2 string) (*exports.ReturnType, error) {
-	a.logger.Info("called method_4")
+	logutil.Info("called method_4")
 	return nil, errors.New("method 'method_4' not implemented")
 }
 
 // Method5 example.
 func (a *ExampleAPI) Method5(input *exports.BodyType, pathParam0 int64, pathParam1 string, queryParam0 int64, queryParam1 float64, queryParam2 string) (*exports.ReturnType, error) {
-	a.logger.Info("called method_5")
+	logutil.Info("called method_5")
 	return nil, errors.New("method 'method_5' not implemented")
 }
 
 // Method6 example.
 func (a *ExampleAPI) Method6(pathParam0 int64, pathParam1 string, queryParam0 int64, queryParam1 float64, queryParam2 string, headerParam0 string, headerParam1 float64, headerParam2 int64) (*exports.ReturnType, error) {
-	a.logger.Info("called method_6")
+	logutil.Info("called method_6")
 	return nil, errors.New("method 'method_6' not implemented")
 }
 
 // Method7 example.
 func (a *ExampleAPI) Method7(input *exports.BodyType, pathParam0 int64, pathParam1 string, queryParam0 int64, queryParam1 float64, queryParam2 string, headerParam0 string, headerParam1 float64, headerParam2 int64) (*exports.ReturnType, error) {
-	a.logger.Info("called method_7")
+	logutil.Info("called method_7")
 	return nil, errors.New("method 'method_7' not implemented")
 }
