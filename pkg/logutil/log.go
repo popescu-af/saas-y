@@ -24,26 +24,26 @@ func Sync() {
 }
 
 // Debug logs a message with DEBUG level.
-func Debug(msg string, fields ...Field) {
+func Debug(msg string, fields ...zap.Field) {
 	logger.Debug(msg, fields...)
 }
 
 // Error logs a message with ERROR level.
-func Error(msg string, fields ...Field) {
+func Error(msg string, fields ...zap.Field) {
 	logger.Error(msg, fields...)
 }
 
 // Fatal logs a message with FATAL level.
-func Fatal(msg string, fields ...Field) {
+func Fatal(msg string, fields ...zap.Field) {
 	logger.Fatal(msg, fields...)
 }
 
 // Info logs a message with INFO level.
-func Info(msg string, fields ...Field) {
+func Info(msg string, fields ...zap.Field) {
 	logger.Info(msg, fields...)
 }
 
 // Warn logs a message with WARN level.
-func Warn(msg string, fields ...Field) {
+func Warn(msg string, fields ...zap.Field) {
 	logger.Warn(msg, fields...)
 }
