@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/popescu-af/saas-y/pkg/model"
+	"github.com/popescu-af/saas-y/internal/model"
 )
 
 func TestMethodTypeValid(t *testing.T) {

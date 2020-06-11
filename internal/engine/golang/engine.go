@@ -1,9 +1,9 @@
 package golang
 
 import (
-	"github.com/popescu-af/saas-y/pkg/generator"
-	gengo "github.com/popescu-af/saas-y/pkg/generator/go"
-	"github.com/popescu-af/saas-y/pkg/parser"
+	"github.com/popescu-af/saas-y/internal/generator"
+	gengo "github.com/popescu-af/saas-y/internal/generator/go"
+	"github.com/popescu-af/saas-y/internal/parser"
 )
 
 // GenerateSourcesFromJSONSpec generates go code for the services from

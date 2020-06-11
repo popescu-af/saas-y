@@ -10,8 +10,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/popescu-af/saas-y/pkg/generator"
-	"github.com/popescu-af/saas-y/pkg/generator/go/templates"
+	"github.com/popescu-af/saas-y/internal/generator"
+	"github.com/popescu-af/saas-y/internal/generator/go/templates"
 )
 
 // Generator generates go code + infrastructure specification from a saas-y Spec.

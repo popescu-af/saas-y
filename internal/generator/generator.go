@@ -9,9 +9,9 @@ import (
 	"regexp"
 	"strings"
 
-	common_templ "github.com/popescu-af/saas-y/pkg/generator/common/templates"
-	"github.com/popescu-af/saas-y/pkg/generator/common/templates/k8s"
-	"github.com/popescu-af/saas-y/pkg/model"
+	common_templ "github.com/popescu-af/saas-y/internal/generator/common/templates"
+	"github.com/popescu-af/saas-y/internal/generator/common/templates/k8s"
+	"github.com/popescu-af/saas-y/internal/model"
 )
 
 // Abstract is the interface for saas-y code & infrastructure generators.

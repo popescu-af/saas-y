@@ -7,11 +7,11 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/popescu-af/saas-y/pkg/generator"
-	"github.com/popescu-af/saas-y/pkg/generator/common/templates/k8s"
-	gengo "github.com/popescu-af/saas-y/pkg/generator/go"
-	"github.com/popescu-af/saas-y/pkg/model"
-	saasytesting "github.com/popescu-af/saas-y/pkg/testing"
+	"github.com/popescu-af/saas-y/internal/generator"
+	"github.com/popescu-af/saas-y/internal/generator/common/templates/k8s"
+	gengo "github.com/popescu-af/saas-y/internal/generator/go"
+	"github.com/popescu-af/saas-y/internal/model"
+	saasytesting "github.com/popescu-af/saas-y/internal/testing"
 )
 
 func generateServiceFiles(svc model.Service) (pOutdir string, err error) {

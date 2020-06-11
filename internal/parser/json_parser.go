@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 
-	"github.com/popescu-af/saas-y/pkg/model"
+	"github.com/popescu-af/saas-y/internal/model"
 )
 
 // A JSON parses the saas-y spec from a JSON file.

@@ -5,7 +5,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/popescu-af/saas-y/pkg/engine/golang"
+	"github.com/popescu-af/saas-y/internal/engine/golang"
 )
 
 func main() {

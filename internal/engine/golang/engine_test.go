@@ -9,7 +9,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	saasy_testing "github.com/popescu-af/saas-y/pkg/testing"
+	saasy_testing "github.com/popescu-af/saas-y/internal/testing"
 )
 
 var fullSpec = `
