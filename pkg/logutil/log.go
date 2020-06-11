@@ -19,7 +19,7 @@ func newLogger() *zap.Logger {
 // Sync flushes the log cache.
 func Sync() {
 	if err := logger.Sync(); err != nil {
-		log.Error("failed to flush log cache - %v", err)
+		log.Printf("failed to flush log cache - %v", err)
 	}
 }
 
