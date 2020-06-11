@@ -90,7 +90,7 @@ func (g *Generator) CodeFormatter(path string) (st generator.SymbolTable, err er
 
 	st = make(generator.SymbolTable)
 	contents := string(b)
-	reLint := regexp.MustCompile(`(var|method|struct field|type) ([a-zA-Z0-9_]+) should be ([a-zA-Z0-9]+)`)
+	reLint := regexp.MustCompile(`(var|method|method parameter|struct field|type) ([a-zA-Z0-9_]+) should be ([a-zA-Z0-9]+)`)
 
 	for _, matchLint := range reLint.FindAllStringSubmatch(out.String(), -1) {
 		old := matchLint[2]

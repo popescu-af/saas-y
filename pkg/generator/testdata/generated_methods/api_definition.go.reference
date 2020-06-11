@@ -4,122 +4,21 @@ package exports
 type API interface {
 	// /method_no_path_params
 	MethodNoPathParams0() (*ReturnType, error)
-
-	MethodNoPathParams1(
-		*BodyType,
-	) (*ReturnType, error)
-
-	MethodNoPathParams2(
-		string,
-		float64,
-		int64,
-	) (*ReturnType, error)
-
-	MethodNoPathParams3(
-		*BodyType,
-		string,
-		float64,
-		int64,
-	) (*ReturnType, error)
-
-	MethodNoPathParams4(
-		int64,
-		float64,
-		string,
-	) (*ReturnType, error)
-
-	MethodNoPathParams5(
-		*BodyType,
-		int64,
-		float64,
-		string,
-	) (*ReturnType, error)
-
-	MethodNoPathParams6(
-		int64,
-		float64,
-		string,
-		string,
-		float64,
-		int64,
-	) (*ReturnType, error)
-
-	MethodNoPathParams7(
-		*BodyType,
-		int64,
-		float64,
-		string,
-		string,
-		float64,
-		int64,
-	) (*ReturnType, error)
+	MethodNoPathParams1(*BodyType) (*ReturnType, error)
+	MethodNoPathParams2(string, float64, int64) (*ReturnType, error)
+	MethodNoPathParams3(*BodyType, string, float64, int64) (*ReturnType, error)
+	MethodNoPathParams4(int64, float64, string) (*ReturnType, error)
+	MethodNoPathParams5(*BodyType, int64, float64, string) (*ReturnType, error)
+	MethodNoPathParams6(int64, float64, string, string, float64, int64) (*ReturnType, error)
+	MethodNoPathParams7(*BodyType, int64, float64, string, string, float64, int64) (*ReturnType, error)
 
 	// /method/{path_param_0:int}/{path_param_1:string}
-	Method0(
-		int64,
-		string,
-	) (*ReturnType, error)
-
-	Method1(
-		*BodyType,
-		int64,
-		string,
-	) (*ReturnType, error)
-
-	Method2(
-		int64,
-		string,
-		string,
-		float64,
-		int64,
-	) (*ReturnType, error)
-
-	Method3(
-		*BodyType,
-		int64,
-		string,
-		string,
-		float64,
-		int64,
-	) (*ReturnType, error)
-
-	Method4(
-		int64,
-		string,
-		int64,
-		float64,
-		string,
-	) (*ReturnType, error)
-
-	Method5(
-		*BodyType,
-		int64,
-		string,
-		int64,
-		float64,
-		string,
-	) (*ReturnType, error)
-
-	Method6(
-		int64,
-		string,
-		int64,
-		float64,
-		string,
-		string,
-		float64,
-		int64,
-	) (*ReturnType, error)
-
-	Method7(
-		*BodyType,
-		int64,
-		string,
-		int64,
-		float64,
-		string,
-		string,
-		float64,
-		int64,
-	) (*ReturnType, error)
+	Method0(int64, string) (*ReturnType, error)
+	Method1(*BodyType, int64, string) (*ReturnType, error)
+	Method2(int64, string, string, float64, int64) (*ReturnType, error)
+	Method3(*BodyType, int64, string, string, float64, int64) (*ReturnType, error)
+	Method4(int64, string, int64, float64, string) (*ReturnType, error)
+	Method5(*BodyType, int64, string, int64, float64, string) (*ReturnType, error)
+	Method6(int64, string, int64, float64, string, string, float64, int64) (*ReturnType, error)
+	Method7(*BodyType, int64, string, int64, float64, string, string, float64, int64) (*ReturnType, error)
 }

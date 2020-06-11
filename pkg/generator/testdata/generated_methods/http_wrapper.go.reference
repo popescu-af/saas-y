@@ -148,7 +148,7 @@ func (h *HTTPWrapper) MethodNoPathParams1(w http.ResponseWriter, r *http.Request
 	// Body
 	body := &exports.BodyType{}
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
-		w.WriteHeader(400)
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
@@ -169,13 +169,13 @@ func (h *HTTPWrapper) MethodNoPathParams2(w http.ResponseWriter, r *http.Request
 
 	headerParam1, err := parseFloatParameter(r.Header.Get("header_param_1"))
 	if err != nil {
-		w.WriteHeader(400)
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	headerParam2, err := parseIntParameter(r.Header.Get("header_param_2"))
 	if err != nil {
-		w.WriteHeader(400)
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
@@ -194,7 +194,7 @@ func (h *HTTPWrapper) MethodNoPathParams3(w http.ResponseWriter, r *http.Request
 	// Body
 	body := &exports.BodyType{}
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
-		w.WriteHeader(400)
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
@@ -203,13 +203,13 @@ func (h *HTTPWrapper) MethodNoPathParams3(w http.ResponseWriter, r *http.Request
 
 	headerParam1, err := parseFloatParameter(r.Header.Get("header_param_1"))
 	if err != nil {
-		w.WriteHeader(400)
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	headerParam2, err := parseIntParameter(r.Header.Get("header_param_2"))
 	if err != nil {
-		w.WriteHeader(400)
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
@@ -230,13 +230,13 @@ func (h *HTTPWrapper) MethodNoPathParams4(w http.ResponseWriter, r *http.Request
 
 	queryParam0, err := parseIntParameter(query.Get("query_param_0"))
 	if err != nil {
-		w.WriteHeader(400)
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	queryParam1, err := parseFloatParameter(query.Get("query_param_1"))
 	if err != nil {
-		w.WriteHeader(400)
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
@@ -257,7 +257,7 @@ func (h *HTTPWrapper) MethodNoPathParams5(w http.ResponseWriter, r *http.Request
 	// Body
 	body := &exports.BodyType{}
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
-		w.WriteHeader(400)
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
@@ -266,13 +266,13 @@ func (h *HTTPWrapper) MethodNoPathParams5(w http.ResponseWriter, r *http.Request
 
 	queryParam0, err := parseIntParameter(query.Get("query_param_0"))
 	if err != nil {
-		w.WriteHeader(400)
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	queryParam1, err := parseFloatParameter(query.Get("query_param_1"))
 	if err != nil {
-		w.WriteHeader(400)
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
@@ -295,13 +295,13 @@ func (h *HTTPWrapper) MethodNoPathParams6(w http.ResponseWriter, r *http.Request
 
 	queryParam0, err := parseIntParameter(query.Get("query_param_0"))
 	if err != nil {
-		w.WriteHeader(400)
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	queryParam1, err := parseFloatParameter(query.Get("query_param_1"))
 	if err != nil {
-		w.WriteHeader(400)
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
@@ -312,13 +312,13 @@ func (h *HTTPWrapper) MethodNoPathParams6(w http.ResponseWriter, r *http.Request
 
 	headerParam1, err := parseFloatParameter(r.Header.Get("header_param_1"))
 	if err != nil {
-		w.WriteHeader(400)
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	headerParam2, err := parseIntParameter(r.Header.Get("header_param_2"))
 	if err != nil {
-		w.WriteHeader(400)
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
@@ -337,7 +337,7 @@ func (h *HTTPWrapper) MethodNoPathParams7(w http.ResponseWriter, r *http.Request
 	// Body
 	body := &exports.BodyType{}
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
-		w.WriteHeader(400)
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
@@ -346,13 +346,13 @@ func (h *HTTPWrapper) MethodNoPathParams7(w http.ResponseWriter, r *http.Request
 
 	queryParam0, err := parseIntParameter(query.Get("query_param_0"))
 	if err != nil {
-		w.WriteHeader(400)
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	queryParam1, err := parseFloatParameter(query.Get("query_param_1"))
 	if err != nil {
-		w.WriteHeader(400)
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
@@ -363,13 +363,13 @@ func (h *HTTPWrapper) MethodNoPathParams7(w http.ResponseWriter, r *http.Request
 
 	headerParam1, err := parseFloatParameter(r.Header.Get("header_param_1"))
 	if err != nil {
-		w.WriteHeader(400)
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	headerParam2, err := parseIntParameter(r.Header.Get("header_param_2"))
 	if err != nil {
-		w.WriteHeader(400)
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
@@ -390,7 +390,7 @@ func (h *HTTPWrapper) Method0(w http.ResponseWriter, r *http.Request) {
 
 	pathParam0, err := parseIntParameter(pathParams["path_param_0"])
 	if err != nil {
-		w.WriteHeader(400)
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
@@ -411,7 +411,7 @@ func (h *HTTPWrapper) Method1(w http.ResponseWriter, r *http.Request) {
 	// Body
 	body := &exports.BodyType{}
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
-		w.WriteHeader(400)
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
@@ -420,7 +420,7 @@ func (h *HTTPWrapper) Method1(w http.ResponseWriter, r *http.Request) {
 
 	pathParam0, err := parseIntParameter(pathParams["path_param_0"])
 	if err != nil {
-		w.WriteHeader(400)
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
@@ -443,7 +443,7 @@ func (h *HTTPWrapper) Method2(w http.ResponseWriter, r *http.Request) {
 
 	pathParam0, err := parseIntParameter(pathParams["path_param_0"])
 	if err != nil {
-		w.WriteHeader(400)
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
@@ -454,13 +454,13 @@ func (h *HTTPWrapper) Method2(w http.ResponseWriter, r *http.Request) {
 
 	headerParam1, err := parseFloatParameter(r.Header.Get("header_param_1"))
 	if err != nil {
-		w.WriteHeader(400)
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	headerParam2, err := parseIntParameter(r.Header.Get("header_param_2"))
 	if err != nil {
-		w.WriteHeader(400)
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
@@ -479,7 +479,7 @@ func (h *HTTPWrapper) Method3(w http.ResponseWriter, r *http.Request) {
 	// Body
 	body := &exports.BodyType{}
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
-		w.WriteHeader(400)
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
@@ -488,7 +488,7 @@ func (h *HTTPWrapper) Method3(w http.ResponseWriter, r *http.Request) {
 
 	pathParam0, err := parseIntParameter(pathParams["path_param_0"])
 	if err != nil {
-		w.WriteHeader(400)
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
@@ -499,13 +499,13 @@ func (h *HTTPWrapper) Method3(w http.ResponseWriter, r *http.Request) {
 
 	headerParam1, err := parseFloatParameter(r.Header.Get("header_param_1"))
 	if err != nil {
-		w.WriteHeader(400)
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	headerParam2, err := parseIntParameter(r.Header.Get("header_param_2"))
 	if err != nil {
-		w.WriteHeader(400)
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
@@ -526,7 +526,7 @@ func (h *HTTPWrapper) Method4(w http.ResponseWriter, r *http.Request) {
 
 	pathParam0, err := parseIntParameter(pathParams["path_param_0"])
 	if err != nil {
-		w.WriteHeader(400)
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
@@ -537,13 +537,13 @@ func (h *HTTPWrapper) Method4(w http.ResponseWriter, r *http.Request) {
 
 	queryParam0, err := parseIntParameter(query.Get("query_param_0"))
 	if err != nil {
-		w.WriteHeader(400)
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	queryParam1, err := parseFloatParameter(query.Get("query_param_1"))
 	if err != nil {
-		w.WriteHeader(400)
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
@@ -564,7 +564,7 @@ func (h *HTTPWrapper) Method5(w http.ResponseWriter, r *http.Request) {
 	// Body
 	body := &exports.BodyType{}
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
-		w.WriteHeader(400)
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
@@ -573,7 +573,7 @@ func (h *HTTPWrapper) Method5(w http.ResponseWriter, r *http.Request) {
 
 	pathParam0, err := parseIntParameter(pathParams["path_param_0"])
 	if err != nil {
-		w.WriteHeader(400)
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
@@ -584,13 +584,13 @@ func (h *HTTPWrapper) Method5(w http.ResponseWriter, r *http.Request) {
 
 	queryParam0, err := parseIntParameter(query.Get("query_param_0"))
 	if err != nil {
-		w.WriteHeader(400)
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	queryParam1, err := parseFloatParameter(query.Get("query_param_1"))
 	if err != nil {
-		w.WriteHeader(400)
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
@@ -613,7 +613,7 @@ func (h *HTTPWrapper) Method6(w http.ResponseWriter, r *http.Request) {
 
 	pathParam0, err := parseIntParameter(pathParams["path_param_0"])
 	if err != nil {
-		w.WriteHeader(400)
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
@@ -624,13 +624,13 @@ func (h *HTTPWrapper) Method6(w http.ResponseWriter, r *http.Request) {
 
 	queryParam0, err := parseIntParameter(query.Get("query_param_0"))
 	if err != nil {
-		w.WriteHeader(400)
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	queryParam1, err := parseFloatParameter(query.Get("query_param_1"))
 	if err != nil {
-		w.WriteHeader(400)
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
@@ -641,13 +641,13 @@ func (h *HTTPWrapper) Method6(w http.ResponseWriter, r *http.Request) {
 
 	headerParam1, err := parseFloatParameter(r.Header.Get("header_param_1"))
 	if err != nil {
-		w.WriteHeader(400)
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	headerParam2, err := parseIntParameter(r.Header.Get("header_param_2"))
 	if err != nil {
-		w.WriteHeader(400)
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
@@ -666,7 +666,7 @@ func (h *HTTPWrapper) Method7(w http.ResponseWriter, r *http.Request) {
 	// Body
 	body := &exports.BodyType{}
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
-		w.WriteHeader(400)
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
@@ -675,7 +675,7 @@ func (h *HTTPWrapper) Method7(w http.ResponseWriter, r *http.Request) {
 
 	pathParam0, err := parseIntParameter(pathParams["path_param_0"])
 	if err != nil {
-		w.WriteHeader(400)
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
@@ -686,13 +686,13 @@ func (h *HTTPWrapper) Method7(w http.ResponseWriter, r *http.Request) {
 
 	queryParam0, err := parseIntParameter(query.Get("query_param_0"))
 	if err != nil {
-		w.WriteHeader(400)
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	queryParam1, err := parseFloatParameter(query.Get("query_param_1"))
 	if err != nil {
-		w.WriteHeader(400)
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
@@ -703,13 +703,13 @@ func (h *HTTPWrapper) Method7(w http.ResponseWriter, r *http.Request) {
 
 	headerParam1, err := parseFloatParameter(r.Header.Get("header_param_1"))
 	if err != nil {
-		w.WriteHeader(400)
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	headerParam2, err := parseIntParameter(r.Header.Get("header_param_2"))
 	if err != nil {
-		w.WriteHeader(400)
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
