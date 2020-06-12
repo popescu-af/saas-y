@@ -45,6 +45,8 @@ func (g *Generator) GetTemplate(name string) string {
 		return templates.APIDefinition
 	case "api_example":
 		return templates.APIExample
+	case "client":
+		return templates.Client
 	case "dockerfile":
 		return templates.Dockerfile
 	case "env":
@@ -97,7 +99,7 @@ func (g *Generator) CodeFormatter(path string) (st generator.SymbolTable, err er
 		new := matchLint[3]
 
 		st[old] = new
-		reDefinition := regexp.MustCompile(old + `([^"'])`)
+		reDefinition := regexp.MustCompile(old + `([^"'=])`)
 
 		for _, matchDefinition := range reDefinition.FindAllStringSubmatch(contents, -1) {
 			contents = strings.ReplaceAll(contents, old+matchDefinition[1], new+matchDefinition[1])

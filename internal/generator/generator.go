@@ -108,6 +108,7 @@ func Service(g Abstract, svc model.Service, outdir string) (err error) {
 		outdir   string
 	}{
 		{"api_example", dirs[4]},
+		{"client", dirs[7]},
 		{"api_definition", dirs[6]},
 		{"errors_example", dirs[4]},
 		{"main_example", dirs[1]},
@@ -159,6 +160,7 @@ func serviceDirs(g Abstract, basePath string) (dirs []string, err error) {
 		path.Join(basePath, g.InternalPath(), "logic"),
 		path.Join(basePath, g.InternalPath(), "service"),
 		path.Join(basePath, g.PackagePath(), "exports"),
+		path.Join(basePath, g.PackagePath(), "client"),
 	}
 
 	for _, dir := range dirs {
@@ -213,11 +215,14 @@ func templateFiller(templ string, codeFormatter func(string) (SymbolTable, error
 
 	loadedTempl := template.Must(template.New("templ").
 		Funcs(template.FuncMap{
-			"decapitalize": func(s string) string { return strings.ToLower(s[:1]) + s[1:] },
-			"capitalize":   func(s string) string { return strings.ToUpper(s[:1]) + s[1:] },
-			"toLower":      strings.ToLower,
-			"toUpper":      strings.ToUpper,
-			"symbolize":    symbolize,
+			"decapitalize":    func(s string) string { return strings.ToLower(s[:1]) + s[1:] },
+			"capitalize":      func(s string) string { return strings.ToUpper(s[:1]) + s[1:] },
+			"toLower":         strings.ToLower,
+			"toUpper":         strings.ToUpper,
+			"symbolize":       symbolize,
+			"typeName":        typeName,
+			"typePlaceholder": typePlaceholder,
+			"pathParameters":  pathParameters,
 			"pathHasParameters": func(s string) string {
 				ss := strings.Split(s, "/")
 				if strings.Contains(ss[len(ss)-1], "}") {
@@ -225,45 +230,35 @@ func templateFiller(templ string, codeFormatter func(string) (SymbolTable, error
 				}
 				return "" // empty value means false in {{if $x}} template conditional
 			},
-			"pathParameters": func(s string) (result []string) {
-				paramMap := make(map[string]string)
-
-				ss := strings.Split(s, "/")
-				for _, p := range ss {
-					if !strings.Contains(p, "}") {
-						continue
-					}
-
-					tokens := strings.Split(p, ":")
-					if len(tokens) != 2 {
-						log.Fatalf("invalid path parameter spec: %s (should be in the form name:type)", p)
-					}
-
-					pName := tokens[0][1:]
-					if _, ok := paramMap[pName]; ok {
-						log.Fatalf("path paramerter already defined: %s", pName)
-					}
-
-					pType := tokens[1][:len(tokens[1])-1]
-					for _, t := range []string{"int", "uint", "float", "string"} {
-						if t == pType {
-							result = append(result, pName)
-							result = append(result, pType)
-							paramMap[pName] = pType
-						}
-					}
-					if _, ok := paramMap[pName]; !ok {
-						log.Fatalf("invalid type for parameter '%s': '%s'", pName, pType)
-					}
-				}
-				return result
-			},
 			"indicesParameters": func(parameters []string) []int {
 				var indices []int
 				for i := 0; i < len(parameters); i += 2 {
 					indices = append(indices, i)
 				}
 				return indices
+			},
+			"createPathWithParameterValues": func(p string) []string {
+				var fmtString string
+				var argString string
+
+				params := pathParameters(p)
+				pIdx := 0
+				tokens := strings.Split(p, "/")
+				for i, t := range tokens {
+					if i > 0 {
+						fmtString += "/"
+					}
+					if !strings.Contains(t, "}") {
+						fmtString += t
+						continue
+					}
+
+					fmtString += typePlaceholder(params[pIdx+1])
+					argString += ", " + params[pIdx]
+					pIdx += 2
+				}
+
+				return []string{fmtString, argString}
 			},
 			"inc": func(i int) int {
 				return i + 1
@@ -281,23 +276,26 @@ func templateFiller(templ string, codeFormatter func(string) (SymbolTable, error
 				}
 				return ""
 			},
-			"typeName": func(t string) string {
-				switch t {
-				case "int":
-					return "int64"
-				case "uint":
-					return "uint64"
-				case "float":
-					return "float64"
-				case "string":
-					return "string"
-				}
-
-				return ""
-			},
 			"cleanPath": func(p string) string {
 				re := regexp.MustCompile(`:(int|uint|float|string)`)
 				return re.ReplaceAllString(p, "")
+			},
+			"cleanName": func(n string) string {
+				result := n[:1]
+				cap := false
+				for _, c := range n[1:] {
+					if c == '_' || c == '-' {
+						cap = true
+						continue
+					}
+					if cap {
+						result += strings.ToUpper(string(c))
+						cap = false
+					} else {
+						result += string(c)
+					}
+				}
+				return result
 			},
 		}).
 		Parse(templ))
@@ -340,4 +338,68 @@ func symbolize(originalName string) string {
 		return translatedName
 	}
 	return originalName
+}
+
+func typeName(t string) string {
+	switch t {
+	case "int":
+		return "int64"
+	case "uint":
+		return "uint64"
+	case "float":
+		return "float64"
+	case "string":
+		return "string"
+	}
+
+	return ""
+}
+
+func typePlaceholder(t string) string {
+	switch t {
+	case "int":
+		return "%d"
+	case "uint":
+		return "%u"
+	case "float":
+		return "%f"
+	case "string":
+		return "%s"
+	}
+
+	return ""
+}
+
+func pathParameters(s string) (result []string) {
+	paramMap := make(map[string]string)
+
+	ss := strings.Split(s, "/")
+	for _, p := range ss {
+		if !strings.Contains(p, "}") {
+			continue
+		}
+
+		tokens := strings.Split(p, ":")
+		if len(tokens) != 2 {
+			log.Fatalf("invalid path parameter spec: %s (should be in the form name:type)", p)
+		}
+
+		pName := tokens[0][1:]
+		if _, ok := paramMap[pName]; ok {
+			log.Fatalf("path paramerter already defined: %s", pName)
+		}
+
+		pType := tokens[1][:len(tokens[1])-1]
+		for _, t := range []string{"int", "uint", "float", "string"} {
+			if t == pType {
+				result = append(result, pName)
+				result = append(result, pType)
+				paramMap[pName] = pType
+			}
+		}
+		if _, ok := paramMap[pName]; !ok {
+			log.Fatalf("invalid type for parameter '%s': '%s'", pName, pType)
+		}
+	}
+	return result
 }
