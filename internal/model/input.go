@@ -188,13 +188,13 @@ type APIMethodType string
 
 const (
 	// GET is the HTTP GET type
-	GET APIMethodType = "get"
+	GET APIMethodType = "GET"
 	// POST is the HTTP POST type
-	POST APIMethodType = "post"
+	POST APIMethodType = "POST"
 	// PATCH is the HTTP PATCH type
-	PATCH APIMethodType = "patch"
+	PATCH APIMethodType = "PATCH"
 	// DELETE is the HTTP DELETE type
-	DELETE APIMethodType = "delete"
+	DELETE APIMethodType = "DELETE"
 )
 
 // Method represents a saas-y API method.
