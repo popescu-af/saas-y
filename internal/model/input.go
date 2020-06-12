@@ -10,14 +10,27 @@ import (
 
 // Spec is the saas-y specification.
 type Spec struct {
+	RepositoryURL    string            `json:"repository_url"`
 	Domain           string            `json:"domain"`
 	Subdomains       []Subdomain       `json:"subdomains"`
 	Services         []Service         `json:"services"`
 	ExternalServices []ExternalService `json:"external_services"`
 }
 
+// GenerateRepositoryURLsForServices generates a repository URL for each service.
+func (s *Spec) GenerateRepositoryURLsForServices() {
+	for i := range s.Services {
+		s.Services[i].RepositoryURL = s.RepositoryURL + "/services/" + s.Services[i].Name
+	}
+}
+
 // Validate checks a specification.
 func (s *Spec) Validate() (err error) {
+	if s.RepositoryURL == "" {
+		return fmt.Errorf("missing 'repository_url' field, please provide one with a valid value")
+	}
+
+	// TODO: repository URL validation
 	// TODO: Domain validation
 
 	var knownServices []string
@@ -118,8 +131,9 @@ func ValidatePathValue(pathValue string) (int, error) {
 // Service represents a saas-y defined service.
 type Service struct {
 	ServiceCommon
-	API     []API    `json:"api"`
-	Structs []Struct `json:"structs"`
+	API           []API    `json:"api"`
+	Structs       []Struct `json:"structs"`
+	RepositoryURL string   // deduced from the spec's repository URL
 }
 
 // Validate checks if the service is well defined.

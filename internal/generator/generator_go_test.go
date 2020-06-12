@@ -37,8 +37,9 @@ func TestGeneratedEnv(t *testing.T) {
 				},
 			},
 		},
-		API:     []model.API{},
-		Structs: []model.Struct{},
+		API:           []model.API{},
+		Structs:       []model.Struct{},
+		RepositoryURL: "foo-service",
 	}
 
 	generator.Init()
@@ -161,6 +162,7 @@ func TestGeneratedMethods(t *testing.T) {
 				},
 			},
 		},
+		RepositoryURL: "foo-service",
 	}
 
 	generator.Init()

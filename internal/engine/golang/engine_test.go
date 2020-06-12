@@ -14,6 +14,7 @@ import (
 
 var fullSpec = `
 {
+    "repository_url": "example.com/example",
     "services": [
         {
             "name": "foo-service",
@@ -113,7 +114,7 @@ func TestGeneratedServiceCompiles(t *testing.T) {
 
 	// compile
 	var errout bytes.Buffer
-	cmd := exec.Command("go", "build", "./cmd/main.go")
+	cmd := exec.Command("go", "build", "./cmd/main_example.go")
 	cmd.Stderr = &errout
 	cmd.Dir = path.Join(pOutdir, "services", "foo-service")
 
