@@ -7,7 +7,7 @@ const HTTPErrorHandlerExample = `package service
 import (
 	"net/http"
 
-	"{{.Name}}/internal/logic"
+	"{{.RepositoryURL}}/internal/logic"
 )
 
 func writeErrorToHTTPResponse(err error, w http.ResponseWriter) {

@@ -77,7 +77,7 @@ func Service(g Abstract, svc model.Service, outdir string) (err error) {
 		return
 	}
 
-	if err = g.GenerateProject(svc.Name, basePath); err != nil {
+	if err = g.GenerateProject(svc.RepositoryURL, basePath); err != nil {
 		return
 	}
 

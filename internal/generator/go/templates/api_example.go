@@ -8,7 +8,7 @@ import (
 
 	"github.com/popescu-af/saas-y/pkg/logutil"
 
-	"{{.Name}}/pkg/exports"
+	"{{.RepositoryURL}}/pkg/exports"
 )
 
 // ExampleAPI is an example, trivial implementation of the API interface.

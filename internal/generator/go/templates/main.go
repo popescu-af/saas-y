@@ -9,9 +9,9 @@ import (
 
 	"github.com/popescu-af/saas-y/pkg/logutil"
 
-	"{{.Name}}/internal/config"
-	"{{.Name}}/internal/logic"
-	"{{.Name}}/internal/service"
+	"{{.RepositoryURL}}/internal/config"
+	"{{.RepositoryURL}}/internal/logic"
+	"{{.RepositoryURL}}/internal/service"
 )
 
 func main() {

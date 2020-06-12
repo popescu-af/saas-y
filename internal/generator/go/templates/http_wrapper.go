@@ -11,7 +11,7 @@ import (
 
 	"github.com/gorilla/mux"
 
-	"{{.Name}}/pkg/exports"
+	"{{.RepositoryURL}}/pkg/exports"
 )
 
 // HTTPWrapper decorates the APIs with from/to HTTP code.
