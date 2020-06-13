@@ -27,7 +27,7 @@ func New{{$cleanName}}Client(remoteAddress string) *{{$cleanName}}Client {
 
 {{range $a := $.API}}
 {{range $mname, $method := $a.Methods}}
-// {{$mname | capitalize}} is the client function for '{{$a.Path}}'.
+// {{$mname | capitalize}} is the client function for {{$method.Type}} '{{$a.Path}}'.
 func (a *{{$cleanName}}Client) {{$mname | capitalize}}(
 	{{- if $method.InputType -}}
 		input *exports.{{$method.InputType | capitalize | symbolize}},
@@ -50,13 +50,15 @@ func (a *{{$cleanName}}Client) {{$mname | capitalize}}(
 		{{- end -}}
 	{{- end -}}
 ) (*exports.{{$method.ReturnType | capitalize | symbolize}}, error) {
+	var body io.Reader
+
 	{{if $method.InputType -}}
 		b, err := json.Marshal(input)
 		if err != nil {
 			return nil, err
 		}
 
-		body := bytes.NewBuffer(b)
+		body = bytes.NewBuffer(b)
 	{{end}}
 
 	{{- with $fmtAndArgs := $a.Path | createPathWithParameterValues -}}
@@ -72,19 +74,21 @@ func (a *{{$cleanName}}Client) {{$mname | capitalize}}(
 		{{- end -}}
 	{{- end}}
 
-	// USE THIS
-	// first of all, make methods to upper
-	// request, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonStr))
-	// request.Header.Set("Content-Type", "application/json")
-	// and ahahah from below
+	request, err := http.NewRequest("{{$method.Type}}", url, body)
+	{{if $method.HeaderParams -}}
+		{{- range $method.HeaderParams -}}
+			request.Header.Set("{{.Name}}", fmt.Sprintf("{{.Type | typePlaceholder}}", {{.Name}}))
+		{{- end -}}
+	{{- end}}
 
+	response, err := http.DefaultClient.Do(request)
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer response.Body.Close()
 
 	if response.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("{{$method.Type}} %s failed with status code %v", url, response.StatusCode)
+		return nil, fmt.Errorf("{{$method.Type}} %s failed with status code %d", url, response.StatusCode)
 	}
 
 	result := new(exports.{{$method.ReturnType | capitalize | symbolize}})
@@ -99,12 +103,4 @@ func (a *{{$cleanName}}Client) {{$mname | capitalize}}(
 {{end}}
 {{end}}
 {{end}}
-`
-
-const ahahah = `
-{{- if $method.HeaderParams -}}
-	{{- range $method.HeaderParams -}}
-		{{- .Name}} {{.Type | typeName}},
-	{{- end -}}
-{{- end -}}
 `
