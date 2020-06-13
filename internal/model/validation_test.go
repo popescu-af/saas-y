@@ -14,10 +14,10 @@ func TestMethodTypeValid(t *testing.T) {
 		valid  bool
 	}{
 		{&model.Method{Type: "dummy"}, false},
-		{&model.Method{Type: "get"}, true},
-		{&model.Method{Type: "post"}, true},
-		{&model.Method{Type: "patch"}, true},
-		{&model.Method{Type: "delete"}, true},
+		{&model.Method{Type: "GET"}, true},
+		{&model.Method{Type: "POST"}, true},
+		{&model.Method{Type: "PATCH"}, true},
+		{&model.Method{Type: "DELETE"}, true},
 	}
 
 	for _, tt := range tests {
@@ -35,14 +35,14 @@ func TestMethodBodyAllowed(t *testing.T) {
 		method *model.Method
 		valid  bool
 	}{
-		{&model.Method{Type: "get"}, true},
-		{&model.Method{Type: "post"}, true},
-		{&model.Method{Type: "patch"}, true},
-		{&model.Method{Type: "delete"}, true},
-		{&model.Method{Type: "get", InputType: "whatever"}, false},
-		{&model.Method{Type: "post", InputType: "whatever"}, true},
-		{&model.Method{Type: "patch", InputType: "whatever"}, true},
-		{&model.Method{Type: "delete", InputType: "whatever"}, false},
+		{&model.Method{Type: "GET"}, true},
+		{&model.Method{Type: "POST"}, true},
+		{&model.Method{Type: "PATCH"}, true},
+		{&model.Method{Type: "DELETE"}, true},
+		{&model.Method{Type: "GET", InputType: "whatever"}, false},
+		{&model.Method{Type: "POST", InputType: "whatever"}, true},
+		{&model.Method{Type: "PATCH", InputType: "whatever"}, true},
+		{&model.Method{Type: "DELETE", InputType: "whatever"}, false},
 	}
 
 	for _, tt := range tests {
@@ -60,10 +60,10 @@ func TestMethodTypes(t *testing.T) {
 		method *model.Method
 		valid  bool
 	}{
-		{&model.Method{Type: "post", InputType: "something_unknown"}, false},
-		{&model.Method{Type: "post", InputType: "something_known"}, true},
-		{&model.Method{Type: "post", ReturnType: "something_unknown"}, false},
-		{&model.Method{Type: "post", ReturnType: "something_known"}, true},
+		{&model.Method{Type: "POST", InputType: "something_unknown"}, false},
+		{&model.Method{Type: "POST", InputType: "something_known"}, true},
+		{&model.Method{Type: "POST", ReturnType: "something_unknown"}, false},
+		{&model.Method{Type: "POST", ReturnType: "something_known"}, true},
 	}
 
 	for _, tt := range tests {

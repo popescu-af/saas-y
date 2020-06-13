@@ -48,82 +48,82 @@ func parseFloatParameter(param string) (float64, error) {
 func (h *HTTPWrapper) Paths() Paths {
 	return Paths{
 		{
-			strings.ToUpper("post"),
+			strings.ToUpper("POST"),
 			"/method_no_path_params",
 			h.MethodNoPathParams0,
 		},
 		{
-			strings.ToUpper("post"),
+			strings.ToUpper("POST"),
 			"/method_no_path_params",
 			h.MethodNoPathParams1,
 		},
 		{
-			strings.ToUpper("post"),
+			strings.ToUpper("POST"),
 			"/method_no_path_params",
 			h.MethodNoPathParams2,
 		},
 		{
-			strings.ToUpper("post"),
+			strings.ToUpper("POST"),
 			"/method_no_path_params",
 			h.MethodNoPathParams3,
 		},
 		{
-			strings.ToUpper("post"),
+			strings.ToUpper("POST"),
 			"/method_no_path_params",
 			h.MethodNoPathParams4,
 		},
 		{
-			strings.ToUpper("post"),
+			strings.ToUpper("POST"),
 			"/method_no_path_params",
 			h.MethodNoPathParams5,
 		},
 		{
-			strings.ToUpper("post"),
+			strings.ToUpper("POST"),
 			"/method_no_path_params",
 			h.MethodNoPathParams6,
 		},
 		{
-			strings.ToUpper("post"),
+			strings.ToUpper("POST"),
 			"/method_no_path_params",
 			h.MethodNoPathParams7,
 		},
 		{
-			strings.ToUpper("post"),
+			strings.ToUpper("POST"),
 			"/method/{pathParam0}/{pathParam1}",
 			h.Method0,
 		},
 		{
-			strings.ToUpper("post"),
+			strings.ToUpper("POST"),
 			"/method/{pathParam0}/{pathParam1}",
 			h.Method1,
 		},
 		{
-			strings.ToUpper("post"),
+			strings.ToUpper("POST"),
 			"/method/{pathParam0}/{pathParam1}",
 			h.Method2,
 		},
 		{
-			strings.ToUpper("post"),
+			strings.ToUpper("POST"),
 			"/method/{pathParam0}/{pathParam1}",
 			h.Method3,
 		},
 		{
-			strings.ToUpper("post"),
+			strings.ToUpper("POST"),
 			"/method/{pathParam0}/{pathParam1}",
 			h.Method4,
 		},
 		{
-			strings.ToUpper("post"),
+			strings.ToUpper("POST"),
 			"/method/{pathParam0}/{pathParam1}",
 			h.Method5,
 		},
 		{
-			strings.ToUpper("post"),
+			strings.ToUpper("POST"),
 			"/method/{pathParam0}/{pathParam1}",
 			h.Method6,
 		},
 		{
-			strings.ToUpper("post"),
+			strings.ToUpper("POST"),
 			"/method/{pathParam0}/{pathParam1}",
 			h.Method7,
 		},

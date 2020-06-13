@@ -61,24 +61,24 @@ func (a *{{$cleanName}}Client) {{$mname | capitalize}}(
 		body = bytes.NewBuffer(b)
 	{{end}}
 
-	{{- with $fmtAndArgs := $a.Path | createPathWithParameterValues -}}
+	{{with $fmtAndArgs := $a.Path | createPathWithParameterValues -}}
 		url := a.RemoteAddress + fmt.Sprintf("{{index $fmtAndArgs 0}}"{{index $fmtAndArgs 1}})
 	{{- end}}
 	{{if $method.QueryParams -}}
-		{{range $i, $p := $method.QueryParams -}}
+		{{- range $i, $p := $method.QueryParams}}
 			{{if eq $i 0 -}}
 				url += fmt.Sprintf("?{{$p.Name}}={{$p.Type | typePlaceholder}}", {{$p.Name}})
 			{{- else -}}
 				url += fmt.Sprintf("&{{$p.Name}}={{$p.Type | typePlaceholder}}", {{$p.Name}})
-			{{- end -}}
-		{{- end -}}
+			{{- end}}
+		{{- end}}
 	{{- end}}
 
 	request, err := http.NewRequest("{{$method.Type}}", url, body)
-	{{if $method.HeaderParams -}}
-		{{- range $method.HeaderParams -}}
+	{{- if $method.HeaderParams -}}
+		{{range $method.HeaderParams}}
 			request.Header.Set("{{.Name}}", fmt.Sprintf("{{.Type | typePlaceholder}}", {{.Name}}))
-		{{- end -}}
+		{{- end}}
 	{{- end}}
 
 	response, err := http.DefaultClient.Do(request)
