@@ -7,6 +7,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 
 	"{{.RepositoryURL}}/pkg/exports"
@@ -92,8 +93,7 @@ func (a *{{$cleanName}}Client) {{$mname | capitalize}}(
 	}
 
 	result := new(exports.{{$method.ReturnType | capitalize | symbolize}})
-	err = json.Unmarshal(response, result)
-	if err != nil {
+	if err := json.NewDecoder(response.Body).Decode(result); err != nil {
 		return nil, err
 	}
 

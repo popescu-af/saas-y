@@ -3,16 +3,30 @@ package templates
 // HTTPWrapper is the template for HTTP boilerplate in go code.
 const HTTPWrapper = `package service
 
+{{range $a := .API}}{{range $mname, $method := $a.Methods}}
+	{{$method.Type | print | checkIfWebSocket}}
+{{end}}{{end}}
+
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
 
 	"github.com/gorilla/mux"
+	{{- if eq foundWebSocket "yes"}}
+	"github.com/gorilla/websocket"
+	{{- end}}
+	"github.com/popescu-af/saas-y/pkg/logutil"
 
 	"{{.RepositoryURL}}/pkg/exports"
 )
+
+{{if eq foundWebSocket "yes"}}
+var upgrader = websocket.Upgrader{} // use default options
+{{end}}
+{{resetFoundWebSocket}}
 
 // HTTPWrapper decorates the APIs with from/to HTTP code.
 type HTTPWrapper struct {
@@ -59,11 +73,40 @@ func (h *HTTPWrapper) Paths() Paths {
 	}
 }
 
-{{range $a := .API}}{{range $mname, $method := $a.Methods}}// {{$mname | capitalize | symbolize}} HTTP wrapper.
+{{range $a := .API}}{{range $mname, $method := $a.Methods}}
+{{if eq $method.Type "WS"}}
+// {{$mname | capitalize | symbolize}} WebSocket wrapper.
+func (h *HTTPWrapper) {{$mname | capitalize | symbolize}}(w http.ResponseWriter, r *http.Request) {
+	c, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		logutil.Error(fmt.Sprintf("web socket upgrade: %v", err))
+		return
+	}
+	defer c.Close()
+
+	for {
+		mt, message, err := c.ReadMessage()
+		if err != nil {
+			logutil.Error(fmt.Sprintf("web socket read: %v", err))
+			break
+		}
+
+		logutil.Info(fmt.Sprintf("web socket recv: %s", message))
+
+		err = c.WriteMessage(mt, message)
+		if err != nil {
+			logutil.Error(fmt.Sprintf("web socket write: %v", err))
+			break
+		}
+	}
+}
+{{else}}
+// {{$mname | capitalize | symbolize}} HTTP wrapper.
 func (h *HTTPWrapper) {{$mname | capitalize | symbolize}}(w http.ResponseWriter, r *http.Request) {
 	{{if $method.InputType}}// Body
 	{{"body" | pushParam}} := &exports.{{$method.InputType | capitalize | symbolize}}{}
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		logutil.Error(fmt.Sprintf("failed to decode input: %v", err))
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -113,10 +156,12 @@ func (h *HTTPWrapper) {{$mname | capitalize | symbolize}}(w http.ResponseWriter,
 	// Call implementation
 	result, err := h.api.{{$mname | capitalize | symbolize}}({{printParamStack}})
 	if err != nil {
+		logutil.Error(fmt.Sprintf("call to implementation failed: %v", err))
 		writeErrorToHTTPResponse(err, w)
 		return
 	}
 
 	encodeJSONResponse(result, nil, w)
 }
+{{end}}
 {{end}}{{end}}`

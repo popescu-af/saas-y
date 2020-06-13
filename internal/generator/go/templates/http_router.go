@@ -27,10 +27,16 @@ type Paths []PathDefinition
 func NewRouter(paths Paths) *mux.Router {
 	router := mux.NewRouter().StrictSlash(true)
 	for _, p := range paths {
-		router.
-			Methods(p.Method).
-			Path(p.Path).
-			Handler(apiLogger(p.Handler))
+		if p.Method == "WS" {
+			router.
+				Path(p.Path).
+				Handler(apiLogger(p.Handler))
+		} else {
+			router.
+				Methods(p.Method).
+				Path(p.Path).
+				Handler(apiLogger(p.Handler))
+		}
 	}
 	return router
 }

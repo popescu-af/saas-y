@@ -195,6 +195,8 @@ const (
 	PATCH APIMethodType = "PATCH"
 	// DELETE is the HTTP DELETE type
 	DELETE APIMethodType = "DELETE"
+	// WS is the WebSocket type
+	WS APIMethodType = "WS"
 )
 
 // Method represents a saas-y API method.
@@ -209,7 +211,7 @@ type Method struct {
 // Validate checks if the method is well defined.
 func (m *Method) Validate(knownTypes []string) (err error) {
 	typeOK := false
-	for _, t := range []APIMethodType{GET, POST, PATCH, DELETE} {
+	for _, t := range []APIMethodType{GET, POST, PATCH, DELETE, WS} {
 		if m.Type == t {
 			typeOK = true
 			break

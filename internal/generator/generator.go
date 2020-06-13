@@ -212,9 +212,26 @@ type templateFillerFunction func(interface{}, string) error
 
 func templateFiller(templ string, codeFormatter func(string) (SymbolTable, error)) templateFillerFunction {
 	paramStack := ""
+	foundWebSocket := false
 
 	loadedTempl := template.Must(template.New("templ").
 		Funcs(template.FuncMap{
+			"checkIfWebSocket": func(s string) string {
+				if s == "WS" {
+					foundWebSocket = true
+				}
+				return ""
+			},
+			"foundWebSocket": func() string {
+				if foundWebSocket {
+					return "yes"
+				}
+				return "no"
+			},
+			"resetFoundWebSocket": func() string {
+				foundWebSocket = false
+				return ""
+			},
 			"decapitalize":    func(s string) string { return strings.ToLower(s[:1]) + s[1:] },
 			"capitalize":      func(s string) string { return strings.ToUpper(s[:1]) + s[1:] },
 			"toLower":         strings.ToLower,
@@ -360,7 +377,7 @@ func typePlaceholder(t string) string {
 	case "int":
 		return "%d"
 	case "uint":
-		return "%u"
+		return "%d"
 	case "float":
 		return "%f"
 	case "string":
