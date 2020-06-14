@@ -1,4 +1,4 @@
-package fullduplex
+package connection
 
 import (
 	"fmt"
@@ -23,13 +23,13 @@ type Message struct {
 	Payload []byte
 }
 
-// Endpoint is the type for communication endpoints.
+// FullDuplexEndpoint is the type for communication endpoints.
 // Communication endpoints function in a full-duplex way, being possible to
 // receive and send messages on the channel at the same time.
 // Processing received messages has priority. If there is nothing to process,
 // the endpoint can do housekeeping work or even send messages to the other side
 // of the communication channel.
-type Endpoint interface {
+type FullDuplexEndpoint interface {
 	// ProcessMessage should process the given message and react accordingly,
 	// by changing state and/or writing something back or none of them.
 	ProcessMessage(*Message, WriterFn) error
