@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	"github.com/gorilla/mux"
-	"github.com/popescu-af/saas-y/pkg/logutil"
+	"github.com/popescu-af/saas-y/pkg/log"
 
 	"foo-service/pkg/exports"
 )
@@ -138,7 +138,7 @@ func (h *HTTPWrapper) MethodNoPathParams0(w http.ResponseWriter, r *http.Request
 	// Call implementation
 	result, err := h.api.MethodNoPathParams0()
 	if err != nil {
-		logutil.Error(fmt.Sprintf("call to implementation failed: %v", err))
+		log.Error(fmt.Sprintf("call to implementation failed: %v", err))
 		writeErrorToHTTPResponse(err, w)
 		return
 	}
@@ -151,7 +151,7 @@ func (h *HTTPWrapper) MethodNoPathParams1(w http.ResponseWriter, r *http.Request
 	// Body
 	body := &exports.BodyType{}
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
-		logutil.Error(fmt.Sprintf("failed to decode input: %v", err))
+		log.Error(fmt.Sprintf("failed to decode input: %v", err))
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -159,7 +159,7 @@ func (h *HTTPWrapper) MethodNoPathParams1(w http.ResponseWriter, r *http.Request
 	// Call implementation
 	result, err := h.api.MethodNoPathParams1(body)
 	if err != nil {
-		logutil.Error(fmt.Sprintf("call to implementation failed: %v", err))
+		log.Error(fmt.Sprintf("call to implementation failed: %v", err))
 		writeErrorToHTTPResponse(err, w)
 		return
 	}
@@ -187,7 +187,7 @@ func (h *HTTPWrapper) MethodNoPathParams2(w http.ResponseWriter, r *http.Request
 	// Call implementation
 	result, err := h.api.MethodNoPathParams2(headerParam0, headerParam1, headerParam2)
 	if err != nil {
-		logutil.Error(fmt.Sprintf("call to implementation failed: %v", err))
+		log.Error(fmt.Sprintf("call to implementation failed: %v", err))
 		writeErrorToHTTPResponse(err, w)
 		return
 	}
@@ -200,7 +200,7 @@ func (h *HTTPWrapper) MethodNoPathParams3(w http.ResponseWriter, r *http.Request
 	// Body
 	body := &exports.BodyType{}
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
-		logutil.Error(fmt.Sprintf("failed to decode input: %v", err))
+		log.Error(fmt.Sprintf("failed to decode input: %v", err))
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -223,7 +223,7 @@ func (h *HTTPWrapper) MethodNoPathParams3(w http.ResponseWriter, r *http.Request
 	// Call implementation
 	result, err := h.api.MethodNoPathParams3(body, headerParam0, headerParam1, headerParam2)
 	if err != nil {
-		logutil.Error(fmt.Sprintf("call to implementation failed: %v", err))
+		log.Error(fmt.Sprintf("call to implementation failed: %v", err))
 		writeErrorToHTTPResponse(err, w)
 		return
 	}
@@ -253,7 +253,7 @@ func (h *HTTPWrapper) MethodNoPathParams4(w http.ResponseWriter, r *http.Request
 	// Call implementation
 	result, err := h.api.MethodNoPathParams4(queryParam0, queryParam1, queryParam2)
 	if err != nil {
-		logutil.Error(fmt.Sprintf("call to implementation failed: %v", err))
+		log.Error(fmt.Sprintf("call to implementation failed: %v", err))
 		writeErrorToHTTPResponse(err, w)
 		return
 	}
@@ -266,7 +266,7 @@ func (h *HTTPWrapper) MethodNoPathParams5(w http.ResponseWriter, r *http.Request
 	// Body
 	body := &exports.BodyType{}
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
-		logutil.Error(fmt.Sprintf("failed to decode input: %v", err))
+		log.Error(fmt.Sprintf("failed to decode input: %v", err))
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -291,7 +291,7 @@ func (h *HTTPWrapper) MethodNoPathParams5(w http.ResponseWriter, r *http.Request
 	// Call implementation
 	result, err := h.api.MethodNoPathParams5(body, queryParam0, queryParam1, queryParam2)
 	if err != nil {
-		logutil.Error(fmt.Sprintf("call to implementation failed: %v", err))
+		log.Error(fmt.Sprintf("call to implementation failed: %v", err))
 		writeErrorToHTTPResponse(err, w)
 		return
 	}
@@ -336,7 +336,7 @@ func (h *HTTPWrapper) MethodNoPathParams6(w http.ResponseWriter, r *http.Request
 	// Call implementation
 	result, err := h.api.MethodNoPathParams6(queryParam0, queryParam1, queryParam2, headerParam0, headerParam1, headerParam2)
 	if err != nil {
-		logutil.Error(fmt.Sprintf("call to implementation failed: %v", err))
+		log.Error(fmt.Sprintf("call to implementation failed: %v", err))
 		writeErrorToHTTPResponse(err, w)
 		return
 	}
@@ -349,7 +349,7 @@ func (h *HTTPWrapper) MethodNoPathParams7(w http.ResponseWriter, r *http.Request
 	// Body
 	body := &exports.BodyType{}
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
-		logutil.Error(fmt.Sprintf("failed to decode input: %v", err))
+		log.Error(fmt.Sprintf("failed to decode input: %v", err))
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -389,7 +389,7 @@ func (h *HTTPWrapper) MethodNoPathParams7(w http.ResponseWriter, r *http.Request
 	// Call implementation
 	result, err := h.api.MethodNoPathParams7(body, queryParam0, queryParam1, queryParam2, headerParam0, headerParam1, headerParam2)
 	if err != nil {
-		logutil.Error(fmt.Sprintf("call to implementation failed: %v", err))
+		log.Error(fmt.Sprintf("call to implementation failed: %v", err))
 		writeErrorToHTTPResponse(err, w)
 		return
 	}
@@ -413,7 +413,7 @@ func (h *HTTPWrapper) Method0(w http.ResponseWriter, r *http.Request) {
 	// Call implementation
 	result, err := h.api.Method0(pathParam0, pathParam1)
 	if err != nil {
-		logutil.Error(fmt.Sprintf("call to implementation failed: %v", err))
+		log.Error(fmt.Sprintf("call to implementation failed: %v", err))
 		writeErrorToHTTPResponse(err, w)
 		return
 	}
@@ -426,7 +426,7 @@ func (h *HTTPWrapper) Method1(w http.ResponseWriter, r *http.Request) {
 	// Body
 	body := &exports.BodyType{}
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
-		logutil.Error(fmt.Sprintf("failed to decode input: %v", err))
+		log.Error(fmt.Sprintf("failed to decode input: %v", err))
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -445,7 +445,7 @@ func (h *HTTPWrapper) Method1(w http.ResponseWriter, r *http.Request) {
 	// Call implementation
 	result, err := h.api.Method1(body, pathParam0, pathParam1)
 	if err != nil {
-		logutil.Error(fmt.Sprintf("call to implementation failed: %v", err))
+		log.Error(fmt.Sprintf("call to implementation failed: %v", err))
 		writeErrorToHTTPResponse(err, w)
 		return
 	}
@@ -484,7 +484,7 @@ func (h *HTTPWrapper) Method2(w http.ResponseWriter, r *http.Request) {
 	// Call implementation
 	result, err := h.api.Method2(pathParam0, pathParam1, headerParam0, headerParam1, headerParam2)
 	if err != nil {
-		logutil.Error(fmt.Sprintf("call to implementation failed: %v", err))
+		log.Error(fmt.Sprintf("call to implementation failed: %v", err))
 		writeErrorToHTTPResponse(err, w)
 		return
 	}
@@ -497,7 +497,7 @@ func (h *HTTPWrapper) Method3(w http.ResponseWriter, r *http.Request) {
 	// Body
 	body := &exports.BodyType{}
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
-		logutil.Error(fmt.Sprintf("failed to decode input: %v", err))
+		log.Error(fmt.Sprintf("failed to decode input: %v", err))
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -531,7 +531,7 @@ func (h *HTTPWrapper) Method3(w http.ResponseWriter, r *http.Request) {
 	// Call implementation
 	result, err := h.api.Method3(body, pathParam0, pathParam1, headerParam0, headerParam1, headerParam2)
 	if err != nil {
-		logutil.Error(fmt.Sprintf("call to implementation failed: %v", err))
+		log.Error(fmt.Sprintf("call to implementation failed: %v", err))
 		writeErrorToHTTPResponse(err, w)
 		return
 	}
@@ -572,7 +572,7 @@ func (h *HTTPWrapper) Method4(w http.ResponseWriter, r *http.Request) {
 	// Call implementation
 	result, err := h.api.Method4(pathParam0, pathParam1, queryParam0, queryParam1, queryParam2)
 	if err != nil {
-		logutil.Error(fmt.Sprintf("call to implementation failed: %v", err))
+		log.Error(fmt.Sprintf("call to implementation failed: %v", err))
 		writeErrorToHTTPResponse(err, w)
 		return
 	}
@@ -585,7 +585,7 @@ func (h *HTTPWrapper) Method5(w http.ResponseWriter, r *http.Request) {
 	// Body
 	body := &exports.BodyType{}
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
-		logutil.Error(fmt.Sprintf("failed to decode input: %v", err))
+		log.Error(fmt.Sprintf("failed to decode input: %v", err))
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -621,7 +621,7 @@ func (h *HTTPWrapper) Method5(w http.ResponseWriter, r *http.Request) {
 	// Call implementation
 	result, err := h.api.Method5(body, pathParam0, pathParam1, queryParam0, queryParam1, queryParam2)
 	if err != nil {
-		logutil.Error(fmt.Sprintf("call to implementation failed: %v", err))
+		log.Error(fmt.Sprintf("call to implementation failed: %v", err))
 		writeErrorToHTTPResponse(err, w)
 		return
 	}
@@ -677,7 +677,7 @@ func (h *HTTPWrapper) Method6(w http.ResponseWriter, r *http.Request) {
 	// Call implementation
 	result, err := h.api.Method6(pathParam0, pathParam1, queryParam0, queryParam1, queryParam2, headerParam0, headerParam1, headerParam2)
 	if err != nil {
-		logutil.Error(fmt.Sprintf("call to implementation failed: %v", err))
+		log.Error(fmt.Sprintf("call to implementation failed: %v", err))
 		writeErrorToHTTPResponse(err, w)
 		return
 	}
@@ -690,7 +690,7 @@ func (h *HTTPWrapper) Method7(w http.ResponseWriter, r *http.Request) {
 	// Body
 	body := &exports.BodyType{}
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
-		logutil.Error(fmt.Sprintf("failed to decode input: %v", err))
+		log.Error(fmt.Sprintf("failed to decode input: %v", err))
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -741,7 +741,7 @@ func (h *HTTPWrapper) Method7(w http.ResponseWriter, r *http.Request) {
 	// Call implementation
 	result, err := h.api.Method7(body, pathParam0, pathParam1, queryParam0, queryParam1, queryParam2, headerParam0, headerParam1, headerParam2)
 	if err != nil {
-		logutil.Error(fmt.Sprintf("call to implementation failed: %v", err))
+		log.Error(fmt.Sprintf("call to implementation failed: %v", err))
 		writeErrorToHTTPResponse(err, w)
 		return
 	}

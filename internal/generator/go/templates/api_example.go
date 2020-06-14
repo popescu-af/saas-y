@@ -6,7 +6,7 @@ const APIExample = `package logic
 import (
 	"errors"
 
-	"github.com/popescu-af/saas-y/pkg/logutil"
+	"github.com/popescu-af/saas-y/pkg/log"
 
 	"{{.RepositoryURL}}/pkg/exports"
 )
@@ -47,7 +47,7 @@ func NewAPI() exports.API {
 				{{- end -}}
 			{{- end -}}
 		) (*exports.{{$method.ReturnType | capitalize | symbolize}}, error) {
-			logutil.Info("called {{$mname}}")
+			log.Info("called {{$mname}}")
 			return nil, errors.New("method '{{$mname}}' not implemented")
 		}
 	{{- end -}}

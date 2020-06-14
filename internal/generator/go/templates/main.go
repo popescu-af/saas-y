@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/popescu-af/saas-y/pkg/logutil"
+	"github.com/popescu-af/saas-y/pkg/log"
 
 	"{{.RepositoryURL}}/internal/config"
 	"{{.RepositoryURL}}/internal/logic"
@@ -15,18 +15,18 @@ import (
 )
 
 func main() {
-	defer logutil.Sync()
+	defer log.Sync()
 
-	logutil.Info("{{.Name}} started")
+	log.Info("{{.Name}} started")
 
 	env, err := config.ProcessEnv()
 	if err != nil {
-		logutil.Fatal(err.Error())
+		log.Fatal(err.Error())
 	}
 
 	api := logic.NewAPI()
 	httpWrapper := service.NewHTTPWrapper(api)
 	router := service.NewRouter(httpWrapper.Paths())
 
-	logutil.Fatal(fmt.Sprintf("error serving - %v", http.ListenAndServe(fmt.Sprintf(":%s", env.Port), router)))
+	log.Fatal(fmt.Sprintf("error serving - %v", http.ListenAndServe(fmt.Sprintf(":%s", env.Port), router)))
 }`

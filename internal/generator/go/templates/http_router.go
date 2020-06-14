@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
-	"github.com/popescu-af/saas-y/pkg/logutil"
+	"github.com/popescu-af/saas-y/pkg/log"
 
 	"go.uber.org/zap"
 )
@@ -43,7 +43,7 @@ func NewRouter(paths Paths) *mux.Router {
 
 func apiLogger(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		logutil.Info(
+		log.Info(
 			"serving",
 			zap.String("method", r.Method),
 			zap.String("path", r.RequestURI),
@@ -52,7 +52,7 @@ func apiLogger(handler http.Handler) http.Handler {
 		start := time.Now()
 		handler.ServeHTTP(w, r)
 
-		logutil.Info(
+		log.Info(
 			"served",
 			zap.String("method", r.Method),
 			zap.String("path", r.RequestURI),
