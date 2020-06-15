@@ -30,7 +30,7 @@ func logCtx(msg string, ctx Context, logFn func(string, ...zap.Field)) {
 	fields := make([]zap.Field, 0, len(ctx))
 
 	for k, v := range ctx {
-		fields := append(fields, zap.Any(k, v))
+		fields = append(fields, zap.Any(k, v))
 	}
 
 	logFn(msg, fields...)
