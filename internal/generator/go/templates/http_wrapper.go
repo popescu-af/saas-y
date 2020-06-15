@@ -17,15 +17,13 @@ import (
 	"github.com/gorilla/mux"
 	{{- if eq foundWebSocket "yes"}}
 	"github.com/gorilla/websocket"
+	"github.com/popescu-af/saas-y/pkg/connection"
 	{{- end}}
 	"github.com/popescu-af/saas-y/pkg/log"
 
 	"{{.RepositoryURL}}/pkg/exports"
 )
 
-{{if eq foundWebSocket "yes"}}
-var upgrader = websocket.Upgrader{} // use default options
-{{end}}
 {{resetFoundWebSocket}}
 
 // HTTPWrapper decorates the APIs with from/to HTTP code.
@@ -77,28 +75,22 @@ func (h *HTTPWrapper) Paths() Paths {
 {{if eq $method.Type "WS"}}
 // {{$mname | capitalize | symbolize}} WebSocket wrapper.
 func (h *HTTPWrapper) {{$mname | capitalize | symbolize}}(w http.ResponseWriter, r *http.Request) {
-	c, err := upgrader.Upgrade(w, r, nil)
+	handler, err := h.api.New{{$method.ReturnType | capitalize | symbolize}}()
 	if err != nil {
-		log.Error(fmt.Sprintf("web socket upgrade: %v", err))
+		writeErrorToHTTPResponse(err, w)
+		log.ErrorCtx("create {{$method.ReturnType | capitalize | symbolize}} failed", log.Context{"error": err})
+		return
+	}
+
+	conn, c, err := connection.NewWebSocketServer(w, r, handler, time.Second)
+	if err != nil {
+		writeErrorToHTTPResponse(err, w)
+		log.ErrorCtx("create {{$method.ReturnType | capitalize | symbolize}} failed", log.Context{"error": err})
 		return
 	}
 	defer c.Close()
 
-	for {
-		mt, message, err := c.ReadMessage()
-		if err != nil {
-			log.Error(fmt.Sprintf("web socket read: %v", err))
-			break
-		}
-
-		log.Info(fmt.Sprintf("web socket recv: %s", message))
-
-		err = c.WriteMessage(mt, message)
-		if err != nil {
-			log.Error(fmt.Sprintf("web socket write: %v", err))
-			break
-		}
-	}
+	conn.Run()
 }
 {{else}}
 // {{$mname | capitalize | symbolize}} HTTP wrapper.
@@ -106,8 +98,8 @@ func (h *HTTPWrapper) {{$mname | capitalize | symbolize}}(w http.ResponseWriter,
 	{{if $method.InputType}}// Body
 	{{"body" | pushParam}} := &exports.{{$method.InputType | capitalize | symbolize}}{}
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
-		log.Error(fmt.Sprintf("failed to decode input: %v", err))
 		w.WriteHeader(http.StatusBadRequest)
+		log.ErrorCtx("decoding input failed", log.Context{"error": err})
 		return
 	}
 
@@ -156,8 +148,8 @@ func (h *HTTPWrapper) {{$mname | capitalize | symbolize}}(w http.ResponseWriter,
 	// Call implementation
 	result, err := h.api.{{$mname | capitalize | symbolize}}({{printParamStack}})
 	if err != nil {
-		log.Error(fmt.Sprintf("call to implementation failed: %v", err))
 		writeErrorToHTTPResponse(err, w)
+		log.ErrorCtx("call to implementation failed", log.Context{"error": err})
 		return
 	}
 
