@@ -42,7 +42,7 @@ type FullDuplexEndpoint interface {
 // TalkFullDuplex is a blocking function that takes a full-duplex endpoint
 // and a channel. It handles messages arriving on the channel while periodically
 // polling the endpoint for new messages to be dispached on the channel.
-func TalkFullDuplex(endpoint FullDuplexEndpoint, channel Channel, pollingPeriod time.Duration) {
+func TalkFullDuplex(endpoint FullDuplexEndpoint, channel Channel, pollingPeriod time.Duration) error {
 	var wg sync.WaitGroup
 	wg.Add(2)
 
