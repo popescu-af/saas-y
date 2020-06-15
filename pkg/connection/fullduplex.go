@@ -12,14 +12,10 @@ type ReadFn func() (*Message, error)
 // WriteFn is the type of function sending messages on a channel.
 type WriteFn func(*Message) error
 
-// CloseFn is the type of function closing a channel.
-type CloseFn func(*Message) error
-
 // Channel is the structure containing a channel's read/write functions.
 type Channel struct {
 	Read  ReadFn
 	Write WriteFn
-	Close CloseFn
 }
 
 // Message is a structure encompassing a message's type and payload.
