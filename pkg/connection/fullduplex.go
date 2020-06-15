@@ -161,10 +161,11 @@ func (f *FullDuplex) Stop() error {
 		return fmt.Errorf("not running")
 	}
 
-	f.channel.Close()
 	f.stopReading <- true
 	f.stopProcessing <- true
 	f.wgStop.Wait()
+
+	f.channel.Close()
 	return nil
 }
 
