@@ -17,7 +17,7 @@ type loggerWrapper struct {
 	level  zap.AtomicLevel
 }
 
-var logger = newLogger()
+var defaultLogger = newLogger()
 
 func newLogger() *loggerWrapper {
 	logLevel := zap.NewAtomicLevel()
@@ -44,21 +44,21 @@ func newEncoder() zapcore.Encoder {
 func SetLevel(logLevel string) {
 	switch logLevel {
 	case "DEBUG":
-		logger.level.SetLevel(zapcore.DebugLevel)
+		defaultLogger.level.SetLevel(zapcore.DebugLevel)
 	case "INFO":
-		logger.level.SetLevel(zapcore.InfoLevel)
+		defaultLogger.level.SetLevel(zapcore.InfoLevel)
 	case "WARN":
-		logger.level.SetLevel(zapcore.WarnLevel)
+		defaultLogger.level.SetLevel(zapcore.WarnLevel)
 	case "ERROR":
-		logger.level.SetLevel(zapcore.ErrorLevel)
+		defaultLogger.level.SetLevel(zapcore.ErrorLevel)
 	case "CRITICAL":
-		logger.level.SetLevel(zapcore.FatalLevel)
+		defaultLogger.level.SetLevel(zapcore.FatalLevel)
 	}
 }
 
 // Sync flushes the log cache.
 func Sync() {
-	if err := logger.Sync(); err != nil {
+	if err := defaultLogger.logger.Sync(); err != nil {
 		log.Printf("failed to flush log cache - %v", err)
 	}
 }
@@ -80,7 +80,7 @@ func Debug(msg string) {
 
 // DebugCtx logs a message with DEBUG level.
 func DebugCtx(msg string, ctx Context) {
-	logCtx(msg, ctx, logger.Debug)
+	logCtx(msg, ctx, defaultLogger.logger.Debug)
 }
 
 // Error logs a message with ERROR level.
@@ -90,7 +90,7 @@ func Error(msg string) {
 
 // ErrorCtx logs a message with ERROR level.
 func ErrorCtx(msg string, ctx Context) {
-	logCtx(msg, ctx, logger.Error)
+	logCtx(msg, ctx, defaultLogger.logger.Error)
 }
 
 // Fatal logs a message with FATAL level.
@@ -100,7 +100,7 @@ func Fatal(msg string) {
 
 // FatalCtx logs a message with FATAL level.
 func FatalCtx(msg string, ctx Context) {
-	logCtx(msg, ctx, logger.Fatal)
+	logCtx(msg, ctx, defaultLogger.logger.Fatal)
 }
 
 // Info logs a message with INFO level.
@@ -110,7 +110,7 @@ func Info(msg string) {
 
 // InfoCtx logs a message with INFO level.
 func InfoCtx(msg string, ctx Context) {
-	logCtx(msg, ctx, logger.Info)
+	logCtx(msg, ctx, defaultLogger.logger.Info)
 }
 
 // Warn logs a message with WARN level.
@@ -120,5 +120,5 @@ func Warn(msg string) {
 
 // WarnCtx logs a message with WARN level.
 func WarnCtx(msg string, ctx Context) {
-	logCtx(msg, ctx, logger.Warn)
+	logCtx(msg, ctx, defaultLogger.logger.Warn)
 }
