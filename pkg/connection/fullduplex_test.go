@@ -22,7 +22,7 @@ func (t *TestEndpoint) Poll(time.Time, WriteFn) error {
 func TestLifetime(t *testing.T) {
 	endp := &TestEndpoint{}
 	channelIsOpen := true
-	ch := Channel{
+	ch := &Channel{
 		Read: func() (*Message, error) {
 			if !channelIsOpen {
 				return nil, fmt.Errorf("error reading from closed channel")

@@ -50,7 +50,7 @@ type FullDuplexEndpoint interface {
 // polling the endpoint for new messages to be dispached on the channel.
 type FullDuplex struct {
 	endpoint       FullDuplexEndpoint
-	channel        Channel
+	channel        *Channel
 	pollingPeriod  time.Duration
 	stopReading    chan bool
 	stopProcessing chan bool
@@ -61,7 +61,7 @@ type FullDuplex struct {
 
 // NewFullDuplex creates a new, inactive full-duplex connection.
 // Call Run to activate run it.
-func NewFullDuplex(endpoint FullDuplexEndpoint, channel Channel, pollingPeriod time.Duration) *FullDuplex {
+func NewFullDuplex(endpoint FullDuplexEndpoint, channel *Channel, pollingPeriod time.Duration) *FullDuplex {
 	return &FullDuplex{
 		endpoint:       endpoint,
 		channel:        channel,
