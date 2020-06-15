@@ -1,9 +1,10 @@
 package connection
 
 import (
-	"fmt"
 	"sync"
 	"time"
+
+	"github.com/popescu-af/saas-y/pkg/log"
 )
 
 // ReadFn is the type of function listening for messages on a channel.
@@ -75,16 +76,16 @@ func TalkFullDuplex(endpoint FullDuplexEndpoint, channel Channel, pollingPeriod 
 			select {
 			case msg := <-msgCh:
 				if err := endpoint.ProcessMessage(msg, channel.Write); err != nil {
-					fmt.Printf("failed to process message: %v", err)
+					log.Error("failed to process message", log.Context{"error": err})
 					return
 				}
 			case err := <-errCh:
-				fmt.Printf("received error: %v", err)
+				log.Error("received error", log.Context{"error": err})
 				finalError = err
 				return
 			case t := <-ticker.C:
 				if err := endpoint.Poll(t, channel.Write); err != nil {
-					fmt.Printf("failed to poll: %v", err)
+					log.Error("failed to poll", log.Context{"error": err})
 					return
 				}
 			}
