@@ -76,16 +76,16 @@ func TalkFullDuplex(endpoint FullDuplexEndpoint, channel Channel, pollingPeriod 
 			select {
 			case msg := <-msgCh:
 				if err := endpoint.ProcessMessage(msg, channel.Write); err != nil {
-					log.Error("failed to process message", log.Context{"error": err})
+					log.ErrorCtx("failed to process message", log.Context{"error": err})
 					return
 				}
 			case err := <-errCh:
-				log.Error("received error", log.Context{"error": err})
+				log.ErrorCtx("received error", log.Context{"error": err})
 				finalError = err
 				return
 			case t := <-ticker.C:
 				if err := endpoint.Poll(t, channel.Write); err != nil {
-					log.Error("failed to poll", log.Context{"error": err})
+					log.ErrorCtx("failed to poll", log.Context{"error": err})
 					return
 				}
 			}
