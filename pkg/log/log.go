@@ -2,21 +2,58 @@ package log
 
 import (
 	"log"
+	"os"
+	"time"
 
 	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 )
 
 // Context is the type for log contexts.
 type Context map[string]interface{}
 
+type loggerWrapper struct {
+	logger *zap.Logger
+	level  zap.AtomicLevel
+}
+
 var logger = newLogger()
 
-func newLogger() *zap.Logger {
-	logger, err := zap.NewProduction()
-	if err != nil {
-		log.Fatalf("failed to initialize logger - %v", err)
+func newLogger() *loggerWrapper {
+	logLevel := zap.NewAtomicLevel()
+	enc := newEncoder()
+	core := zapcore.NewCore(enc, os.Stdout, logLevel)
+	return &loggerWrapper{
+		logger: zap.New(core).Named("root"),
+		level:  logLevel,
 	}
-	return logger
+}
+
+func newEncoder() zapcore.Encoder {
+	encCfg := zap.NewProductionEncoderConfig()
+	encCfg.CallerKey = ""     // disable caller
+	encCfg.StacktraceKey = "" // disable stack trace
+	encCfg.EncodeLevel = zapcore.CapitalLevelEncoder
+	encCfg.EncodeTime = zapcore.TimeEncoder(func(t time.Time, enc zapcore.PrimitiveArrayEncoder) {
+		enc.AppendString(t.UTC().Format(timeFormat))
+	})
+	return zapcore.NewConsoleEncoder(encCfg)
+}
+
+// SetLevel sets the logging level.
+func SetLevel(logLevel string) {
+	switch logLevel {
+	case "DEBUG":
+		logger.level.SetLevel(zapcore.DebugLevel)
+	case "INFO":
+		logger.level.SetLevel(zapcore.InfoLevel)
+	case "WARN":
+		logger.level.SetLevel(zapcore.WarnLevel)
+	case "ERROR":
+		logger.level.SetLevel(zapcore.ErrorLevel)
+	case "CRITICAL":
+		logger.level.SetLevel(zapcore.FatalLevel)
+	}
 }
 
 // Sync flushes the log cache.
