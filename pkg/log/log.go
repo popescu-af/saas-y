@@ -9,6 +9,8 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
+const timeFormat = "2020-01-01 20:20:20.999"
+
 // Context is the type for log contexts.
 type Context map[string]interface{}
 
