@@ -1,6 +1,7 @@
 package connection
 
 import (
+	"fmt"
 	"sync"
 	"time"
 
@@ -13,10 +14,14 @@ type ReadFn func() (*Message, error)
 // WriteFn is the type of function sending messages on a channel.
 type WriteFn func(*Message) error
 
+// CloseFn is the type of function that closes a channel.
+type CloseFn func()
+
 // Channel is the structure containing a channel's read/write functions.
 type Channel struct {
 	Read  ReadFn
 	Write WriteFn
+	Close CloseFn
 }
 
 // Message is a structure encompassing a message's type and payload.
@@ -40,10 +45,42 @@ type FullDuplexEndpoint interface {
 	Poll(time.Time, WriteFn) error
 }
 
-// TalkFullDuplex is a blocking function that takes a full-duplex endpoint
+// FullDuplex is a full-duplex connection that takes a full-duplex endpoint
 // and a channel. It handles messages arriving on the channel while periodically
 // polling the endpoint for new messages to be dispached on the channel.
-func TalkFullDuplex(endpoint FullDuplexEndpoint, channel Channel, pollingPeriod time.Duration) error {
+type FullDuplex struct {
+	endpoint       FullDuplexEndpoint
+	channel        Channel
+	pollingPeriod  time.Duration
+	stopReading    chan bool
+	stopProcessing chan bool
+	wgStop         sync.WaitGroup
+	lock           sync.Mutex
+	isRunning      bool
+}
+
+// NewFullDuplex creates a new, inactive full-duplex connection.
+// Call Run to activate run it.
+func NewFullDuplex(endpoint FullDuplexEndpoint, channel Channel, pollingPeriod time.Duration) *FullDuplex {
+	return &FullDuplex{
+		endpoint:       endpoint,
+		channel:        channel,
+		pollingPeriod:  pollingPeriod,
+		stopReading:    make(chan bool),
+		stopProcessing: make(chan bool),
+	}
+}
+
+// Run is a blocking function that takes a full-duplex endpoint
+// and a channel. It handles messages arriving on the channel while periodically
+// polling the endpoint for new messages to be dispached on the channel.
+func (f *FullDuplex) Run() error {
+	f.lock.Lock()
+	if f.isRunning {
+		f.lock.Unlock()
+		return fmt.Errorf("already running")
+	}
+
 	var wg sync.WaitGroup
 	wg.Add(2)
 
@@ -55,12 +92,18 @@ func TalkFullDuplex(endpoint FullDuplexEndpoint, channel Channel, pollingPeriod 
 		defer wg.Done()
 
 		for {
-			m, err := channel.Read()
-			if err != nil {
-				errCh <- err
+			select {
+			case <-f.stopReading:
+				log.Info("external stop")
 				return
+			default:
+				m, err := f.channel.Read()
+				if err != nil {
+					errCh <- err
+					return
+				}
+				msgCh <- m
 			}
-			msgCh <- m
 		}
 	}()
 
@@ -70,12 +113,15 @@ func TalkFullDuplex(endpoint FullDuplexEndpoint, channel Channel, pollingPeriod 
 	go func() {
 		defer wg.Done()
 
-		ticker := time.NewTicker(pollingPeriod)
+		ticker := time.NewTicker(f.pollingPeriod)
 
 		for {
 			select {
+			case <-f.stopProcessing:
+				log.Info("external stop")
+				return
 			case msg := <-msgCh:
-				if err := endpoint.ProcessMessage(msg, channel.Write); err != nil {
+				if err := f.endpoint.ProcessMessage(msg, f.channel.Write); err != nil {
 					log.ErrorCtx("failed to process message", log.Context{"error": err})
 					return
 				}
@@ -84,7 +130,7 @@ func TalkFullDuplex(endpoint FullDuplexEndpoint, channel Channel, pollingPeriod 
 				finalError = err
 				return
 			case t := <-ticker.C:
-				if err := endpoint.Poll(t, channel.Write); err != nil {
+				if err := f.endpoint.Poll(t, f.channel.Write); err != nil {
 					log.ErrorCtx("failed to poll", log.Context{"error": err})
 					return
 				}
@@ -92,6 +138,40 @@ func TalkFullDuplex(endpoint FullDuplexEndpoint, channel Channel, pollingPeriod 
 		}
 	}()
 
+	f.isRunning = true
+	f.wgStop.Add(1)
+	f.lock.Unlock()
 	wg.Wait()
+
+	f.lock.Lock()
+	f.isRunning = false
+	f.lock.Unlock()
+
+	f.wgStop.Done()
 	return finalError
+}
+
+// Stop stops a full-duplex connection.
+func (f *FullDuplex) Stop() error {
+	f.lock.Lock()
+	isRunning := f.isRunning
+	f.lock.Unlock()
+
+	if !isRunning {
+		return fmt.Errorf("not running")
+	}
+
+	f.channel.Close()
+	f.stopReading <- true
+	f.stopProcessing <- true
+	f.wgStop.Wait()
+	return nil
+}
+
+// IsRunning returns the running status of a full-duplex connection.
+func (f *FullDuplex) IsRunning() bool {
+	f.lock.Lock()
+	defer f.lock.Unlock()
+
+	return f.isRunning
 }
