@@ -3,6 +3,7 @@ package connection
 import (
 	"fmt"
 	"sync"
+	"time"
 )
 
 // ReaderFn is the type for functions listening for messages.
@@ -33,15 +34,16 @@ type FullDuplexEndpoint interface {
 	// ProcessMessage should process the given message and react accordingly,
 	// by changing state and/or writing something back or none of them.
 	ProcessMessage(*Message, WriterFn) error
-	// NextIteration should inspect the current state and decide whether
-	// to take any action and/or write something on the connections' channel or not.
-	NextIteration(WriterFn) error
+	// Poll should inspect the current state and decide whether to take any action
+	// and/or write something on the channel or not.
+	Poll(WriterFn) error
 }
 
 // HandleTwoWayConnection is a blocking function that takes a full-duplex endpoint
-// and a channel given by its read/write functions and handles the communication
-// between the two.
-func HandleTwoWayConnection(endpoint FullDuplexEndpoint, channel Channel) {
+// and a channel given by its read/write functions and handles messages arriving on
+// the channel as well as periodically polling the endpoint for new messages to be
+// dispached on the channel.
+func HandleTwoWayConnection(endpoint FullDuplexEndpoint, channel Channel, pollingPeriod time.Duration) {
 	var wg sync.WaitGroup
 	wg.Add(2)
 
@@ -66,6 +68,8 @@ func HandleTwoWayConnection(endpoint FullDuplexEndpoint, channel Channel) {
 	go func() {
 		defer wg.Done()
 
+		ticker := time.NewTicker(pollingPeriod)
+
 		for {
 			select {
 			case msg := <-msgCh:
@@ -76,9 +80,9 @@ func HandleTwoWayConnection(endpoint FullDuplexEndpoint, channel Channel) {
 			case err := <-errCh:
 				fmt.Printf("received error: %v", err)
 				return
-			default:
-				if err := endpoint.NextIteration(channel.Write); err != nil {
-					fmt.Printf("failed to iterate: %v", err)
+			case t := <-ticker.C:
+				if err := endpoint.Poll(channel.Write); err != nil {
+					fmt.Printf("failed to poll: %v", err)
 					return
 				}
 			}
