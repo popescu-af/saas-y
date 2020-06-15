@@ -36,7 +36,7 @@ type FullDuplexEndpoint interface {
 	ProcessMessage(*Message, WriterFn) error
 	// Poll should inspect the current state and decide whether to take any action
 	// and/or write something on the channel or not.
-	Poll(WriterFn) error
+	Poll(time.Time, WriterFn) error
 }
 
 // HandleTwoWayConnection is a blocking function that takes a full-duplex endpoint
@@ -81,7 +81,7 @@ func HandleTwoWayConnection(endpoint FullDuplexEndpoint, channel Channel, pollin
 				fmt.Printf("received error: %v", err)
 				return
 			case t := <-ticker.C:
-				if err := endpoint.Poll(channel.Write); err != nil {
+				if err := endpoint.Poll(t, channel.Write); err != nil {
 					fmt.Printf("failed to poll: %v", err)
 					return
 				}
