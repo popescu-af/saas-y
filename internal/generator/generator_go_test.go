@@ -176,6 +176,7 @@ func TestGeneratedMethods(t *testing.T) {
 	saasytesting.CheckFilesInDirsEqual(t, path.Join(pOutdir, "internal", "logic"), referenceDir, []string{"api_example.go"})
 	saasytesting.CheckFilesInDirsEqual(t, path.Join(pOutdir, "internal", "service"), referenceDir, []string{"http_wrapper.go"})
 	saasytesting.CheckFilesInDirsEqual(t, path.Join(pOutdir, "pkg", "exports"), referenceDir, []string{"api_definition.go"})
+	saasytesting.CheckFilesInDirsEqual(t, path.Join(pOutdir, "pkg", "client"), referenceDir, []string{"client.go"})
 }
 
 func TestGeneratedStruct(t *testing.T) {
@@ -215,4 +216,61 @@ func TestGeneratedStruct(t *testing.T) {
 	pOutdir = path.Join(pOutdir, "services", svc.Name)
 	referenceDir := path.Join(saasytesting.GetTestingCommonDirectory(), "..", "generator", "testdata", "generated_structs")
 	saasytesting.CheckFilesInDirsEqual(t, path.Join(pOutdir, "pkg", "exports"), referenceDir, []string{"hakuna_matata.go"})
+}
+
+func TestGeneratedWebsocketMethod(t *testing.T) {
+	qParams := []model.Variable{
+		{Name: "query_param_0", Type: "int"},
+		{Name: "query_param_1", Type: "float"},
+		{Name: "query_param_2", Type: "string"},
+	}
+
+	svc := model.Service{
+		ServiceCommon: model.ServiceCommon{
+			Name: "foo-service",
+			Port: "80",
+		},
+		API: []model.API{
+			{
+				Path: "/some_path",
+				Methods: map[string]model.Method{
+					"method_0":    {Type: model.GET, QueryParams: qParams, ReturnType: "return_type"},
+					"method_ws_1": {Type: model.WS},
+					"method_2":    {Type: model.POST, InputType: "body_type", ReturnType: "return_type"},
+				},
+			},
+		},
+		Structs: []model.Struct{
+			{
+				Name: "body_type",
+				Fields: []model.Variable{
+					{Name: "variable_0", Type: "int"},
+					{Name: "variable_1", Type: "string"},
+					{Name: "variable_2", Type: "float"},
+				},
+			},
+			{
+				Name: "return_type",
+				Fields: []model.Variable{
+					{Name: "return_variable_0", Type: "string"},
+					{Name: "return_variable_1", Type: "string"},
+					{Name: "return_variable_2", Type: "float"},
+				},
+			},
+		},
+		RepositoryURL: "foo-service",
+	}
+
+	generator.Init()
+
+	pOutdir, err := generateServiceFiles(svc)
+	require.NoError(t, err)
+	defer os.RemoveAll(pOutdir)
+
+	pOutdir = path.Join(pOutdir, "services", svc.Name)
+	referenceDir := path.Join(saasytesting.GetTestingCommonDirectory(), "..", "generator", "testdata", "generated_websocket")
+	saasytesting.CheckFilesInDirsEqual(t, path.Join(pOutdir, "internal", "logic"), referenceDir, []string{"api_example.go"})
+	saasytesting.CheckFilesInDirsEqual(t, path.Join(pOutdir, "internal", "service"), referenceDir, []string{"http_wrapper.go"})
+	saasytesting.CheckFilesInDirsEqual(t, path.Join(pOutdir, "pkg", "exports"), referenceDir, []string{"api_definition.go"})
+	saasytesting.CheckFilesInDirsEqual(t, path.Join(pOutdir, "pkg", "client"), referenceDir, []string{"client.go"})
 }

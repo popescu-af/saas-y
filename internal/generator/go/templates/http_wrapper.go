@@ -80,13 +80,13 @@ func (h *HTTPWrapper) {{$mname | capitalize | symbolize}}(w http.ResponseWriter,
 		return
 	}
 
-	conn, c, err := connection.NewWebSocketServer(w, r, handler, time.Second)
+	conn, close, err := connection.NewWebSocketServer(w, r, handler, time.Second)
 	if err != nil {
 		writeErrorToHTTPResponse(err, w)
 		log.ErrorCtx("creating websocket connection failed", log.Context{"error": err})
 		return
 	}
-	defer c.Close()
+	defer close()
 
 	conn.Run()
 }

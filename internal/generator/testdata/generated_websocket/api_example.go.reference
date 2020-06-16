@@ -1,0 +1,56 @@
+package logic
+
+import (
+	"errors"
+	"time"
+
+	"github.com/popescu-af/saas-y/pkg/connection"
+	"github.com/popescu-af/saas-y/pkg/log"
+
+	"foo-service/pkg/exports"
+)
+
+// ExampleAPI is an example, trivial implementation of the API interface.
+// It simply logs the request name.
+type ExampleAPI struct {
+}
+
+// NewAPI creates an instance of the example API implementation.
+func NewAPI() exports.API {
+	return &ExampleAPI{}
+}
+
+// /some_path
+
+// Method0 example.
+func (a *ExampleAPI) Method0(queryParam0 int64, queryParam1 float64, queryParam2 string) (*exports.ReturnType, error) {
+	log.Info("called method_0")
+	return nil, errors.New("method 'method_0' not implemented")
+}
+
+// Method2 example.
+func (a *ExampleAPI) Method2(input *exports.BodyType) (*exports.ReturnType, error) {
+	log.Info("called method_2")
+	return nil, errors.New("method 'method_2' not implemented")
+}
+
+// NewMethodWs1Handler example.
+func (a *ExampleAPI) NewMethodWs1Handler(connection.FullDuplexEndpoint, error) {
+	log.Info("called method_ws_1")
+	return nil, errors.New("method 'method_ws_1' not implemented")
+}
+
+type methodWs1Handler struct {
+}
+
+// ProcessMessage implements a method of the connection.FullDuplexEndpoint interface.
+func (s *methodWs1Handler) ProcessMessage(m *connection.Message, write connection.WriteFn) error {
+	log.Info("ProcessMessage not implemented")
+	return nil
+}
+
+// Poll implements a method of the connection.FullDuplexEndpoint interface.
+func (e *TickerEndpoint) Poll(t time.Time, write connection.WriteFn) error {
+	log.Info("Poll not implemented")
+	return nil
+}

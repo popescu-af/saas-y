@@ -3,15 +3,27 @@ package templates
 // Client is the template for the client of the service.
 const Client = `package client
 
+{{range $a := .API}}{{range $mname, $method := $a.Methods}}
+	{{$method.Type | print | checkIfWebSocket}}
+{{end}}{{end}}
+
 import (
 	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
+	{{- if eq foundWebSocket "yes"}}
+	"net/url"
+	"time"
+
+	"github.com/popescu-af/saas-y/pkg/connection"
+	{{- end}}
 
 	"{{.RepositoryURL}}/pkg/exports"
 )
+
+{{resetFoundWebSocket}}
 
 {{with $cleanName := .Name | cleanName | capitalize}}
 // {{$cleanName}}Client is the structure that encompasses a {{$.Name}} client.
@@ -28,6 +40,14 @@ func New{{$cleanName}}Client(remoteAddress string) *{{$cleanName}}Client {
 
 {{range $a := $.API}}
 {{range $mname, $method := $a.Methods}}
+{{if eq $method.Type "WS"}}
+// New{{$mname | capitalize}}Client creates a client for websocket at the path '{{$a.Path}}'.
+// The caller is responsible to close the returned websocket channel when done.
+func (a *{{$cleanName}}Client) New{{$mname | capitalize}}Client(addr string, handler connection.FullDuplexEndpoint, pollingPeriod time.Duration) (*connection.FullDuplex, func(), error) {
+	u := url.URL{Scheme: "ws", Host: addr, Path: "{{$a.Path}}"}
+	return connection.NewWebSocketClient(u, handler, time.Second)
+}
+{{- else -}}
 // {{$mname | capitalize}} is the client function for {{$method.Type}} '{{$a.Path}}'.
 func (a *{{$cleanName}}Client) {{$mname | capitalize}}(
 	{{- if $method.InputType -}}
@@ -99,6 +119,7 @@ func (a *{{$cleanName}}Client) {{$mname | capitalize}}(
 
 	return result, nil
 }
+{{end}}
 
 {{end}}
 {{end}}

@@ -1,0 +1,13 @@
+package exports
+
+import (
+	"github.com/popescu-af/saas-y/pkg/connection"
+)
+
+// API defines the operations supported by the foo-service service.
+type API interface {
+	// /some_path
+	Method0(int64, float64, string) (*ReturnType, error)
+	Method2(*BodyType) (*ReturnType, error)
+	NewMethod_ws_1Handler() (connection.FullDuplexEndpoint, error)
+}

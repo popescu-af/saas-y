@@ -1,0 +1,97 @@
+package client
+
+import (
+	"bytes"
+	"encoding/json"
+	"fmt"
+	"io"
+	"net/http"
+	"net/url"
+	"time"
+
+	"github.com/popescu-af/saas-y/pkg/connection"
+
+	"foo-service/pkg/exports"
+)
+
+// FooServiceClient is the structure that encompasses a foo-service client.
+type FooServiceClient struct {
+	RemoteAddress string
+}
+
+// NewFooServiceClient creates a new instance of foo-service client.
+func NewFooServiceClient(remoteAddress string) *FooServiceClient {
+	return &FooServiceClient{
+		RemoteAddress: remoteAddress,
+	}
+}
+
+// Method0 is the client function for GET '/some_path'.
+func (a *FooServiceClient) Method0(queryParam0 int64, queryParam1 float64, queryParam2 string) (*exports.ReturnType, error) {
+	var body io.Reader
+
+	url := a.RemoteAddress + fmt.Sprintf("/some_path")
+
+	url += fmt.Sprintf("?query_param_0=%d", queryParam0)
+	url += fmt.Sprintf("&query_param_1=%f", queryParam1)
+	url += fmt.Sprintf("&query_param_2=%s", queryParam2)
+
+	request, err := http.NewRequest("GET", url, body)
+
+	response, err := http.DefaultClient.Do(request)
+	if err != nil {
+		return nil, err
+	}
+	defer response.Body.Close()
+
+	if response.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("GET %s failed with status code %d", url, response.StatusCode)
+	}
+
+	result := new(exports.ReturnType)
+	if err := json.NewDecoder(response.Body).Decode(result); err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
+// Method2 is the client function for POST '/some_path'.
+func (a *FooServiceClient) Method2(input *exports.BodyType) (*exports.ReturnType, error) {
+	var body io.Reader
+
+	b, err := json.Marshal(input)
+	if err != nil {
+		return nil, err
+	}
+
+	body = bytes.NewBuffer(b)
+
+	url := a.RemoteAddress + fmt.Sprintf("/some_path")
+
+	request, err := http.NewRequest("POST", url, body)
+
+	response, err := http.DefaultClient.Do(request)
+	if err != nil {
+		return nil, err
+	}
+	defer response.Body.Close()
+
+	if response.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("POST %s failed with status code %d", url, response.StatusCode)
+	}
+
+	result := new(exports.ReturnType)
+	if err := json.NewDecoder(response.Body).Decode(result); err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
+// NewMethodWs1Client creates a client for websocket at the path '/some_path'.
+// The caller is responsible to close the returned websocket channel when done.
+func (a *FooServiceClient) NewMethodWs1Client(addr string, handler connection.FullDuplexEndpoint, pollingPeriod time.Duration) (*connection.FullDuplex, func(), error) {
+	u := url.URL{Scheme: "ws", Host: addr, Path: "/some_path"}
+	return connection.NewWebSocketClient(u, handler, time.Second)
+}

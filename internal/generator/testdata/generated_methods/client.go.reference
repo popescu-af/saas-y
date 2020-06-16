@@ -1,0 +1,551 @@
+package client
+
+import (
+	"bytes"
+	"encoding/json"
+	"fmt"
+	"io"
+	"net/http"
+
+	"foo-service/pkg/exports"
+)
+
+// FooServiceClient is the structure that encompasses a foo-service client.
+type FooServiceClient struct {
+	RemoteAddress string
+}
+
+// NewFooServiceClient creates a new instance of foo-service client.
+func NewFooServiceClient(remoteAddress string) *FooServiceClient {
+	return &FooServiceClient{
+		RemoteAddress: remoteAddress,
+	}
+}
+
+// MethodNoPathParams0 is the client function for POST '/method_no_path_params'.
+func (a *FooServiceClient) MethodNoPathParams0() (*exports.ReturnType, error) {
+	var body io.Reader
+
+	url := a.RemoteAddress + fmt.Sprintf("/method_no_path_params")
+
+	request, err := http.NewRequest("POST", url, body)
+
+	response, err := http.DefaultClient.Do(request)
+	if err != nil {
+		return nil, err
+	}
+	defer response.Body.Close()
+
+	if response.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("POST %s failed with status code %d", url, response.StatusCode)
+	}
+
+	result := new(exports.ReturnType)
+	if err := json.NewDecoder(response.Body).Decode(result); err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
+// MethodNoPathParams1 is the client function for POST '/method_no_path_params'.
+func (a *FooServiceClient) MethodNoPathParams1(input *exports.BodyType) (*exports.ReturnType, error) {
+	var body io.Reader
+
+	b, err := json.Marshal(input)
+	if err != nil {
+		return nil, err
+	}
+
+	body = bytes.NewBuffer(b)
+
+	url := a.RemoteAddress + fmt.Sprintf("/method_no_path_params")
+
+	request, err := http.NewRequest("POST", url, body)
+
+	response, err := http.DefaultClient.Do(request)
+	if err != nil {
+		return nil, err
+	}
+	defer response.Body.Close()
+
+	if response.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("POST %s failed with status code %d", url, response.StatusCode)
+	}
+
+	result := new(exports.ReturnType)
+	if err := json.NewDecoder(response.Body).Decode(result); err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
+// MethodNoPathParams2 is the client function for POST '/method_no_path_params'.
+func (a *FooServiceClient) MethodNoPathParams2(headerParam0 string, headerParam1 float64, headerParam2 int64) (*exports.ReturnType, error) {
+	var body io.Reader
+
+	url := a.RemoteAddress + fmt.Sprintf("/method_no_path_params")
+
+	request, err := http.NewRequest("POST", url, body)
+	request.Header.Set("header_param_0", fmt.Sprintf("%s", headerParam0))
+	request.Header.Set("header_param_1", fmt.Sprintf("%f", headerParam1))
+	request.Header.Set("header_param_2", fmt.Sprintf("%d", headerParam2))
+
+	response, err := http.DefaultClient.Do(request)
+	if err != nil {
+		return nil, err
+	}
+	defer response.Body.Close()
+
+	if response.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("POST %s failed with status code %d", url, response.StatusCode)
+	}
+
+	result := new(exports.ReturnType)
+	if err := json.NewDecoder(response.Body).Decode(result); err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
+// MethodNoPathParams3 is the client function for POST '/method_no_path_params'.
+func (a *FooServiceClient) MethodNoPathParams3(input *exports.BodyType, headerParam0 string, headerParam1 float64, headerParam2 int64) (*exports.ReturnType, error) {
+	var body io.Reader
+
+	b, err := json.Marshal(input)
+	if err != nil {
+		return nil, err
+	}
+
+	body = bytes.NewBuffer(b)
+
+	url := a.RemoteAddress + fmt.Sprintf("/method_no_path_params")
+
+	request, err := http.NewRequest("POST", url, body)
+	request.Header.Set("header_param_0", fmt.Sprintf("%s", headerParam0))
+	request.Header.Set("header_param_1", fmt.Sprintf("%f", headerParam1))
+	request.Header.Set("header_param_2", fmt.Sprintf("%d", headerParam2))
+
+	response, err := http.DefaultClient.Do(request)
+	if err != nil {
+		return nil, err
+	}
+	defer response.Body.Close()
+
+	if response.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("POST %s failed with status code %d", url, response.StatusCode)
+	}
+
+	result := new(exports.ReturnType)
+	if err := json.NewDecoder(response.Body).Decode(result); err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
+// MethodNoPathParams4 is the client function for POST '/method_no_path_params'.
+func (a *FooServiceClient) MethodNoPathParams4(queryParam0 int64, queryParam1 float64, queryParam2 string) (*exports.ReturnType, error) {
+	var body io.Reader
+
+	url := a.RemoteAddress + fmt.Sprintf("/method_no_path_params")
+
+	url += fmt.Sprintf("?query_param_0=%d", queryParam0)
+	url += fmt.Sprintf("&query_param_1=%f", queryParam1)
+	url += fmt.Sprintf("&query_param_2=%s", queryParam2)
+
+	request, err := http.NewRequest("POST", url, body)
+
+	response, err := http.DefaultClient.Do(request)
+	if err != nil {
+		return nil, err
+	}
+	defer response.Body.Close()
+
+	if response.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("POST %s failed with status code %d", url, response.StatusCode)
+	}
+
+	result := new(exports.ReturnType)
+	if err := json.NewDecoder(response.Body).Decode(result); err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
+// MethodNoPathParams5 is the client function for POST '/method_no_path_params'.
+func (a *FooServiceClient) MethodNoPathParams5(input *exports.BodyType, queryParam0 int64, queryParam1 float64, queryParam2 string) (*exports.ReturnType, error) {
+	var body io.Reader
+
+	b, err := json.Marshal(input)
+	if err != nil {
+		return nil, err
+	}
+
+	body = bytes.NewBuffer(b)
+
+	url := a.RemoteAddress + fmt.Sprintf("/method_no_path_params")
+
+	url += fmt.Sprintf("?query_param_0=%d", queryParam0)
+	url += fmt.Sprintf("&query_param_1=%f", queryParam1)
+	url += fmt.Sprintf("&query_param_2=%s", queryParam2)
+
+	request, err := http.NewRequest("POST", url, body)
+
+	response, err := http.DefaultClient.Do(request)
+	if err != nil {
+		return nil, err
+	}
+	defer response.Body.Close()
+
+	if response.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("POST %s failed with status code %d", url, response.StatusCode)
+	}
+
+	result := new(exports.ReturnType)
+	if err := json.NewDecoder(response.Body).Decode(result); err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
+// MethodNoPathParams6 is the client function for POST '/method_no_path_params'.
+func (a *FooServiceClient) MethodNoPathParams6(queryParam0 int64, queryParam1 float64, queryParam2 string, headerParam0 string, headerParam1 float64, headerParam2 int64) (*exports.ReturnType, error) {
+	var body io.Reader
+
+	url := a.RemoteAddress + fmt.Sprintf("/method_no_path_params")
+
+	url += fmt.Sprintf("?query_param_0=%d", queryParam0)
+	url += fmt.Sprintf("&query_param_1=%f", queryParam1)
+	url += fmt.Sprintf("&query_param_2=%s", queryParam2)
+
+	request, err := http.NewRequest("POST", url, body)
+	request.Header.Set("header_param_0", fmt.Sprintf("%s", headerParam0))
+	request.Header.Set("header_param_1", fmt.Sprintf("%f", headerParam1))
+	request.Header.Set("header_param_2", fmt.Sprintf("%d", headerParam2))
+
+	response, err := http.DefaultClient.Do(request)
+	if err != nil {
+		return nil, err
+	}
+	defer response.Body.Close()
+
+	if response.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("POST %s failed with status code %d", url, response.StatusCode)
+	}
+
+	result := new(exports.ReturnType)
+	if err := json.NewDecoder(response.Body).Decode(result); err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
+// MethodNoPathParams7 is the client function for POST '/method_no_path_params'.
+func (a *FooServiceClient) MethodNoPathParams7(input *exports.BodyType, queryParam0 int64, queryParam1 float64, queryParam2 string, headerParam0 string, headerParam1 float64, headerParam2 int64) (*exports.ReturnType, error) {
+	var body io.Reader
+
+	b, err := json.Marshal(input)
+	if err != nil {
+		return nil, err
+	}
+
+	body = bytes.NewBuffer(b)
+
+	url := a.RemoteAddress + fmt.Sprintf("/method_no_path_params")
+
+	url += fmt.Sprintf("?query_param_0=%d", queryParam0)
+	url += fmt.Sprintf("&query_param_1=%f", queryParam1)
+	url += fmt.Sprintf("&query_param_2=%s", queryParam2)
+
+	request, err := http.NewRequest("POST", url, body)
+	request.Header.Set("header_param_0", fmt.Sprintf("%s", headerParam0))
+	request.Header.Set("header_param_1", fmt.Sprintf("%f", headerParam1))
+	request.Header.Set("header_param_2", fmt.Sprintf("%d", headerParam2))
+
+	response, err := http.DefaultClient.Do(request)
+	if err != nil {
+		return nil, err
+	}
+	defer response.Body.Close()
+
+	if response.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("POST %s failed with status code %d", url, response.StatusCode)
+	}
+
+	result := new(exports.ReturnType)
+	if err := json.NewDecoder(response.Body).Decode(result); err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
+// Method0 is the client function for POST '/method/{pathParam0:int}/{pathParam1:string}'.
+func (a *FooServiceClient) Method0(pathParam0 int64, pathParam1 string) (*exports.ReturnType, error) {
+	var body io.Reader
+
+	url := a.RemoteAddress + fmt.Sprintf("/method/%d/%s", pathParam0, pathParam1)
+
+	request, err := http.NewRequest("POST", url, body)
+
+	response, err := http.DefaultClient.Do(request)
+	if err != nil {
+		return nil, err
+	}
+	defer response.Body.Close()
+
+	if response.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("POST %s failed with status code %d", url, response.StatusCode)
+	}
+
+	result := new(exports.ReturnType)
+	if err := json.NewDecoder(response.Body).Decode(result); err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
+// Method1 is the client function for POST '/method/{pathParam0:int}/{pathParam1:string}'.
+func (a *FooServiceClient) Method1(input *exports.BodyType, pathParam0 int64, pathParam1 string) (*exports.ReturnType, error) {
+	var body io.Reader
+
+	b, err := json.Marshal(input)
+	if err != nil {
+		return nil, err
+	}
+
+	body = bytes.NewBuffer(b)
+
+	url := a.RemoteAddress + fmt.Sprintf("/method/%d/%s", pathParam0, pathParam1)
+
+	request, err := http.NewRequest("POST", url, body)
+
+	response, err := http.DefaultClient.Do(request)
+	if err != nil {
+		return nil, err
+	}
+	defer response.Body.Close()
+
+	if response.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("POST %s failed with status code %d", url, response.StatusCode)
+	}
+
+	result := new(exports.ReturnType)
+	if err := json.NewDecoder(response.Body).Decode(result); err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
+// Method2 is the client function for POST '/method/{pathParam0:int}/{pathParam1:string}'.
+func (a *FooServiceClient) Method2(pathParam0 int64, pathParam1 string, headerParam0 string, headerParam1 float64, headerParam2 int64) (*exports.ReturnType, error) {
+	var body io.Reader
+
+	url := a.RemoteAddress + fmt.Sprintf("/method/%d/%s", pathParam0, pathParam1)
+
+	request, err := http.NewRequest("POST", url, body)
+	request.Header.Set("header_param_0", fmt.Sprintf("%s", headerParam0))
+	request.Header.Set("header_param_1", fmt.Sprintf("%f", headerParam1))
+	request.Header.Set("header_param_2", fmt.Sprintf("%d", headerParam2))
+
+	response, err := http.DefaultClient.Do(request)
+	if err != nil {
+		return nil, err
+	}
+	defer response.Body.Close()
+
+	if response.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("POST %s failed with status code %d", url, response.StatusCode)
+	}
+
+	result := new(exports.ReturnType)
+	if err := json.NewDecoder(response.Body).Decode(result); err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
+// Method3 is the client function for POST '/method/{pathParam0:int}/{pathParam1:string}'.
+func (a *FooServiceClient) Method3(input *exports.BodyType, pathParam0 int64, pathParam1 string, headerParam0 string, headerParam1 float64, headerParam2 int64) (*exports.ReturnType, error) {
+	var body io.Reader
+
+	b, err := json.Marshal(input)
+	if err != nil {
+		return nil, err
+	}
+
+	body = bytes.NewBuffer(b)
+
+	url := a.RemoteAddress + fmt.Sprintf("/method/%d/%s", pathParam0, pathParam1)
+
+	request, err := http.NewRequest("POST", url, body)
+	request.Header.Set("header_param_0", fmt.Sprintf("%s", headerParam0))
+	request.Header.Set("header_param_1", fmt.Sprintf("%f", headerParam1))
+	request.Header.Set("header_param_2", fmt.Sprintf("%d", headerParam2))
+
+	response, err := http.DefaultClient.Do(request)
+	if err != nil {
+		return nil, err
+	}
+	defer response.Body.Close()
+
+	if response.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("POST %s failed with status code %d", url, response.StatusCode)
+	}
+
+	result := new(exports.ReturnType)
+	if err := json.NewDecoder(response.Body).Decode(result); err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
+// Method4 is the client function for POST '/method/{pathParam0:int}/{pathParam1:string}'.
+func (a *FooServiceClient) Method4(pathParam0 int64, pathParam1 string, queryParam0 int64, queryParam1 float64, queryParam2 string) (*exports.ReturnType, error) {
+	var body io.Reader
+
+	url := a.RemoteAddress + fmt.Sprintf("/method/%d/%s", pathParam0, pathParam1)
+
+	url += fmt.Sprintf("?query_param_0=%d", queryParam0)
+	url += fmt.Sprintf("&query_param_1=%f", queryParam1)
+	url += fmt.Sprintf("&query_param_2=%s", queryParam2)
+
+	request, err := http.NewRequest("POST", url, body)
+
+	response, err := http.DefaultClient.Do(request)
+	if err != nil {
+		return nil, err
+	}
+	defer response.Body.Close()
+
+	if response.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("POST %s failed with status code %d", url, response.StatusCode)
+	}
+
+	result := new(exports.ReturnType)
+	if err := json.NewDecoder(response.Body).Decode(result); err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
+// Method5 is the client function for POST '/method/{pathParam0:int}/{pathParam1:string}'.
+func (a *FooServiceClient) Method5(input *exports.BodyType, pathParam0 int64, pathParam1 string, queryParam0 int64, queryParam1 float64, queryParam2 string) (*exports.ReturnType, error) {
+	var body io.Reader
+
+	b, err := json.Marshal(input)
+	if err != nil {
+		return nil, err
+	}
+
+	body = bytes.NewBuffer(b)
+
+	url := a.RemoteAddress + fmt.Sprintf("/method/%d/%s", pathParam0, pathParam1)
+
+	url += fmt.Sprintf("?query_param_0=%d", queryParam0)
+	url += fmt.Sprintf("&query_param_1=%f", queryParam1)
+	url += fmt.Sprintf("&query_param_2=%s", queryParam2)
+
+	request, err := http.NewRequest("POST", url, body)
+
+	response, err := http.DefaultClient.Do(request)
+	if err != nil {
+		return nil, err
+	}
+	defer response.Body.Close()
+
+	if response.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("POST %s failed with status code %d", url, response.StatusCode)
+	}
+
+	result := new(exports.ReturnType)
+	if err := json.NewDecoder(response.Body).Decode(result); err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
+// Method6 is the client function for POST '/method/{pathParam0:int}/{pathParam1:string}'.
+func (a *FooServiceClient) Method6(pathParam0 int64, pathParam1 string, queryParam0 int64, queryParam1 float64, queryParam2 string, headerParam0 string, headerParam1 float64, headerParam2 int64) (*exports.ReturnType, error) {
+	var body io.Reader
+
+	url := a.RemoteAddress + fmt.Sprintf("/method/%d/%s", pathParam0, pathParam1)
+
+	url += fmt.Sprintf("?query_param_0=%d", queryParam0)
+	url += fmt.Sprintf("&query_param_1=%f", queryParam1)
+	url += fmt.Sprintf("&query_param_2=%s", queryParam2)
+
+	request, err := http.NewRequest("POST", url, body)
+	request.Header.Set("header_param_0", fmt.Sprintf("%s", headerParam0))
+	request.Header.Set("header_param_1", fmt.Sprintf("%f", headerParam1))
+	request.Header.Set("header_param_2", fmt.Sprintf("%d", headerParam2))
+
+	response, err := http.DefaultClient.Do(request)
+	if err != nil {
+		return nil, err
+	}
+	defer response.Body.Close()
+
+	if response.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("POST %s failed with status code %d", url, response.StatusCode)
+	}
+
+	result := new(exports.ReturnType)
+	if err := json.NewDecoder(response.Body).Decode(result); err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
+// Method7 is the client function for POST '/method/{pathParam0:int}/{pathParam1:string}'.
+func (a *FooServiceClient) Method7(input *exports.BodyType, pathParam0 int64, pathParam1 string, queryParam0 int64, queryParam1 float64, queryParam2 string, headerParam0 string, headerParam1 float64, headerParam2 int64) (*exports.ReturnType, error) {
+	var body io.Reader
+
+	b, err := json.Marshal(input)
+	if err != nil {
+		return nil, err
+	}
+
+	body = bytes.NewBuffer(b)
+
+	url := a.RemoteAddress + fmt.Sprintf("/method/%d/%s", pathParam0, pathParam1)
+
+	url += fmt.Sprintf("?query_param_0=%d", queryParam0)
+	url += fmt.Sprintf("&query_param_1=%f", queryParam1)
+	url += fmt.Sprintf("&query_param_2=%s", queryParam2)
+
+	request, err := http.NewRequest("POST", url, body)
+	request.Header.Set("header_param_0", fmt.Sprintf("%s", headerParam0))
+	request.Header.Set("header_param_1", fmt.Sprintf("%f", headerParam1))
+	request.Header.Set("header_param_2", fmt.Sprintf("%d", headerParam2))
+
+	response, err := http.DefaultClient.Do(request)
+	if err != nil {
+		return nil, err
+	}
+	defer response.Body.Close()
+
+	if response.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("POST %s failed with status code %d", url, response.StatusCode)
+	}
+
+	result := new(exports.ReturnType)
+	if err := json.NewDecoder(response.Body).Decode(result); err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
