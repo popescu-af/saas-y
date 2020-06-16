@@ -43,11 +43,14 @@ var fullSpec = `
                             "type": "POST",
                             "input_type": "input_struct_name",
                             "return_type": "return_struct_name"
+                        },
+                        "cool_websocket": {
+                            "type": "WS"
                         }
                     }
                 },
                 {
-                    "path": "/bar/{rank:uint}/{price:float}",
+                    "path": "/foo/{rank:uint}/{price:float}",
                     "methods": {
                         "method_name_3": {
                             "type": "GET",
@@ -96,6 +99,37 @@ var fullSpec = `
                     "value": "42"
                 }
             ]
+        },
+        {
+            "name": "bar-service",
+            "port": "80",
+            "api": [
+                {
+                    "path": "/bar",
+                    "methods": {
+                        "method_name_0": {
+                            "type": "GET",
+                            "return_type": "return_struct_name"
+                        },
+                        "method_name_1": {
+                            "type": "POST",
+                            "return_type": "return_struct_name"
+                        }
+                    }
+                }
+            ],
+            "structs": [
+                {
+                    "name": "return_struct_name",
+                    "fields": [
+                        {
+                            "name": "status",
+                            "type": "int"
+                        }
+                    ]
+                }
+            ],
+            "dependencies": [ "foo-service" ]
         }
     ]
 }

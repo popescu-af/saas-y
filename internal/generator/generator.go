@@ -107,6 +107,7 @@ func Service(g Abstract, svc model.Service, outdir string) (err error) {
 		template string
 		outdir   string
 	}{
+		// KEEP THIS ORDER !!!
 		{"api_example", dirs[4]},
 		{"client", dirs[7]},
 		{"api_definition", dirs[6]},

@@ -35,7 +35,7 @@ func (a *ExampleAPI) Method2(input *exports.BodyType) (*exports.ReturnType, erro
 }
 
 // NewMethodWs1Handler example.
-func (a *ExampleAPI) NewMethodWs1Handler(connection.FullDuplexEndpoint, error) {
+func (a *ExampleAPI) NewMethodWs1Handler() (connection.FullDuplexEndpoint, error) {
 	log.Info("called method_ws_1")
 	return nil, errors.New("method 'method_ws_1' not implemented")
 }

@@ -156,7 +156,7 @@ type Service struct {
 	DependencyInfos []DependencyInfo // deduced from the service's dependency list and the existing services' spec
 }
 
-//
+// DependencyInfo holds information about a dependency that is useful when generating code for a particular service.
 type DependencyInfo struct {
 	RepositoryURL string
 }

@@ -9,5 +9,5 @@ type API interface {
 	// /some_path
 	Method0(int64, float64, string) (*ReturnType, error)
 	Method2(*BodyType) (*ReturnType, error)
-	NewMethod_ws_1Handler() (connection.FullDuplexEndpoint, error)
+	NewMethodWs1Handler() (connection.FullDuplexEndpoint, error)
 }

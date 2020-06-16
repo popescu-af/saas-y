@@ -12,6 +12,9 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	{{- if eq foundWebSocket "yes"}}
+	"time"
+	{{- end}}
 
 	"github.com/gorilla/mux"
 	{{- if eq foundWebSocket "yes"}}

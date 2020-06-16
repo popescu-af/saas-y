@@ -53,7 +53,7 @@ func NewAPI(
 	{{range $mname, $method := $a.Methods}}
 	{{if eq $method.Type "WS"}}
 		// New{{$mname | capitalize}}Handler example.
-		func (a *ExampleAPI) New{{$mname | capitalize}}Handler (connection.FullDuplexEndpoint, error) {
+		func (a *ExampleAPI) New{{$mname | capitalize}}Handler() (connection.FullDuplexEndpoint, error) {
 			log.Info("called {{$mname}}")
 			return nil, errors.New("method '{{$mname}}' not implemented")
 		}

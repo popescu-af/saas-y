@@ -21,7 +21,9 @@ type API interface {
 		// {{$a.Path}}
 		{{range $mname, $method := $a.Methods}}
 		{{- if eq $method.Type "WS" -}}
-			New{{$mname | capitalize | symbolize}}Handler() (connection.FullDuplexEndpoint, error)
+			{{with $fname := $mname | capitalize -}}
+			{{printf "%s%s%s" "New" $fname "Handler" | symbolize}}() (connection.FullDuplexEndpoint, error)
+			{{- end}}
 		{{else -}}
 			{{- $mname | capitalize | symbolize}}(
 				{{- if $method.InputType -}}
