@@ -42,9 +42,7 @@
                             "return_type": "return_struct_name"
                         },
                         "method_web_socket": {
-                            "type": "WS",
-                            "input_type": "input_struct_name",
-                            "return_type": "return_struct_name"
+                            "type": "WS"
                         }
                     }
                 },
