@@ -9,14 +9,12 @@ const HTTPWrapper = `package service
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
 
 	"github.com/gorilla/mux"
 	{{- if eq foundWebSocket "yes"}}
-	"github.com/gorilla/websocket"
 	"github.com/popescu-af/saas-y/pkg/connection"
 	{{- end}}
 	"github.com/popescu-af/saas-y/pkg/log"

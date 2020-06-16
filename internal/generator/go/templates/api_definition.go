@@ -3,13 +3,25 @@ package templates
 // APIDefinition is the template for the go definition of the API.
 const APIDefinition = `package exports
 
+{{range $a := .API}}{{range $mname, $method := $a.Methods}}
+	{{$method.Type | print | checkIfWebSocket}}
+{{end}}{{end}}
+
+{{- if eq foundWebSocket "yes"}}
+import (
+	"github.com/popescu-af/saas-y/pkg/connection"
+)
+{{- end}}
+
+{{resetFoundWebSocket}}
+
 // API defines the operations supported by the {{.Name}} service.
 type API interface {
 	{{- range $a := .API}}
 		// {{$a.Path}}
 		{{range $mname, $method := $a.Methods}}
 		{{- if eq $method.Type "WS" -}}
-			New{{$mname | capitalize | symbolize}}Handler() (*{{$mname | capitalize | symbolize}}Handler, error)
+			New{{$mname | capitalize | symbolize}}Handler() (connection.FullDuplexEndpoint, error)
 		{{else -}}
 			{{- $mname | capitalize | symbolize}}(
 				{{- if $method.InputType -}}

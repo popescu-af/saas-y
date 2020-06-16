@@ -9,8 +9,6 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/popescu-af/saas-y/pkg/log"
-
-	"go.uber.org/zap"
 )
 
 // A PathDefinition groups an HTTP method on a path with its handler function.
@@ -43,20 +41,9 @@ func NewRouter(paths Paths) *mux.Router {
 
 func apiLogger(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		log.Info(
-			"serving",
-			zap.String("method", r.Method),
-			zap.String("path", r.RequestURI),
-		)
-
+		log.InfoCtx("serving", log.Context{"method": r.Method, "path": r.RequestURI})
 		start := time.Now()
 		handler.ServeHTTP(w, r)
-
-		log.Info(
-			"served",
-			zap.String("method", r.Method),
-			zap.String("path", r.RequestURI),
-			zap.String("duration", time.Since(start).String()),
-		)
+		log.InfoCtx("served", log.Context{"method": r.Method, "path": r.RequestURI, "duration": time.Since(start).String()})
 	})
 }`
