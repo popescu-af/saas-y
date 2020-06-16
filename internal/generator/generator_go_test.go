@@ -27,8 +27,9 @@ func generateServiceFiles(svc model.Service) (pOutdir string, err error) {
 func TestGeneratedEnv(t *testing.T) {
 	svc := model.Service{
 		ServiceCommon: model.ServiceCommon{
-			Name: "foo-service",
-			Port: "80",
+			Name:          "foo-service",
+			RepositoryURL: "foo-service",
+			Port:          "80",
 			Environment: []model.Variable{
 				{
 					Name:  "ENV_VAR_NAME",
@@ -37,9 +38,8 @@ func TestGeneratedEnv(t *testing.T) {
 				},
 			},
 		},
-		API:           []model.API{},
-		Structs:       []model.Struct{},
-		RepositoryURL: "foo-service",
+		API:     []model.API{},
+		Structs: []model.Struct{},
 	}
 
 	generator.Init()
@@ -113,8 +113,9 @@ func TestGeneratedMethods(t *testing.T) {
 
 	svc := model.Service{
 		ServiceCommon: model.ServiceCommon{
-			Name: "foo-service",
-			Port: "80",
+			Name:          "foo-service",
+			RepositoryURL: "foo-service",
+			Port:          "80",
 		},
 		API: []model.API{
 			{
@@ -162,7 +163,6 @@ func TestGeneratedMethods(t *testing.T) {
 				},
 			},
 		},
-		RepositoryURL: "foo-service",
 	}
 
 	generator.Init()
@@ -227,8 +227,9 @@ func TestGeneratedWebsocketMethod(t *testing.T) {
 
 	svc := model.Service{
 		ServiceCommon: model.ServiceCommon{
-			Name: "foo-service",
-			Port: "80",
+			Name:          "foo-service",
+			RepositoryURL: "foo-service",
+			Port:          "80",
 		},
 		API: []model.API{
 			{
@@ -258,7 +259,6 @@ func TestGeneratedWebsocketMethod(t *testing.T) {
 				},
 			},
 		},
-		RepositoryURL: "foo-service",
 	}
 
 	generator.Init()

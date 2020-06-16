@@ -25,6 +25,6 @@ func (j *JSON) Parse(filename string) (spec *model.Spec, err error) {
 		spec = nil
 	}
 
-	spec.GenerateRepositoryURLsForServices()
+	spec.GenerateAdditionalInformation()
 	return
 }

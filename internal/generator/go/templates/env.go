@@ -8,8 +8,12 @@ import "github.com/kelseyhightower/envconfig"
 // Env holds all environmental variables for the service app.
 type Env struct {
 	Port string ` + "`" + `default:"{{.Port}}" envconfig:"PORT"` + "`" + `
-	{{range .Environment}}{{.Name | toLower | capitalize}} {{.Type}} ` + "`" + `default:"{{.Value}}" envconfig:"{{.Name | toUpper}}"` + "`" + `
-	{{end}}
+	{{range .Environment -}}
+	{{.Name | toLower | capitalize}} {{.Type}} ` + "`" + `default:"{{.Value}}" envconfig:"{{.Name | toUpper}}"` + "`" + `
+	{{- end}}
+	{{range $d := .Dependencies -}}
+	{{$d | replaceHyphens | toLower | capitalize}}Addr string ` + "`" + `default:"" envconfig:"{{$d | replaceHyphens | toUpper}}_ADDR"` + "`" + `
+	{{- end}}
 }
 
 // ProcessEnv processes the environment, filling an

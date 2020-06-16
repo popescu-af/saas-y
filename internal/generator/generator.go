@@ -202,6 +202,9 @@ func CommonEntity(obj interface{}, templ string, resultPath string) (err error) 
 				}
 				return s
 			},
+			"replaceHyphens": func(s string) string {
+				return strings.ReplaceAll(s, "-", "_")
+			},
 		}).
 		Parse(templ))
 	err = applyObjectToTemplateAndSaveToFile(obj, loadedTempl, resultPath)
@@ -313,6 +316,9 @@ func templateFiller(templ string, codeFormatter func(string) (SymbolTable, error
 					}
 				}
 				return result
+			},
+			"replaceHyphens": func(s string) string {
+				return strings.ReplaceAll(s, "-", "_")
 			},
 		}).
 		Parse(templ))

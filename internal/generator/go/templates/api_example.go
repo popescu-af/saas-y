@@ -19,6 +19,10 @@ import (
 	{{- end}}
 
 	"{{.RepositoryURL}}/pkg/exports"
+
+	{{range $i, $d := .DependencyInfos -}}
+	exports{{$i}} "{{$d.RepositoryURL}}/pkg/exports"
+	{{end}}
 )
 
 {{resetFoundWebSocket}}
@@ -26,11 +30,22 @@ import (
 // ExampleAPI is an example, trivial implementation of the API interface.
 // It simply logs the request name.
 type ExampleAPI struct {
+	{{range $i, $d := .Dependencies -}}
+	{{$d | replaceHyphens | toLower}} exports{{$i}}.API
+	{{- end}}
 }
 
 // NewAPI creates an instance of the example API implementation.
-func NewAPI() exports.API {
-	return &ExampleAPI{}
+func NewAPI(
+	{{- range $i, $d := .Dependencies -}}
+	{{$d | replaceHyphens | toLower}} exports{{$i}}.API,
+	{{- end -}}
+) exports.API {
+	return &ExampleAPI{
+		{{range $i, $d := .Dependencies -}}
+		{{$d | replaceHyphens | toLower}}: {{$d | replaceHyphens | toLower}},
+		{{- end}}
+	}
 }
 
 {{range $a := .API}}
@@ -53,7 +68,7 @@ func NewAPI() exports.API {
 		}
 
 		// Poll implements a method of the connection.FullDuplexEndpoint interface.
-		func (e *TickerEndpoint) Poll(t time.Time, write connection.WriteFn) error {
+		func (s *{{$mname}}Handler) Poll(t time.Time, write connection.WriteFn) error {
 			log.Info("Poll not implemented")
 			return nil
 		}

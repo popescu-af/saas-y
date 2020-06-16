@@ -38,7 +38,7 @@ The input consists of a JSON file with the following format
                     "path": "/foo",
                     "methods": {
                         "method_name_0": {
-                            "type": "get",
+                            "type": "GET",
                             "header_params": [
                                 {
                                     "name": "header_param_name",
@@ -54,34 +54,25 @@ The input consists of a JSON file with the following format
                             "return_type": "return_struct_name"
                         },
                         "method_name_1": {
-                            "type": "post",
+                            "type": "POST",
                             "input_type": "input_struct_name",
                             "return_type": "return_struct_name"
                         },
-                        "method_name_2": {
-                            "type": "options",
-                            "header_params": [
-                                {
-                                    "name": "header_param_name",
-                                    "value": "value"
-                                }
-                            ]
-                        }
                     }
                 },
                 {
                     "path": "/bar/{rank:uint}/{price:float}",
                     "methods": {
                         "method_name_3": {
-                            "type": "get",
+                            "type": "GET",
                             "return_type": "return_struct_name"
                         },
                         "method_name_4": {
-                            "type": "delete",
+                            "type": "DELETE",
                             "return_type": "return_struct_name"
                         },
                         "method_name_5": {
-                            "type": "patch",
+                            "type": "PATCH",
                             "input_type": "input_struct_name",
                             "return_type": "return_struct_name"
                         }
@@ -116,6 +107,7 @@ The input consists of a JSON file with the following format
     "external_services": [
         {
             "name": "external-service",
+            "repository_url": "example.com/external-service",
             "port": "80",
             "image_url": "localhost:5000/external-service:latest",
             "env": [

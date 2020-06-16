@@ -32,6 +32,10 @@ spec:
               value: "{{.Port}}"{{range .Environment}}
             - name: APP_{{.Name | toUpper}}
               value: "{{.Value}}"{{end}}
+            {{range $d := .Dependencies -}}
+            - name: APP_{{$d | replaceHyphens | toUpper}}_ADDR
+              value: "{{$d}}:8000"
+            {{- end}}
 ---
 apiVersion: v1
 kind: Service

@@ -17,10 +17,30 @@ type Spec struct {
 	ExternalServices []ExternalService `json:"external_services"`
 }
 
-// GenerateRepositoryURLsForServices generates a repository URL for each service.
-func (s *Spec) GenerateRepositoryURLsForServices() {
+// GenerateAdditionalInformation generates additional information needed for code/config generation.
+func (s *Spec) GenerateAdditionalInformation() {
+	dependencyInfoMap := make(map[string]DependencyInfo)
+
 	for i := range s.Services {
-		s.Services[i].RepositoryURL = s.RepositoryURL + "/services/" + s.Services[i].Name
+		srvRepo := s.RepositoryURL + "/services/" + s.Services[i].Name
+
+		s.Services[i].RepositoryURL = srvRepo
+
+		dependencyInfoMap[s.Services[i].Name] = DependencyInfo{
+			RepositoryURL: srvRepo,
+		}
+	}
+
+	for i := range s.ExternalServices {
+		dependencyInfoMap[s.ExternalServices[i].Name] = DependencyInfo{
+			RepositoryURL: s.ExternalServices[i].RepositoryURL,
+		}
+	}
+
+	for i := range s.Services {
+		for _, d := range s.Services[i].Dependencies {
+			s.Services[i].DependencyInfos = append(s.Services[i].DependencyInfos, dependencyInfoMap[d])
+		}
 	}
 }
 
@@ -131,9 +151,14 @@ func ValidatePathValue(pathValue string) (int, error) {
 // Service represents a saas-y defined service.
 type Service struct {
 	ServiceCommon
-	API           []API    `json:"api"`
-	Structs       []Struct `json:"structs"`
-	RepositoryURL string   // deduced from the spec's repository URL
+	API             []API            `json:"api"`
+	Structs         []Struct         `json:"structs"`
+	DependencyInfos []DependencyInfo // deduced from the service's dependency list and the existing services' spec
+}
+
+//
+type DependencyInfo struct {
+	RepositoryURL string
 }
 
 // Validate checks if the service is well defined.
@@ -359,6 +384,10 @@ var compiledImageURLRegex *regexp.Regexp
 func (s *ExternalService) Validate(knownServices []string) (err error) {
 	errPrefix := "failed to validate external service " + s.Name + ": "
 
+	if s.RepositoryURL == "" {
+		return errors.New(errPrefix + "missing repository URL")
+	}
+
 	if err = s.ServiceCommon.Validate(knownServices); err != nil {
 		return errors.New(errPrefix + err.Error())
 	}
@@ -378,10 +407,11 @@ func (s *ExternalService) Validate(knownServices []string) (err error) {
 
 // ServiceCommon contains the core attributes of both saas-y and external services.
 type ServiceCommon struct {
-	Name         string     `json:"name"`
-	Port         string     `json:"port"`
-	Environment  []Variable `json:"env"`
-	Dependencies []string   `json:"dependencies"`
+	Name          string     `json:"name"`
+	RepositoryURL string     `json:"repository_url"`
+	Port          string     `json:"port"`
+	Environment   []Variable `json:"env"`
+	Dependencies  []string   `json:"dependencies"`
 }
 
 // Validate checks if the service core attributes are well defined.

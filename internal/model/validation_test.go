@@ -317,7 +317,7 @@ func TestServiceCommonValid(t *testing.T) {
 }
 
 func TestExternalServiceValid(t *testing.T) {
-	validSvcCommon := model.ServiceCommon{Name: "good_name", Port: "80"}
+	validSvcCommon := model.ServiceCommon{Name: "good_name", RepositoryURL: "good-name-repo", Port: "80"}
 
 	tests := []struct {
 		extSvc *model.ExternalService

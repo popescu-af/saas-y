@@ -50,7 +50,7 @@ func (s *methodWs1Handler) ProcessMessage(m *connection.Message, write connectio
 }
 
 // Poll implements a method of the connection.FullDuplexEndpoint interface.
-func (e *TickerEndpoint) Poll(t time.Time, write connection.WriteFn) error {
+func (s *methodWs1Handler) Poll(t time.Time, write connection.WriteFn) error {
 	log.Info("Poll not implemented")
 	return nil
 }
