@@ -8,6 +8,9 @@ type API interface {
 	{{- range $a := .API}}
 		// {{$a.Path}}
 		{{range $mname, $method := $a.Methods}}
+		{{- if eq $method.Type "WS" -}}
+			New{{$mname | capitalize | symbolize}}Handler() (*{{$mname | capitalize | symbolize}}Handler, error)
+		{{else -}}
 			{{- $mname | capitalize | symbolize}}(
 				{{- if $method.InputType -}}
 					*{{- $method.InputType | capitalize | symbolize}},
@@ -32,6 +35,7 @@ type API interface {
 				{{- end -}}
 			{{- end -}}
 			)(*{{$method.ReturnType | capitalize | symbolize}}, error)
+		{{end -}}
 		{{end -}}
 	{{- end -}}
 }`

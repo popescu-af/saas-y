@@ -75,17 +75,17 @@ func (h *HTTPWrapper) Paths() Paths {
 {{if eq $method.Type "WS"}}
 // {{$mname | capitalize | symbolize}} WebSocket wrapper.
 func (h *HTTPWrapper) {{$mname | capitalize | symbolize}}(w http.ResponseWriter, r *http.Request) {
-	handler, err := h.api.New{{$method.ReturnType | capitalize | symbolize}}()
+	handler, err := h.api.New{{$mname | capitalize | symbolize}}Handler()
 	if err != nil {
 		writeErrorToHTTPResponse(err, w)
-		log.ErrorCtx("create {{$method.ReturnType | capitalize | symbolize}} failed", log.Context{"error": err})
+		log.ErrorCtx("creating instance of {{$mname | capitalize | symbolize}}Handler failed", log.Context{"error": err})
 		return
 	}
 
 	conn, c, err := connection.NewWebSocketServer(w, r, handler, time.Second)
 	if err != nil {
 		writeErrorToHTTPResponse(err, w)
-		log.ErrorCtx("create {{$method.ReturnType | capitalize | symbolize}} failed", log.Context{"error": err})
+		log.ErrorCtx("creating websocket connection failed", log.Context{"error": err})
 		return
 	}
 	defer c.Close()
