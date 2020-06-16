@@ -234,6 +234,11 @@ func (m *Method) Validate(knownTypes []string) (err error) {
 		}
 	}
 
+	if m.Type == WS && (m.InputType != "" || m.ReturnType != "") {
+		err = fmt.Errorf("neither body nor return type are allowed for method type %s", m.Type)
+		return
+	}
+
 	for _, t := range []APIMethodType{GET, DELETE} {
 		if m.Type == t && m.InputType != "" {
 			err = fmt.Errorf("body is not allowed for method type %s", m.Type)

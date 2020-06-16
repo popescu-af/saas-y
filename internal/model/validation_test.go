@@ -30,7 +30,7 @@ func TestMethodTypeValid(t *testing.T) {
 	}
 }
 
-func TestMethodBodyAllowed(t *testing.T) {
+func TestMethodBodyOrReturnTypeAllowed(t *testing.T) {
 	tests := []struct {
 		method *model.Method
 		valid  bool
@@ -39,10 +39,17 @@ func TestMethodBodyAllowed(t *testing.T) {
 		{&model.Method{Type: "POST"}, true},
 		{&model.Method{Type: "PATCH"}, true},
 		{&model.Method{Type: "DELETE"}, true},
+		{&model.Method{Type: "WS"}, true},
 		{&model.Method{Type: "GET", InputType: "whatever"}, false},
 		{&model.Method{Type: "POST", InputType: "whatever"}, true},
 		{&model.Method{Type: "PATCH", InputType: "whatever"}, true},
 		{&model.Method{Type: "DELETE", InputType: "whatever"}, false},
+		{&model.Method{Type: "WS", InputType: "whatever"}, false},
+		{&model.Method{Type: "GET", ReturnType: "whatever"}, true},
+		{&model.Method{Type: "POST", ReturnType: "whatever"}, true},
+		{&model.Method{Type: "PATCH", ReturnType: "whatever"}, true},
+		{&model.Method{Type: "DELETE", ReturnType: "whatever"}, true},
+		{&model.Method{Type: "WS", ReturnType: "whatever"}, false},
 	}
 
 	for _, tt := range tests {
