@@ -13,8 +13,8 @@ import (
 	"{{.RepositoryURL}}/internal/logic"
 	"{{.RepositoryURL}}/internal/service"
 
-	{{range $i, $d := .DependencyInfos -}}
-	client{{$i}} "{{$d.RepositoryURL}}/pkg/client"
+	{{range $d := .DependencyInfos -}}
+	{{$d.Name | cleanName | toLower}} "{{$d.RepositoryURL}}/pkg/client"
 	{{end}}
 )
 
@@ -29,9 +29,9 @@ func main() {
 	}
 
 	api := logic.NewAPI(
-		{{range $i, $d := .Dependencies}}
-			{{- with $name := $d | cleanName | capitalize -}}
-				client{{$i}}.New{{$name}}Client(env.{{$name}}Addr),
+		{{range $d := .DependencyInfos}}
+			{{- with $name := $d.Name | cleanName | capitalize -}}
+				{{$d.Name | cleanName | toLower}}.New{{$name}}Client(env.{{$name}}Addr),
 			{{- end -}}
 		{{end}}
 	)

@@ -20,8 +20,8 @@ import (
 
 	"{{.RepositoryURL}}/pkg/exports"
 
-	{{range $i, $d := .DependencyInfos -}}
-	exports{{$i}} "{{$d.RepositoryURL}}/pkg/exports"
+	{{range $d := .DependencyInfos -}}
+	{{$d.Name | cleanName | toLower}} "{{$d.RepositoryURL}}/pkg/exports"
 	{{end}}
 )
 
@@ -30,20 +30,20 @@ import (
 // ExampleAPI is an example, trivial implementation of the API interface.
 // It simply logs the request name.
 type ExampleAPI struct {
-	{{range $i, $d := .Dependencies -}}
-	{{$d | replaceHyphens | toLower}} exports{{$i}}.API
+	{{range $d := .DependencyInfos -}}
+	{{$d.Name | cleanName}} {{$d.Name | cleanName | toLower}}.API
 	{{- end}}
 }
 
 // NewAPI creates an instance of the example API implementation.
 func NewAPI(
-	{{- range $i, $d := .Dependencies -}}
-	{{$d | replaceHyphens | toLower}} exports{{$i}}.API,
+	{{- range $d := .DependencyInfos -}}
+	{{$d.Name | cleanName}} {{$d.Name | cleanName | toLower}}.API,
 	{{- end -}}
 ) exports.API {
 	return &ExampleAPI{
-		{{range $i, $d := .Dependencies -}}
-		{{$d | replaceHyphens | toLower}}: {{$d | replaceHyphens | toLower}},
+		{{range $d := .DependencyInfos -}}
+		{{$d.Name | cleanName}}: {{$d.Name | cleanName}},
 		{{- end}}
 	}
 }

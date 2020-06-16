@@ -27,12 +27,14 @@ func (s *Spec) GenerateAdditionalInformation() {
 		s.Services[i].RepositoryURL = srvRepo
 
 		dependencyInfoMap[s.Services[i].Name] = DependencyInfo{
+			Name:          s.Services[i].Name,
 			RepositoryURL: srvRepo,
 		}
 	}
 
 	for i := range s.ExternalServices {
 		dependencyInfoMap[s.ExternalServices[i].Name] = DependencyInfo{
+			Name:          s.ExternalServices[i].Name,
 			RepositoryURL: s.ExternalServices[i].RepositoryURL,
 		}
 	}
@@ -158,6 +160,7 @@ type Service struct {
 
 // DependencyInfo holds information about a dependency that is useful when generating code for a particular service.
 type DependencyInfo struct {
+	Name          string
 	RepositoryURL string
 }
 
