@@ -32,7 +32,7 @@ import (
 type ExampleAPI struct {
 	{{range $d := .DependencyInfos -}}
 	{{$d.Name | cleanName}} {{$d.Name | cleanName | toLower}}.API
-	{{- end}}
+	{{end}}
 }
 
 // NewAPI creates an instance of the example API implementation.
@@ -44,7 +44,7 @@ func NewAPI(
 	return &ExampleAPI{
 		{{range $d := .DependencyInfos -}}
 		{{$d.Name | cleanName}}: {{$d.Name | cleanName}},
-		{{- end}}
+		{{end}}
 	}
 }
 

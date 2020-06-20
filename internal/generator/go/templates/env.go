@@ -10,10 +10,10 @@ type Env struct {
 	Port string ` + "`" + `default:"{{.Port}}" envconfig:"PORT"` + "`" + `
 	{{range .Environment -}}
 	{{.Name | toLower | capitalize}} {{.Type}} ` + "`" + `default:"{{.Value}}" envconfig:"{{.Name | toUpper}}"` + "`" + `
-	{{- end}}
+	{{end}}
 	{{range $d := .Dependencies -}}
 	{{$d | replaceHyphens | toLower | capitalize}}Addr string ` + "`" + `default:"" envconfig:"{{$d | replaceHyphens | toUpper}}_ADDR"` + "`" + `
-	{{- end}}
+	{{end}}
 }
 
 // ProcessEnv processes the environment, filling an
