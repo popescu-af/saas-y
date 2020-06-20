@@ -3,20 +3,12 @@ package templates
 // APIExample is the template for an example of go implementation of the API.
 const APIExample = `package logic
 
-{{range $a := .API}}{{range $mname, $method := $a.Methods}}
-	{{$method.Type | print | checkIfWebSocket}}
-{{end}}{{end}}
-
 import (
 	"errors"
-	{{- if eq foundWebSocket "yes"}}
 	"time"
-	{{- end}}
 
 	"github.com/popescu-af/saas-y/pkg/log"
-	{{- if eq foundWebSocket "yes"}}
 	"github.com/popescu-af/saas-y/pkg/connection"
-	{{- end}}
 
 	"{{.RepositoryURL}}/pkg/exports"
 
@@ -25,20 +17,18 @@ import (
 	{{end}}
 )
 
-{{resetFoundWebSocket}}
-
 // ExampleAPI is an example, trivial implementation of the API interface.
 // It simply logs the request name.
 type ExampleAPI struct {
 	{{range $d := .DependencyInfos -}}
-	{{$d.Name | cleanName}} {{$d.Name | cleanName | toLower}}.API
+	{{$d.Name | cleanName}} {{$d.Name | cleanName | toLower}}.APIClient
 	{{end}}
 }
 
 // NewAPI creates an instance of the example API implementation.
 func NewAPI(
 	{{- range $d := .DependencyInfos -}}
-	{{$d.Name | cleanName}} {{$d.Name | cleanName | toLower}}.API,
+	{{$d.Name | cleanName}} {{$d.Name | cleanName | toLower}}.APIClient,
 	{{- end -}}
 ) exports.API {
 	return &ExampleAPI{

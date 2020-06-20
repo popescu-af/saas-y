@@ -220,3 +220,30 @@ func (f *FullDuplex) IsClosed() bool {
 
 	return f.isClosed
 }
+
+// FullDuplexManager keeps track of a list of existing full-duplex connections.
+type FullDuplexManager struct {
+	connections []*FullDuplex
+}
+
+// NewFullDuplexManager creates a full-duplex connection list manager.
+func NewFullDuplexManager() *FullDuplexManager {
+	return new(FullDuplexManager)
+}
+
+// AddConnection appends a connection to the list of managed connections
+// and runs it in a parallel goroutine.
+func (m *FullDuplexManager) AddConnection(conn *FullDuplex) {
+	m.connections = append(m.connections, conn)
+	go conn.Run()
+}
+
+// CloseConnections closes all managed connections.
+func (m *FullDuplexManager) CloseConnections() {
+	for _, c := range m.connections {
+		err := c.Close()
+		if err != nil {
+			log.ErrorCtx("manager - failed to close connection", log.Context{"error": err})
+		}
+	}
+}

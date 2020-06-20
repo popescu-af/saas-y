@@ -3,29 +3,19 @@ package templates
 // HTTPWrapper is the template for HTTP boilerplate in go code.
 const HTTPWrapper = `package service
 
-{{range $a := .API}}{{range $mname, $method := $a.Methods}}
-	{{$method.Type | print | checkIfWebSocket}}
-{{end}}{{end}}
-
 import (
 	"encoding/json"
 	"net/http"
 	"strconv"
 	"strings"
-	{{- if eq foundWebSocket "yes"}}
 	"time"
-	{{- end}}
 
 	"github.com/gorilla/mux"
-	{{- if eq foundWebSocket "yes"}}
 	"github.com/popescu-af/saas-y/pkg/connection"
-	{{- end}}
 	"github.com/popescu-af/saas-y/pkg/log"
 
 	"{{.RepositoryURL}}/pkg/exports"
 )
-
-{{resetFoundWebSocket}}
 
 // HTTPWrapper decorates the APIs with from/to HTTP code.
 type HTTPWrapper struct {
