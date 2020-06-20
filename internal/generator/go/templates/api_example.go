@@ -10,6 +10,7 @@ import (
 	"github.com/popescu-af/saas-y/pkg/log"
 	"github.com/popescu-af/saas-y/pkg/connection"
 
+	"{{.RepositoryURL}}/pkg/internal/config"
 	"{{.RepositoryURL}}/pkg/exports"
 
 	{{range $d := .DependencyInfos -}}
@@ -20,18 +21,20 @@ import (
 // ExampleAPI is an example, trivial implementation of the API interface.
 // It simply logs the request name.
 type ExampleAPI struct {
+	env config.Env
 	{{range $d := .DependencyInfos -}}
 	{{$d.Name | cleanName}} {{$d.Name | cleanName | toLower}}.APIClient
 	{{end}}
 }
 
 // NewAPI creates an instance of the example API implementation.
-func NewAPI(
+func NewAPI(env config.Env,
 	{{- range $d := .DependencyInfos -}}
 	{{$d.Name | cleanName}} {{$d.Name | cleanName | toLower}}.APIClient,
 	{{- end -}}
 ) exports.API {
 	return &ExampleAPI{
+		env: env,
 		{{range $d := .DependencyInfos -}}
 		{{$d.Name | cleanName}}: {{$d.Name | cleanName}},
 		{{end}}
