@@ -5,17 +5,21 @@ import (
 
 	"github.com/popescu-af/saas-y/pkg/log"
 
+	"foo-service/internal/config"
 	"foo-service/pkg/exports"
 )
 
 // ExampleAPI is an example, trivial implementation of the API interface.
 // It simply logs the request name.
 type ExampleAPI struct {
+	env config.Env
 }
 
 // NewAPI creates an instance of the example API implementation.
-func NewAPI() exports.API {
-	return &ExampleAPI{}
+func NewAPI(env config.Env) exports.API {
+	return &ExampleAPI{
+		env: env,
+	}
 }
 
 // /method_no_path_params

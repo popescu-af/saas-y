@@ -1,6 +1,8 @@
 package exports
 
 import (
+	"time"
+
 	"github.com/popescu-af/saas-y/pkg/connection"
 )
 
@@ -10,4 +12,14 @@ type API interface {
 	Method0(int64, float64, string) (*ReturnType, error)
 	Method2(*BodyType) (*ReturnType, error)
 	NewMethodWs1Handler() (connection.FullDuplexEndpoint, error)
+}
+
+// APIClient defines the operations supported by the foo-service service client.
+type APIClient interface {
+	// /some_path
+	Method0(int64, float64, string) (*ReturnType, error)
+	Method2(*BodyType) (*ReturnType, error)
+	NewMethodWs1Client(connection.FullDuplexEndpoint, time.Duration) error
+
+	CloseConnections()
 }

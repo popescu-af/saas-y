@@ -1,13 +1,37 @@
 package saasytesting
 
 import (
+	"io"
 	"io/ioutil"
+	"os"
 	"path"
 	"runtime"
 	"testing"
 
 	"github.com/stretchr/testify/require"
 )
+
+var generateReferenceFiles = false
+
+func copyFileContents(src, dst string) error {
+	in, err := os.Open(src)
+	if err != nil {
+		return err
+	}
+	defer in.Close()
+
+	out, err := os.Create(dst)
+	if err != nil {
+		return err
+	}
+	defer out.Close()
+
+	_, err = io.Copy(out, in)
+	if err != nil {
+		return err
+	}
+	return out.Close()
+}
 
 // GetTestingCommonDirectory returns the directory of the common testing package.
 func GetTestingCommonDirectory() string {
@@ -43,10 +67,21 @@ func CreateOutdir() (pOutdir string, err error) {
 // given directories are equal in content
 func CheckFilesInDirsEqual(t *testing.T, outDir string, referenceDir string, filenames []string) {
 	for _, fname := range filenames {
-		bActual, err := ioutil.ReadFile(path.Join(outDir, fname))
-		require.NoError(t, err)
-		bExpected, err := ioutil.ReadFile(path.Join(referenceDir, fname+".reference"))
-		require.NoError(t, err)
-		require.Equal(t, bExpected, bActual)
+		actualFileName := path.Join(outDir, fname)
+		referenceFileName := path.Join(referenceDir, fname+".reference")
+
+		if !generateReferenceFiles {
+			bActual, err := ioutil.ReadFile(actualFileName)
+			require.NoError(t, err)
+
+			bExpected, err := ioutil.ReadFile(referenceFileName)
+			require.NoError(t, err)
+			require.Equal(t, bExpected, bActual)
+		} else {
+			err := copyFileContents(actualFileName, referenceFileName)
+			if err != nil {
+				require.FailNowf(t, "could not write reference file", "error - %v", err)
+			}
+		}
 	}
 }

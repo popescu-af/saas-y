@@ -10,7 +10,7 @@ import (
 	"github.com/popescu-af/saas-y/pkg/log"
 	"github.com/popescu-af/saas-y/pkg/connection"
 
-	"{{.RepositoryURL}}/pkg/internal/config"
+	"{{.RepositoryURL}}/internal/config"
 	"{{.RepositoryURL}}/pkg/exports"
 
 	{{range $d := .DependencyInfos -}}
