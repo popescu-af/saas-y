@@ -109,7 +109,7 @@ func (g *Generator) CodeFormatter(path string) (st generator.SymbolTable, err er
 	out.Reset()
 	errout.Reset()
 
-	cmd = exec.Command("gofmt")
+	cmd = exec.Command("goimports")
 	cmd.Stdin = bytes.NewBufferString(contents)
 	cmd.Stdout = &out
 	cmd.Stderr = &errout
