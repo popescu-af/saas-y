@@ -85,9 +85,9 @@ func Service(g Abstract, svc model.Service, outdir string) (err error) {
 		template string
 		outpath  string
 	}{
-		{g.GetTemplate("dockerfile"), path.Join(dirs[0], "Dockerfile.example")},
-		{common_templ.Makefile, path.Join(dirs[0], "Makefile.example")},
-		{common_templ.Readme, path.Join(dirs[0], "README-example.md")},
+		{g.GetTemplate("dockerfile"), path.Join(dirs[0], "Dockerfile")},
+		{common_templ.Makefile, path.Join(dirs[0], "Makefile")},
+		{common_templ.Readme, path.Join(dirs[0], "README.md")},
 		{k8s.DeplSvc, path.Join(dirs[2], svc.Name+".yaml")},
 	}
 
@@ -108,15 +108,15 @@ func Service(g Abstract, svc model.Service, outdir string) (err error) {
 		outdir   string
 	}{
 		// KEEP THIS ORDER !!!
-		{"api_example", dirs[4]},
+		{"impl", dirs[4]},
 		{"client", dirs[7]},
-		{"api_definition", dirs[6]},
-		{"errors_example", dirs[4]},
-		{"main_example", dirs[1]},
+		{"api", dirs[6]},
+		{"errors", dirs[4]},
+		{"main", dirs[1]},
 		{"env", dirs[3]},
 		{"http_router", dirs[5]},
 		{"http_wrapper", dirs[5]},
-		{"http_error_handler_example", dirs[5]},
+		{"http_error_handler", dirs[5]},
 	}
 
 	for _, c := range components {

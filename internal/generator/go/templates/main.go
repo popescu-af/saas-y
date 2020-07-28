@@ -1,7 +1,7 @@
 package templates
 
-// MainExample is the template for the main functionality in go code.
-const MainExample = `package main
+// Main is the template for the main functionality in go code.
+const Main = `package main
 
 import (
 	"fmt"
@@ -28,7 +28,7 @@ func main() {
 		log.Fatal(err.Error())
 	}
 
-	api := logic.NewAPI(
+	impl := logic.NewImpl(
 		env,
 		{{range $d := .DependencyInfos}}
 			{{- with $name := $d.Name | cleanName | capitalize -}}
@@ -36,7 +36,7 @@ func main() {
 			{{- end -}}
 		{{end}}
 	)
-	httpWrapper := service.NewHTTPWrapper(api)
+	httpWrapper := service.NewHTTPWrapper(impl)
 	router := service.NewRouter(httpWrapper.Paths())
 
 	log.Fatal(fmt.Sprintf("error serving - %v", http.ListenAndServe(fmt.Sprintf(":%s", env.Port), router)))

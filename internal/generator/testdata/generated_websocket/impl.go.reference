@@ -11,40 +11,40 @@ import (
 	"foo-service/pkg/exports"
 )
 
-// ExampleAPI is an example, trivial implementation of the API interface.
-// It simply logs the request name.
-type ExampleAPI struct {
+// Implementation is the main implementation of the API interface.
+type Implementation struct {
 	env config.Env
 }
 
-// NewAPI creates an instance of the example API implementation.
-func NewAPI(env config.Env) exports.API {
-	return &ExampleAPI{
+// NewImpl creates an instance of the main implementation.
+func NewImpl(env config.Env) exports.API {
+	return &Implementation{
 		env: env,
 	}
 }
 
 // /some_path
 
-// Method0 example.
-func (a *ExampleAPI) Method0(queryParam0 int64, queryParam1 float64, queryParam2 string) (*exports.ReturnType, error) {
+// Method0 implementation.
+func (i *Implementation) Method0(queryParam0 int64, queryParam1 float64, queryParam2 string) (*exports.ReturnType, error) {
 	log.Info("called method_0")
 	return nil, errors.New("method 'method_0' not implemented")
 }
 
-// Method2 example.
-func (a *ExampleAPI) Method2(input *exports.BodyType) (*exports.ReturnType, error) {
+// Method2 implementation.
+func (i *Implementation) Method2(input *exports.BodyType) (*exports.ReturnType, error) {
 	log.Info("called method_2")
 	return nil, errors.New("method 'method_2' not implemented")
 }
 
-// NewMethodWs1Handler example.
-func (a *ExampleAPI) NewMethodWs1Handler() (connection.FullDuplexEndpoint, error) {
+// NewMethodWs1Handler implementation.
+func (i *Implementation) NewMethodWs1Handler() (connection.FullDuplexEndpoint, error) {
 	log.Info("called method_ws_1")
 	return nil, errors.New("method 'method_ws_1' not implemented")
 }
 
 type methodWs1Handler struct {
+	closeCh chan bool
 }
 
 // ProcessMessage implements a method of the connection.FullDuplexEndpoint interface.
@@ -57,4 +57,9 @@ func (s *methodWs1Handler) ProcessMessage(m *connection.Message, write connectio
 func (s *methodWs1Handler) Poll(t time.Time, write connection.WriteFn) error {
 	log.Info("Poll not implemented")
 	return nil
+}
+
+// CloseCommandChannel implements a method of the connection.FullDuplexEndpoint interface.
+func (s *methodWs1Handler) CloseCommandChannel() chan bool {
+	return s.closeCh
 }

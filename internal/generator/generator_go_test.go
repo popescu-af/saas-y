@@ -173,9 +173,9 @@ func TestGeneratedMethods(t *testing.T) {
 
 	pOutdir = path.Join(pOutdir, "services", svc.Name)
 	referenceDir := path.Join(saasytesting.GetTestingCommonDirectory(), "..", "generator", "testdata", "generated_methods")
-	saasytesting.CheckFilesInDirsEqual(t, path.Join(pOutdir, "internal", "logic"), referenceDir, []string{"api_example.go"})
+	saasytesting.CheckFilesInDirsEqual(t, path.Join(pOutdir, "internal", "logic"), referenceDir, []string{"impl.go"})
 	saasytesting.CheckFilesInDirsEqual(t, path.Join(pOutdir, "internal", "service"), referenceDir, []string{"http_wrapper.go"})
-	saasytesting.CheckFilesInDirsEqual(t, path.Join(pOutdir, "pkg", "exports"), referenceDir, []string{"api_definition.go"})
+	saasytesting.CheckFilesInDirsEqual(t, path.Join(pOutdir, "pkg", "exports"), referenceDir, []string{"api.go"})
 	saasytesting.CheckFilesInDirsEqual(t, path.Join(pOutdir, "pkg", "client"), referenceDir, []string{"client.go"})
 }
 
@@ -269,8 +269,8 @@ func TestGeneratedWebsocketMethod(t *testing.T) {
 
 	pOutdir = path.Join(pOutdir, "services", svc.Name)
 	referenceDir := path.Join(saasytesting.GetTestingCommonDirectory(), "..", "generator", "testdata", "generated_websocket")
-	saasytesting.CheckFilesInDirsEqual(t, path.Join(pOutdir, "internal", "logic"), referenceDir, []string{"api_example.go"})
+	saasytesting.CheckFilesInDirsEqual(t, path.Join(pOutdir, "internal", "logic"), referenceDir, []string{"impl.go"})
 	saasytesting.CheckFilesInDirsEqual(t, path.Join(pOutdir, "internal", "service"), referenceDir, []string{"http_wrapper.go"})
-	saasytesting.CheckFilesInDirsEqual(t, path.Join(pOutdir, "pkg", "exports"), referenceDir, []string{"api_definition.go"})
+	saasytesting.CheckFilesInDirsEqual(t, path.Join(pOutdir, "pkg", "exports"), referenceDir, []string{"api.go"})
 	saasytesting.CheckFilesInDirsEqual(t, path.Join(pOutdir, "pkg", "client"), referenceDir, []string{"client.go"})
 }

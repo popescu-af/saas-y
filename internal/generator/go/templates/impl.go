@@ -1,7 +1,7 @@
 package templates
 
-// APIExample is the template for an example of go implementation of the API.
-const APIExample = `package logic
+// Impl is the template for the main go implementation of the API.
+const Impl = `package logic
 
 import (
 	"errors"
@@ -18,22 +18,21 @@ import (
 	{{end}}
 )
 
-// ExampleAPI is an example, trivial implementation of the API interface.
-// It simply logs the request name.
-type ExampleAPI struct {
+// Implementation is the main implementation of the API interface.
+type Implementation struct {
 	env config.Env
 	{{range $d := .DependencyInfos -}}
 	{{$d.Name | cleanName}} {{$d.Name | cleanName | toLower}}.APIClient
 	{{end}}
 }
 
-// NewAPI creates an instance of the example API implementation.
-func NewAPI(env config.Env,
+// NewImpl creates an instance of the main implementation.
+func NewImpl(env config.Env,
 	{{- range $d := .DependencyInfos -}}
 	{{$d.Name | cleanName}} {{$d.Name | cleanName | toLower}}.APIClient,
 	{{- end -}}
 ) exports.API {
-	return &ExampleAPI{
+	return &Implementation{
 		env: env,
 		{{range $d := .DependencyInfos -}}
 		{{$d.Name | cleanName}}: {{$d.Name | cleanName}},
@@ -45,13 +44,14 @@ func NewAPI(env config.Env,
 	// {{$a.Path}}
 	{{range $mname, $method := $a.Methods}}
 	{{if eq $method.Type "WS"}}
-		// New{{$mname | capitalize}}Handler example.
-		func (a *ExampleAPI) New{{$mname | capitalize}}Handler() (connection.FullDuplexEndpoint, error) {
+		// New{{$mname | capitalize}}Handler implementation.
+		func (i *Implementation) New{{$mname | capitalize}}Handler() (connection.FullDuplexEndpoint, error) {
 			log.Info("called {{$mname}}")
 			return nil, errors.New("method '{{$mname}}' not implemented")
 		}
 
 		type {{$mname}}Handler struct {
+			closeCh chan bool
 		}
 
 		// ProcessMessage implements a method of the connection.FullDuplexEndpoint interface.
@@ -65,9 +65,14 @@ func NewAPI(env config.Env,
 			log.Info("Poll not implemented")
 			return nil
 		}
+
+		// CloseCommandChannel implements a method of the connection.FullDuplexEndpoint interface.
+		func (s *{{$mname}}Handler) CloseCommandChannel() chan bool {
+			return s.closeCh
+		}
 	{{- else -}}
-		// {{$mname | capitalize}} example.
-		func (a *ExampleAPI) {{$mname | capitalize}}(
+		// {{$mname | capitalize}} implementation.
+		func (i *Implementation) {{$mname | capitalize}}(
 			{{- if $method.InputType -}}
 				input *exports.{{$method.InputType | capitalize | symbolize}},
 			{{- end -}}

@@ -8,16 +8,7 @@ This service was generated with saas-y. Please modify a copy of this file, by ad
 - etc.
 
 ## Quick start
-First thing to do after generating a saas-y service is to rename all example generated files, like so
-` + "```" + `bash
-mv Dockerfile.example Dockerfile
-mv Makefile.example Makefile
-mv README-example.md README.md
-mv cmd/main_example.go cmd/main.go
-# maybe others...
-` + "```" + `
-
-Then, run
+Run
 ` + "```" + `bash
 # build docker image
 make build
