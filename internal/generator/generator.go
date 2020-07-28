@@ -127,6 +127,7 @@ func Service(g Abstract, svc model.Service, outdir string) (err error) {
 	}
 
 	// TODO:
+	// - add support for byte data in structs and for arrays
 	// - proper error when some field is missing (e.g. return_type)
 	// - README.md on how to use saas-y
 	//   - test the usage of readme

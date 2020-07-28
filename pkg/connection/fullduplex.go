@@ -24,6 +24,24 @@ type Channel struct {
 	Close CloseFn
 }
 
+// Message types, same as websocket.
+const (
+    // TextMessage denotes a text data message.
+    TextMessage = 1
+
+    // BinaryMessage denotes a binary data message.
+    BinaryMessage = 2
+
+    // CloseMessage denotes a close control message.
+    CloseMessage = 8
+
+    // PingMessage denotes a ping control message.
+    PingMessage = 9
+
+    // PongMessage denotes a pong control message.
+    PongMessage = 10
+)
+
 // Message is a structure encompassing a message's type and payload.
 type Message struct {
 	Type    int
