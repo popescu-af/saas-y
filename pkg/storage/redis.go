@@ -20,9 +20,8 @@ func NewRedis(options *redis.Options) *Redis {
 }
 
 // Get returns the pre-cached value for the given key.
-func (r *Redis) Get(key string) (string, error) {
-	val, err := r.client.Get(context.TODO(), key).Result()
-	return val, err
+func (r *Redis) Get(key string) ([]byte, error) {
+	return r.client.Get(context.TODO(), key).Bytes()
 }
 
 // Set sets the value for the specified key in the cache.
