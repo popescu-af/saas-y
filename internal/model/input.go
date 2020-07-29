@@ -146,7 +146,7 @@ func ValidatePathValue(pathValue string) (int, error) {
 		pathValue,
 		"path",
 		&compiledPathRegex,
-		`(/([A-Za-z0-9_]+|\{[A-Za-z0-9_]+:(u?int|float|string)\}))*/?`,
+		`(/([A-Za-z0-9\-\._]+|\{[A-Za-z0-9_]+:(u?int|float|string)\}))*/?`,
 	)
 }
 
