@@ -52,9 +52,9 @@ func (g *Generator) GetTemplate(name string) string {
 	case "env":
 		return templates.Env
 	case "errors":
-		return templates.ErrorsExample
+		return templates.Errors
 	case "http_error_handler":
-		return templates.HTTPErrorHandlerExample
+		return templates.HTTPErrorHandler
 	case "http_router":
 		return templates.HTTPRouter
 	case "http_wrapper":

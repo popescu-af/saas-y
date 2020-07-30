@@ -1,8 +1,8 @@
 package templates
 
-// HTTPErrorHandlerExample is the template for the go definition
-// of the HTTP error handler example code.
-const HTTPErrorHandlerExample = `package service
+// HTTPErrorHandler is the template for the go definition
+// of the HTTP error handler code.
+const HTTPErrorHandler = `package service
 
 import (
 	"net/http"
