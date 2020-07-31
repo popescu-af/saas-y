@@ -93,11 +93,35 @@ func (f *FullDuplex) Run() error {
 	}
 
 	var wg sync.WaitGroup
-	wg.Add(1)
+	wg.Add(2)
+
+	// processor <- reader
+	msgCh := make(chan *Message)
 
 	// reader
 	go func() {
 		defer wg.Done()
+		defer log.InfoCtx("reading done", map[string]interface{}{"instance": fmt.Sprintf("%p", f)})
+
+		for {
+			msg, err := f.channel.Read()
+			if err != nil {
+				log.ErrorCtx("failed to read message", log.Context{"error": err})
+				return
+			}
+
+			msgCh <- msg
+
+			if msg.Type == CloseMessage {
+				return
+			}
+		}
+	}()
+
+	// processor
+	go func() {
+		defer wg.Done()
+		defer log.InfoCtx("processing done", map[string]interface{}{"instance": fmt.Sprintf("%p", f)})
 
 		writeOnChannel := func(m *Message) error {
 			return f.channel.Write(m)
@@ -107,26 +131,22 @@ func (f *FullDuplex) Run() error {
 			select {
 			case <-f.stopCh:
 				log.Info("external stop")
+				f.channel.Close()
 				return
-			default:
-				msg, err := f.channel.Read()
-				if err != nil {
-					log.ErrorCtx("failed to read message", log.Context{"error": err})
-					return
-				}
-
+			case msg := <-msgCh:
 				switch msg.Type {
 				case CloseMessage:
+					log.Info("channel closed by the other party")
 					return
 				case PingMessage:
-					if err = writeOnChannel(&Message{Type: PongMessage}); err != nil {
+					if err := writeOnChannel(&Message{Type: PongMessage}); err != nil {
 						log.ErrorCtx("failed to send pong", log.Context{"error": err})
 						return
 					}
 				case PongMessage:
 					// do nothing for now
 				default:
-					if err = f.listener.ProcessMessage(msg, writeOnChannel); err != nil {
+					if err := f.listener.ProcessMessage(msg, writeOnChannel); err != nil {
 						log.ErrorCtx("failed to process message", log.Context{"error": err})
 						return
 					}
@@ -144,8 +164,6 @@ func (f *FullDuplex) Run() error {
 	defer f.lockState.Unlock()
 
 	f.isRunning = false
-
-	f.channel.Close()
 	f.isClosed = true
 
 	f.wgStop.Done()
