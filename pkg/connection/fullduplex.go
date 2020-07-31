@@ -3,43 +3,33 @@ package connection
 import (
 	"fmt"
 	"sync"
-	"time"
 
 	"github.com/popescu-af/saas-y/pkg/log"
 )
 
-// ReadFn is the type of function listening for messages on a channel.
-type ReadFn func() (*Message, error)
-
-// WriteFn is the type of function sending messages on a channel.
-type WriteFn func(*Message) error
-
-// CloseFn is the type of function that closes a channel.
-type CloseFn func()
-
-// Channel is the structure containing a channel's read/write functions.
-type Channel struct {
-	Read  ReadFn
-	Write WriteFn
-	Close CloseFn
+// Channel is the interface for a full duplex channel.
+type Channel interface {
+	Read() (*Message, error)
+	Write(*Message) error
+	Close()
 }
 
 // Message types, same as websocket.
 const (
-    // TextMessage denotes a text data message.
-    TextMessage = 1
+	// TextMessage denotes a text data message.
+	TextMessage = 1
 
-    // BinaryMessage denotes a binary data message.
-    BinaryMessage = 2
+	// BinaryMessage denotes a binary data message.
+	BinaryMessage = 2
 
-    // CloseMessage denotes a close control message.
-    CloseMessage = 8
+	// CloseMessage denotes a close control message.
+	CloseMessage = 8
 
-    // PingMessage denotes a ping control message.
-    PingMessage = 9
+	// PingMessage denotes a ping control message.
+	PingMessage = 9
 
-    // PongMessage denotes a pong control message.
-    PongMessage = 10
+	// PongMessage denotes a pong control message.
+	PongMessage = 10
 )
 
 // Message is a structure encompassing a message's type and payload.
@@ -48,52 +38,43 @@ type Message struct {
 	Payload []byte
 }
 
-// FullDuplexEndpoint is the type for communication endpoints.
-// Communication endpoints function in a full-duplex way, being possible to
-// receive and send messages on the channel at the same time.
-// Processing received messages has priority. If there is nothing to process,
-// the endpoint can do housekeeping work or even send messages to the other side
-// of the communication channel.
-type FullDuplexEndpoint interface {
+// WriteOnChannelFunc can be called to write back on the channel
+// from inside the processing message method.
+type WriteOnChannelFunc func(*Message) error
+
+// ErrorStop is the error a listener should return when processing a message,
+// if the connection should be subsequently closed.
+var ErrorStop = fmt.Errorf("listener: stop connection")
+
+// ChannelListener is the interface for types that can process incoming messages from
+// a full duplex channel. The listener can react to messages with a reply or by closing the channel.
+type ChannelListener interface {
 	// ProcessMessage should process the given message and react accordingly,
 	// by changing state and/or writing something back or none of them.
-	ProcessMessage(*Message, WriteFn) error
-	// Poll should inspect the current state and decide whether to take any action
-	// and/or write something on the channel or not.
-	Poll(time.Time, WriteFn) error
-	// CloseCommandChannel should return the channel the full duplex connection would listen
-	// to for 'close' commands that come from inside the endpoint's logic.
-	// A value written on the channel (either true or false) will close the connection.
-	CloseCommandChannel() chan bool
+	ProcessMessage(*Message, WriteOnChannelFunc) error
 }
 
-// FullDuplex is a full-duplex connection that takes a full-duplex endpoint
-// and a channel. It handles messages arriving on the channel while periodically
-// polling the endpoint for new messages to be dispached on the channel.
+// FullDuplex is a full-duplex connection that takes a channel listener
+// and a channel. It handles messages arriving on the channel through the listener
+// and also handles sending messages and closing the communication.
 type FullDuplex struct {
-	endpoint        FullDuplexEndpoint
-	channel         *Channel
-	pollingPeriod   time.Duration
-	stopWaitClosing chan bool
-	stopReading     chan bool
-	stopProcessing  chan bool
-	wgStop          sync.WaitGroup
-	lockState       sync.Mutex
-	lockStop        sync.Mutex
-	isRunning       bool
-	isClosed        bool
+	listener  ChannelListener
+	channel   Channel
+	stopCh    chan bool
+	wgStop    sync.WaitGroup
+	lockState sync.Mutex
+	lockStop  sync.Mutex
+	isRunning bool
+	isClosed  bool
 }
 
 // NewFullDuplex creates a new, inactive full-duplex connection.
 // Call Run to run it.
-func NewFullDuplex(endpoint FullDuplexEndpoint, channel *Channel, pollingPeriod time.Duration) *FullDuplex {
+func NewFullDuplex(listener ChannelListener, channel Channel) *FullDuplex {
 	return &FullDuplex{
-		endpoint:        endpoint,
-		channel:         channel,
-		pollingPeriod:   pollingPeriod,
-		stopWaitClosing: make(chan bool),
-		stopReading:     make(chan bool),
-		stopProcessing:  make(chan bool),
+		listener: listener,
+		channel:  channel,
+		stopCh:   make(chan bool),
 	}
 }
 
@@ -112,74 +93,43 @@ func (f *FullDuplex) Run() error {
 	}
 
 	var wg sync.WaitGroup
-	wg.Add(3)
-
-	msgCh := make(chan *Message)
-
-	// close listener
-	go func() {
-		defer wg.Done()
-
-		for {
-			select {
-			case <-f.endpoint.CloseCommandChannel():
-				log.Info("internal stop")
-				f.stopReading <- true
-				f.stopProcessing <- true
-				return
-			case <-f.stopWaitClosing:
-				log.Info("external stop")
-				return
-			}
-		}
-	}()
+	wg.Add(1)
 
 	// reader
 	go func() {
 		defer wg.Done()
 
+		writeOnChannel := func(m *Message) error {
+			return f.channel.Write(m)
+		}
+
 		for {
 			select {
-			case <-f.stopReading:
+			case <-f.stopCh:
 				log.Info("external stop")
 				return
 			default:
-				m, err := f.channel.Read()
+				msg, err := f.channel.Read()
 				if err != nil {
 					log.ErrorCtx("failed to read message", log.Context{"error": err})
-					f.stopWaitClosing <- true
-					f.stopProcessing <- true
 					return
 				}
-				msgCh <- m
-			}
-		}
-	}()
 
-	// processor
-	go func() {
-		defer wg.Done()
-
-		ticker := time.NewTicker(f.pollingPeriod)
-
-		for {
-			select {
-			case <-f.stopProcessing:
-				log.Info("external stop")
-				return
-			case msg := <-msgCh:
-				if err := f.endpoint.ProcessMessage(msg, f.channel.Write); err != nil {
-					log.ErrorCtx("failed to process message", log.Context{"error": err})
-					f.stopWaitClosing <- true
-					f.stopReading <- true
+				switch msg.Type {
+				case CloseMessage:
 					return
-				}
-			case t := <-ticker.C:
-				if err := f.endpoint.Poll(t, f.channel.Write); err != nil {
-					log.ErrorCtx("failed to poll", log.Context{"error": err})
-					f.stopWaitClosing <- true
-					f.stopReading <- true
-					return
+				case PingMessage:
+					if err = writeOnChannel(&Message{Type: PongMessage}); err != nil {
+						log.ErrorCtx("failed to send pong", log.Context{"error": err})
+						return
+					}
+				case PongMessage:
+					// do nothing for now
+				default:
+					if err = f.listener.ProcessMessage(msg, writeOnChannel); err != nil {
+						log.ErrorCtx("failed to process message", log.Context{"error": err})
+						return
+					}
 				}
 			}
 		}
@@ -202,6 +152,11 @@ func (f *FullDuplex) Run() error {
 	return nil
 }
 
+// SendMessage sends a message on the full duplex channel.
+func (f *FullDuplex) SendMessage(m *Message) error {
+	return f.channel.Write(m)
+}
+
 // Close stops a full-duplex connection.
 func (f *FullDuplex) Close() error {
 	f.lockStop.Lock()
@@ -215,9 +170,7 @@ func (f *FullDuplex) Close() error {
 		return fmt.Errorf("not running")
 	}
 
-	f.stopWaitClosing <- true
-	f.stopReading <- true
-	f.stopProcessing <- true
+	f.stopCh <- true
 
 	f.wgStop.Wait()
 	return nil

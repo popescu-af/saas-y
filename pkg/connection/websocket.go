@@ -3,38 +3,41 @@ package connection
 import (
 	"net/http"
 	"net/url"
-	"time"
 
 	"github.com/gorilla/websocket"
 
 	"github.com/popescu-af/saas-y/pkg/log"
 )
 
-func newWebSocketChannel(c *websocket.Conn) *Channel {
-	return &Channel{
-		Read: func() (*Message, error) {
-			mt, message, err := c.ReadMessage()
-			return &Message{Type: mt, Payload: message}, err
-		},
-		Write: func(m *Message) error {
-			return c.WriteMessage(m.Type, m.Payload)
-		},
-		Close: func() {
-			closeMsgFmt := websocket.FormatCloseMessage(websocket.CloseNormalClosure, "")
-			err := c.WriteMessage(websocket.CloseMessage, closeMsgFmt)
-			if err != nil {
-				log.ErrorCtx("write close message", log.Context{"error": err})
-			}
-			c.Close()
-		},
+type webSocketChannel struct {
+	wsConn *websocket.Conn
+}
+
+func (w *webSocketChannel) Read() (*Message, error) {
+	mt, message, err := w.wsConn.ReadMessage()
+	return &Message{Type: mt, Payload: message}, err
+}
+
+func (w *webSocketChannel) Write(m *Message) error {
+	return w.wsConn.WriteMessage(m.Type, m.Payload)
+}
+
+func (w *webSocketChannel) Close() {
+	closeMsgFmt := websocket.FormatCloseMessage(websocket.CloseNormalClosure, "")
+	err := w.wsConn.WriteMessage(websocket.CloseMessage, closeMsgFmt)
+	if err != nil {
+		log.ErrorCtx("write close message", log.Context{"error": err})
 	}
+	w.wsConn.Close()
+}
+
+func newWebSocketChannel(c *websocket.Conn) Channel {
+	return &webSocketChannel{wsConn: c}
 }
 
 // NewWebSocketClient creates a new websocket connection and a full-duplex
-// connection controller on top of it, returning both. It is the responsibility
-// of the caller to both close the websocket connection and to stop the controller
-// in case it is runnning.
-func NewWebSocketClient(url url.URL, handler FullDuplexEndpoint, pollingPeriod time.Duration) (*FullDuplex, error) {
+// connection on top of it.
+func NewWebSocketClient(url url.URL, listener ChannelListener) (*FullDuplex, error) {
 	c, _, err := websocket.DefaultDialer.Dial(url.String(), nil)
 	if err != nil {
 		log.ErrorCtx("dial", log.Context{"error": err})
@@ -42,16 +45,14 @@ func NewWebSocketClient(url url.URL, handler FullDuplexEndpoint, pollingPeriod t
 	}
 
 	channel := newWebSocketChannel(c)
-	conn := NewFullDuplex(handler, channel, pollingPeriod)
+	conn := NewFullDuplex(listener, channel)
 	return conn, nil
 }
 
 var upgrader = websocket.Upgrader{}
 
 // NewWebSocketServer does the same as NewWebSocketClient, but from a server point of view.
-// It creates the websocket by upgrading the HTTP request, compared to the client version,
-// which creates the websocket by dialing an HTTP endpoint accepting the protocol.
-func NewWebSocketServer(w http.ResponseWriter, r *http.Request, handler FullDuplexEndpoint, pollingPeriod time.Duration) (*FullDuplex, error) {
+func NewWebSocketServer(w http.ResponseWriter, r *http.Request, listener ChannelListener) (*FullDuplex, error) {
 	c, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.ErrorCtx("upgrade", log.Context{"error": err})
@@ -59,6 +60,6 @@ func NewWebSocketServer(w http.ResponseWriter, r *http.Request, handler FullDupl
 	}
 
 	channel := newWebSocketChannel(c)
-	conn := NewFullDuplex(handler, channel, pollingPeriod)
+	conn := NewFullDuplex(listener, channel)
 	return conn, nil
 }

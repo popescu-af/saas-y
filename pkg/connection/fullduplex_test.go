@@ -5,68 +5,82 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 )
 
-var channelIsOpen bool
-var defaultChannel = &Channel{
-	Read: func() (*Message, error) {
-		if !channelIsOpen {
-			return nil, fmt.Errorf("error reading from closed channel")
-		}
-		return &Message{Type: 0, Payload: []byte("dummy message")}, nil
-	},
-	Write: func(m *Message) error {
-		// do nothing
-		return nil
-	},
-	Close: func() {
-		channelIsOpen = false
-	},
+type testChannel struct {
+	mock.Mock
+	failReading        bool
+	failWriting        bool
+	messageType        int
+	channelIsClosed    bool
+	lastWrittenMessage *Message
 }
 
-type TestEndpoint struct {
-	channelClosed                 bool
-	closeCh                       chan bool
-	stopInternallyFromProcessFunc bool
-	stopInternallyFromPollFunc    bool
+var errRead = fmt.Errorf("error reading message")
+
+func (t *testChannel) Read() (*Message, error) {
+	if t.channelIsClosed {
+		return nil, fmt.Errorf("error reading from closed channel")
+	} else if t.failReading {
+		t.Called()
+		return nil, errRead
+	}
+	return &Message{Type: t.messageType, Payload: []byte("dummy message")}, nil
 }
 
-func (t *TestEndpoint) ProcessMessage(*Message, WriteFn) error {
-	if !t.channelClosed && t.stopInternallyFromProcessFunc {
-		t.closeCh <- true
-		t.channelClosed = true
-		close(t.closeCh)
+var errWrite = fmt.Errorf("error writing message")
+
+func (t *testChannel) Write(m *Message) error {
+	t.lastWrittenMessage = m
+	t.Called()
+
+	if t.failWriting {
+		return errWrite
 	}
 	return nil
 }
 
-func (t *TestEndpoint) Poll(time.Time, WriteFn) error {
-	if !t.channelClosed && t.stopInternallyFromPollFunc {
-		t.closeCh <- true
-		t.channelClosed = true
-		close(t.closeCh)
+func (t *testChannel) Close() {
+	t.channelIsClosed = true
+}
+
+type testListener struct {
+	mock.Mock
+	stopInternally            bool
+	replyToProcessMessageOnce bool
+}
+
+func (t *testListener) ProcessMessage(m *Message, write WriteOnChannelFunc) error {
+	if t.stopInternally {
+		t.Called()
+		return ErrorStop
+	} else if t.replyToProcessMessageOnce {
+		t.replyToProcessMessageOnce = false
+		return write(nil)
 	}
 	return nil
 }
 
-func (t *TestEndpoint) CloseCommandChannel() chan bool {
-	return t.closeCh
-}
-
-func NewTestEndpoint(stopInternallyFromProcessFunc, stopInternallyFromPollFunc bool) *TestEndpoint {
-	return &TestEndpoint{
-		closeCh:                       make(chan bool),
-		stopInternallyFromProcessFunc: stopInternallyFromProcessFunc,
-		stopInternallyFromPollFunc:    stopInternallyFromPollFunc,
+func setupTest(stopInternally, failReading, failWriting, replyToProcessMessageOnce bool, msgType int) (*FullDuplex, *testListener, *testChannel) {
+	listener := &testListener{
+		stopInternally:            stopInternally,
+		replyToProcessMessageOnce: replyToProcessMessageOnce,
 	}
+	channel := &testChannel{
+		failReading: failReading,
+		failWriting: failWriting,
+		messageType: msgType,
+	}
+	return NewFullDuplex(listener, channel), listener, channel
 }
 
 func TestLifetime(t *testing.T) {
-	endp := NewTestEndpoint(false, false)
+	conn, _, channel := setupTest(false, false, false, true, TextMessage)
 
-	channelIsOpen = true
-	conn := NewFullDuplex(endp, defaultChannel, time.Second)
+	// it will happen as a single reply to the first processed message
+	channel.On("Write")
 
 	go func() {
 		err := conn.Run()
@@ -77,7 +91,17 @@ func TestLifetime(t *testing.T) {
 	require.True(t, conn.IsRunning(), "unexpected not running connection")
 	require.False(t, conn.IsClosed(), "unexpected closed connection")
 
-	err := conn.Close()
+	// see comment above
+	channel.AssertCalled(t, "Write")
+
+	err := conn.Run()
+	require.Error(t, err, "unexpected successful second run")
+
+	channel.On("Write")
+	conn.SendMessage(nil)
+	channel.AssertCalled(t, "Write")
+
+	err = conn.Close()
 	require.NoError(t, err, "unexpected error when stopping")
 	require.False(t, conn.IsRunning(), "unexpected running connection")
 
@@ -92,21 +116,52 @@ func TestLifetime(t *testing.T) {
 }
 
 func TestInternalStop(t *testing.T) {
-	tests := [][]bool{
-		{false, true},
-		{true, false},
-	}
+	conn, listener, _ := setupTest(true, false, false, false, TextMessage)
 
-	for _, tt := range tests {
-		endp := NewTestEndpoint(tt[0], tt[1])
+	listener.On("ProcessMessage").Return(ErrorStop)
+	conn.Run()
+	listener.AssertCalled(t, "ProcessMessage")
+}
 
-		channelIsOpen = true
-		conn := NewFullDuplex(endp, defaultChannel, time.Second)
+func TestReadError(t *testing.T) {
+	conn, _, channel := setupTest(false, true, false, false, TextMessage)
 
+	channel.On("Read").Return(errRead)
+	conn.Run()
+	channel.AssertCalled(t, "Read")
+}
+
+func TestPingReply(t *testing.T) {
+	conn, _, channel := setupTest(false, false, false, false, PingMessage)
+
+	channel.On("Write")
+	go func() {
 		err := conn.Run()
 		require.NoError(t, err, "unexpected error returned by run")
+	}()
+	time.Sleep(time.Duration(100) * time.Millisecond)
 
-		require.False(t, conn.IsRunning(), "unexpected running connection")
-		require.True(t, conn.IsClosed(), "unexpected not closed connection")
-	}
+	channel.AssertCalled(t, "Write")
+	conn.Close()
+
+	require.Equal(t, PongMessage, channel.lastWrittenMessage.Type, "unexpected last sent message type: %d", channel.lastWrittenMessage.Type)
+}
+
+func TestPingReplyFailed(t *testing.T) {
+	conn, _, channel := setupTest(false, false, true, false, PingMessage)
+
+	channel.On("Write").Return(errWrite)
+	conn.Run()
+	channel.AssertCalled(t, "Write")
+
+	require.Equal(t, PongMessage, channel.lastWrittenMessage.Type, "unexpected last sent message type: %d", channel.lastWrittenMessage.Type)
+}
+
+func TestCloseMessage(t *testing.T) {
+	conn, _, _ := setupTest(false, false, false, false, CloseMessage)
+
+	conn.Run()
+
+	require.False(t, conn.IsRunning(), "unexpected running connection")
+	require.True(t, conn.IsClosed(), "unexpected open connection")
 }
