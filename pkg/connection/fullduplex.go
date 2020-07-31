@@ -58,28 +58,27 @@ type ChannelListener interface {
 // and a channel. It handles messages arriving on the channel through the listener
 // and also handles sending messages and closing the communication.
 type FullDuplex struct {
-	listener  ChannelListener
-	channel   Channel
-	stopCh    chan bool
-	wgStop    sync.WaitGroup
-	lockState sync.Mutex
-	lockStop  sync.Mutex
-	isRunning bool
-	isClosed  bool
+	listener       ChannelListener
+	channel        Channel
+	stopProcessing chan bool
+	wgStop         sync.WaitGroup
+	lockState      sync.Mutex
+	lockStop       sync.Mutex
+	isRunning      bool
+	isClosed       bool
 }
 
 // NewFullDuplex creates a new, inactive full-duplex connection.
 // Call Run to run it.
 func NewFullDuplex(listener ChannelListener, channel Channel) *FullDuplex {
 	return &FullDuplex{
-		listener: listener,
-		channel:  channel,
-		stopCh:   make(chan bool),
+		listener:       listener,
+		channel:        channel,
+		stopProcessing: make(chan bool),
 	}
 }
 
-// Run is a blocking function that handles messages arriving on the channel
-// while periodically polling the endpoint for new messages to be dispached on the channel.
+// Run is a blocking function that handles messages arriving on the channel.
 func (f *FullDuplex) Run() error {
 	f.lockState.Lock()
 	if f.isClosed {
@@ -107,6 +106,7 @@ func (f *FullDuplex) Run() error {
 			msg, err := f.channel.Read()
 			if err != nil {
 				log.ErrorCtx("failed to read message", log.Context{"error": err})
+				f.stopProcessing <- true
 				return
 			}
 
@@ -129,9 +129,8 @@ func (f *FullDuplex) Run() error {
 
 		for {
 			select {
-			case <-f.stopCh:
-				log.Info("external stop")
-				f.channel.Close()
+			case <-f.stopProcessing:
+				f.channel.Close() // should unblock Read()
 				return
 			case msg := <-msgCh:
 				switch msg.Type {
@@ -141,6 +140,7 @@ func (f *FullDuplex) Run() error {
 				case PingMessage:
 					if err := writeOnChannel(&Message{Type: PongMessage}); err != nil {
 						log.ErrorCtx("failed to send pong", log.Context{"error": err})
+						f.channel.Close()
 						return
 					}
 				case PongMessage:
@@ -148,6 +148,7 @@ func (f *FullDuplex) Run() error {
 				default:
 					if err := f.listener.ProcessMessage(msg, writeOnChannel); err != nil {
 						log.ErrorCtx("failed to process message", log.Context{"error": err})
+						f.channel.Close()
 						return
 					}
 				}
@@ -188,7 +189,8 @@ func (f *FullDuplex) Close() error {
 		return fmt.Errorf("not running")
 	}
 
-	f.stopCh <- true
+	log.Info("called close")
+	f.stopProcessing <- true
 
 	f.wgStop.Wait()
 	return nil

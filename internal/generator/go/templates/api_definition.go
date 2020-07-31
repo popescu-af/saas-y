@@ -59,7 +59,7 @@ type APIClient interface {
 		{{range $mname, $method := $a.Methods}}
 		{{- if eq $method.Type "WS" -}}
 			{{with $fname := $mname | capitalize -}}
-			{{printf "%s%s%s" "New" $fname "Client" | symbolize}}(connection.ChannelListener, time.Duration) error
+			{{printf "%s%s%s" "New" $fname "Client" | symbolize}}(connection.ChannelListener) error
 			{{- end}}
 		{{else -}}
 			{{- $mname | capitalize | symbolize}}(

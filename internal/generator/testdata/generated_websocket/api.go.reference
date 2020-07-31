@@ -1,8 +1,6 @@
 package exports
 
 import (
-	"time"
-
 	"github.com/popescu-af/saas-y/pkg/connection"
 )
 
@@ -19,7 +17,7 @@ type APIClient interface {
 	// /some_path
 	Method0(int64, float64, string) (*ReturnType, error)
 	Method2(*BodyType) (*ReturnType, error)
-	NewMethodWs1Client(connection.ChannelListener, time.Duration) error
+	NewMethodWs1Client(connection.ChannelListener) error
 
 	CloseConnections()
 }
