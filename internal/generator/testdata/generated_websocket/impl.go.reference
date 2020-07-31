@@ -2,7 +2,6 @@ package logic
 
 import (
 	"errors"
-	"time"
 
 	"github.com/popescu-af/saas-y/pkg/connection"
 	"github.com/popescu-af/saas-y/pkg/log"
@@ -37,29 +36,17 @@ func (i *Implementation) Method2(input *exports.BodyType) (*exports.ReturnType, 
 	return nil, errors.New("method 'method_2' not implemented")
 }
 
-// NewMethodWs1Handler implementation.
-func (i *Implementation) NewMethodWs1Handler() (connection.FullDuplexEndpoint, error) {
+// NewMethodWs1ChannelListener implementation.
+func (i *Implementation) NewMethodWs1ChannelListener() (connection.ChannelListener, error) {
 	log.Info("called method_ws_1")
 	return nil, errors.New("method 'method_ws_1' not implemented")
 }
 
-type methodWs1Handler struct {
-	closeCh chan bool
+type methodWs1ChannelListener struct {
 }
 
-// ProcessMessage implements a method of the connection.FullDuplexEndpoint interface.
-func (s *methodWs1Handler) ProcessMessage(m *connection.Message, write connection.WriteFn) error {
+// ProcessMessage implements a method of the connection.ChannelListener interface.
+func (s *methodWs1ChannelListener) ProcessMessage(m *connection.Message, write connection.WriteOnChannelFunc) error {
 	log.Info("ProcessMessage not implemented")
 	return nil
-}
-
-// Poll implements a method of the connection.FullDuplexEndpoint interface.
-func (s *methodWs1Handler) Poll(t time.Time, write connection.WriteFn) error {
-	log.Info("Poll not implemented")
-	return nil
-}
-
-// CloseCommandChannel implements a method of the connection.FullDuplexEndpoint interface.
-func (s *methodWs1Handler) CloseCommandChannel() chan bool {
-	return s.closeCh
 }

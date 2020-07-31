@@ -7,7 +7,6 @@ import (
 	"io"
 	"net/http"
 	"net/url"
-	"time"
 
 	"github.com/popescu-af/saas-y/pkg/connection"
 
@@ -93,9 +92,9 @@ func (c *FooServiceClient) Method2(input *exports.BodyType) (*exports.ReturnType
 
 // NewMethodWs1Client creates a client for websocket at the path '/some_path'.
 // The caller is responsible to close the returned websocket channel when done.
-func (c *FooServiceClient) NewMethodWs1Client(handler connection.FullDuplexEndpoint, pollingPeriod time.Duration) error {
+func (c *FooServiceClient) NewMethodWs1Client(listener connection.ChannelListener) error {
 	u := url.URL{Scheme: "ws", Host: c.RemoteAddress, Path: "/some_path"}
-	conn, err := connection.NewWebSocketClient(u, handler, pollingPeriod)
+	conn, err := connection.NewWebSocketClient(u, listener)
 	if err != nil {
 		return err
 	}

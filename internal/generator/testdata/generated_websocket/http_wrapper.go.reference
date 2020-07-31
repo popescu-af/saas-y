@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/popescu-af/saas-y/pkg/connection"
 	"github.com/popescu-af/saas-y/pkg/log"
@@ -120,20 +119,19 @@ func (h *HTTPWrapper) Method2(w http.ResponseWriter, r *http.Request) {
 
 // MethodWs1 WebSocket wrapper.
 func (h *HTTPWrapper) MethodWs1(w http.ResponseWriter, r *http.Request) {
-	handler, err := h.api.NewMethodWs1Handler()
+	listener, err := h.api.NewMethodWs1ChannelListener()
 	if err != nil {
 		writeErrorToHTTPResponse(err, w)
-		log.ErrorCtx("creating instance of MethodWs1Handler failed", log.Context{"error": err})
+		log.ErrorCtx("creating instance of MethodWs1ChannelListener failed", log.Context{"error": err})
 		return
 	}
 
-	conn, err := connection.NewWebSocketServer(w, r, handler, time.Second)
+	conn, err := connection.NewWebSocketServer(w, r, listener)
 	if err != nil {
 		writeErrorToHTTPResponse(err, w)
 		log.ErrorCtx("creating websocket connection failed", log.Context{"error": err})
 		return
 	}
-	defer conn.Close()
 
 	conn.Run()
 }

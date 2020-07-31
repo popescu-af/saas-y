@@ -44,31 +44,19 @@ func NewImpl(env config.Env,
 	// {{$a.Path}}
 	{{range $mname, $method := $a.Methods}}
 	{{if eq $method.Type "WS"}}
-		// New{{$mname | capitalize}}Handler implementation.
-		func (i *Implementation) New{{$mname | capitalize}}Handler() (connection.FullDuplexEndpoint, error) {
+		// New{{$mname | capitalize}}ChannelListener implementation.
+		func (i *Implementation) New{{$mname | capitalize}}ChannelListener() (connection.ChannelListener, error) {
 			log.Info("called {{$mname}}")
 			return nil, errors.New("method '{{$mname}}' not implemented")
 		}
 
-		type {{$mname}}Handler struct {
-			closeCh chan bool
+		type {{$mname}}ChannelListener struct {
 		}
 
-		// ProcessMessage implements a method of the connection.FullDuplexEndpoint interface.
-		func (s *{{$mname}}Handler) ProcessMessage(m *connection.Message, write connection.WriteFn) error {
+		// ProcessMessage implements a method of the connection.ChannelListener interface.
+		func (s *{{$mname}}ChannelListener) ProcessMessage(m *connection.Message, write connection.WriteOnChannelFunc) error {
 			log.Info("ProcessMessage not implemented")
 			return nil
-		}
-
-		// Poll implements a method of the connection.FullDuplexEndpoint interface.
-		func (s *{{$mname}}Handler) Poll(t time.Time, write connection.WriteFn) error {
-			log.Info("Poll not implemented")
-			return nil
-		}
-
-		// CloseCommandChannel implements a method of the connection.FullDuplexEndpoint interface.
-		func (s *{{$mname}}Handler) CloseCommandChannel() chan bool {
-			return s.closeCh
 		}
 	{{- else -}}
 		// {{$mname | capitalize}} implementation.
