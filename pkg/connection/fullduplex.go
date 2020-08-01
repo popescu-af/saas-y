@@ -106,7 +106,6 @@ func (f *FullDuplex) Run() error {
 			msg, err := f.channel.Read()
 			if err != nil {
 				log.ErrorCtx("failed to read message", log.Context{"error": err})
-				f.stopProcessing <- true
 				return
 			}
 
@@ -130,7 +129,7 @@ func (f *FullDuplex) Run() error {
 		for {
 			select {
 			case <-f.stopProcessing:
-				f.channel.Close() // should unblock Read()
+				f.channel.Close() // unblocks Read()
 				return
 			case msg := <-msgCh:
 				switch msg.Type {
