@@ -12,7 +12,7 @@ import (
 type ChannelListenerMock struct {
 	mock.Mock
 	wg  sync.WaitGroup
-	msg *Message
+	Msg *Message
 }
 
 // ExpectMessageArrival implements the method with the same name from ChannelListener.
@@ -32,7 +32,7 @@ func (c *ChannelListenerMock) ProcessMessage(msg *Message, write WriteOnChannelF
 	defer c.wg.Done()
 
 	c.Called()
-	c.msg = msg
+	c.Msg = msg
 	return nil
 }
 
