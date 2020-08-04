@@ -89,6 +89,7 @@ type APIClient interface {
 		{{end -}}
 		{{end -}}
 	{{- end -}}
+			OverrideRemoteAddress(address string)
 	{{- if eq foundWebSocket "yes"}}
 			CloseConnections()
 	{{end -}}

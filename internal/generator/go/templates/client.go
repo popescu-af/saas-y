@@ -25,14 +25,14 @@ import (
 // {{$cleanName}}Client is the structure that encompasses a {{$.Name}} client.
 type {{$cleanName}}Client struct {
 	connectionManager *connection.FullDuplexManager
-	RemoteAddress string
+	remoteAddress string
 }
 
 // New{{$cleanName}}Client creates a new instance of {{$.Name}} client.
 func New{{$cleanName}}Client(remoteAddress string) *{{$cleanName}}Client {
 	return &{{$cleanName}}Client{
 		connectionManager: connection.NewFullDuplexManager(),
-		RemoteAddress: remoteAddress,
+		remoteAddress: remoteAddress,
 	}
 }
 
@@ -42,7 +42,7 @@ func New{{$cleanName}}Client(remoteAddress string) *{{$cleanName}}Client {
 // New{{$mname | capitalize}}Client creates a client for websocket at the path '{{$a.Path}}'.
 // The caller is responsible to close the returned websocket channel when done.
 func (c *{{$cleanName}}Client) New{{$mname | capitalize}}Client(listener connection.ChannelListener) error {
-	u := url.URL{Scheme: "ws", Host: c.RemoteAddress, Path: "{{$a.Path}}"}
+	u := url.URL{Scheme: "ws", Host: c.remoteAddress, Path: "{{$a.Path}}"}
 	conn, err := connection.NewWebSocketClient(u, listener)
 	if err != nil {
 		return err
@@ -86,7 +86,7 @@ func (c *{{$cleanName}}Client) {{$mname | capitalize}}(
 	{{end}}
 
 	{{with $fmtAndArgs := $a.Path | createPathWithParameterValues -}}
-		url := c.RemoteAddress + fmt.Sprintf("{{index $fmtAndArgs 0}}"{{index $fmtAndArgs 1}})
+		url := c.remoteAddress + fmt.Sprintf("{{index $fmtAndArgs 0}}"{{index $fmtAndArgs 1}})
 	{{- end}}
 	{{if $method.QueryParams -}}
 		{{- range $i, $p := $method.QueryParams}}
@@ -126,8 +126,12 @@ func (c *{{$cleanName}}Client) {{$mname | capitalize}}(
 
 {{end}}
 {{end}}
-
-{{- if eq foundWebSocket "yes"}}
+	// OverrideRemoteAddress overrides this client's remote address.
+	// Helpful when the server is stateful and multi-instance.
+	func (c *{{$cleanName}}Client) OverrideRemoteAddress(address string) {
+		c.remoteAddress = address
+	}
+{{if eq foundWebSocket "yes"}}
 	// CloseConnections closes all connections made by this client.
 	func (c *{{$cleanName}}Client) CloseConnections() {
 		c.connectionManager.CloseConnections()
