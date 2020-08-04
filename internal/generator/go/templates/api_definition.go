@@ -88,7 +88,7 @@ type APIClient interface {
 			)(*{{$method.ReturnType | capitalize | symbolize}}, error)
 		{{end -}}
 		{{end -}}
-	{{- end -}}
+	{{- end}}
 			OverrideRemoteAddress(address string)
 	{{- if eq foundWebSocket "yes"}}
 			CloseConnections()
