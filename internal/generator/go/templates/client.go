@@ -86,7 +86,7 @@ func (c *{{$cleanName}}Client) {{$mname | capitalize}}(
 	{{end}}
 
 	{{with $fmtAndArgs := $a.Path | createPathWithParameterValues -}}
-		url := c.remoteAddress + fmt.Sprintf("{{index $fmtAndArgs 0}}"{{index $fmtAndArgs 1}})
+		url := "http://" + c.remoteAddress + fmt.Sprintf("{{index $fmtAndArgs 0}}"{{index $fmtAndArgs 1}})
 	{{- end}}
 	{{if $method.QueryParams -}}
 		{{- range $i, $p := $method.QueryParams}}

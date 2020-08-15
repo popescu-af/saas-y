@@ -30,7 +30,7 @@ func NewFooServiceClient(remoteAddress string) *FooServiceClient {
 func (c *FooServiceClient) MethodNoPathParams0() (*exports.ReturnType, error) {
 	var body io.Reader
 
-	url := c.remoteAddress + fmt.Sprintf("/method_no_path_params")
+	url := "http://" + c.remoteAddress + fmt.Sprintf("/method_no_path_params")
 
 	request, err := http.NewRequest("POST", url, body)
 
@@ -63,7 +63,7 @@ func (c *FooServiceClient) MethodNoPathParams1(input *exports.BodyType) (*export
 
 	body = bytes.NewBuffer(b)
 
-	url := c.remoteAddress + fmt.Sprintf("/method_no_path_params")
+	url := "http://" + c.remoteAddress + fmt.Sprintf("/method_no_path_params")
 
 	request, err := http.NewRequest("POST", url, body)
 
@@ -89,7 +89,7 @@ func (c *FooServiceClient) MethodNoPathParams1(input *exports.BodyType) (*export
 func (c *FooServiceClient) MethodNoPathParams2(headerParam0 string, headerParam1 float64, headerParam2 int64) (*exports.ReturnType, error) {
 	var body io.Reader
 
-	url := c.remoteAddress + fmt.Sprintf("/method_no_path_params")
+	url := "http://" + c.remoteAddress + fmt.Sprintf("/method_no_path_params")
 
 	request, err := http.NewRequest("POST", url, body)
 	request.Header.Set("header_param_0", fmt.Sprintf("%s", headerParam0))
@@ -125,7 +125,7 @@ func (c *FooServiceClient) MethodNoPathParams3(input *exports.BodyType, headerPa
 
 	body = bytes.NewBuffer(b)
 
-	url := c.remoteAddress + fmt.Sprintf("/method_no_path_params")
+	url := "http://" + c.remoteAddress + fmt.Sprintf("/method_no_path_params")
 
 	request, err := http.NewRequest("POST", url, body)
 	request.Header.Set("header_param_0", fmt.Sprintf("%s", headerParam0))
@@ -154,7 +154,7 @@ func (c *FooServiceClient) MethodNoPathParams3(input *exports.BodyType, headerPa
 func (c *FooServiceClient) MethodNoPathParams4(queryParam0 int64, queryParam1 float64, queryParam2 string) (*exports.ReturnType, error) {
 	var body io.Reader
 
-	url := c.remoteAddress + fmt.Sprintf("/method_no_path_params")
+	url := "http://" + c.remoteAddress + fmt.Sprintf("/method_no_path_params")
 
 	url += fmt.Sprintf("?query_param_0=%d", queryParam0)
 	url += fmt.Sprintf("&query_param_1=%f", queryParam1)
@@ -191,7 +191,7 @@ func (c *FooServiceClient) MethodNoPathParams5(input *exports.BodyType, queryPar
 
 	body = bytes.NewBuffer(b)
 
-	url := c.remoteAddress + fmt.Sprintf("/method_no_path_params")
+	url := "http://" + c.remoteAddress + fmt.Sprintf("/method_no_path_params")
 
 	url += fmt.Sprintf("?query_param_0=%d", queryParam0)
 	url += fmt.Sprintf("&query_param_1=%f", queryParam1)
@@ -221,7 +221,7 @@ func (c *FooServiceClient) MethodNoPathParams5(input *exports.BodyType, queryPar
 func (c *FooServiceClient) MethodNoPathParams6(queryParam0 int64, queryParam1 float64, queryParam2 string, headerParam0 string, headerParam1 float64, headerParam2 int64) (*exports.ReturnType, error) {
 	var body io.Reader
 
-	url := c.remoteAddress + fmt.Sprintf("/method_no_path_params")
+	url := "http://" + c.remoteAddress + fmt.Sprintf("/method_no_path_params")
 
 	url += fmt.Sprintf("?query_param_0=%d", queryParam0)
 	url += fmt.Sprintf("&query_param_1=%f", queryParam1)
@@ -261,7 +261,7 @@ func (c *FooServiceClient) MethodNoPathParams7(input *exports.BodyType, queryPar
 
 	body = bytes.NewBuffer(b)
 
-	url := c.remoteAddress + fmt.Sprintf("/method_no_path_params")
+	url := "http://" + c.remoteAddress + fmt.Sprintf("/method_no_path_params")
 
 	url += fmt.Sprintf("?query_param_0=%d", queryParam0)
 	url += fmt.Sprintf("&query_param_1=%f", queryParam1)
@@ -294,7 +294,7 @@ func (c *FooServiceClient) MethodNoPathParams7(input *exports.BodyType, queryPar
 func (c *FooServiceClient) Method0(pathParam0 int64, pathParam1 string) (*exports.ReturnType, error) {
 	var body io.Reader
 
-	url := c.remoteAddress + fmt.Sprintf("/method/%d/%s", pathParam0, pathParam1)
+	url := "http://" + c.remoteAddress + fmt.Sprintf("/method/%d/%s", pathParam0, pathParam1)
 
 	request, err := http.NewRequest("POST", url, body)
 
@@ -327,7 +327,7 @@ func (c *FooServiceClient) Method1(input *exports.BodyType, pathParam0 int64, pa
 
 	body = bytes.NewBuffer(b)
 
-	url := c.remoteAddress + fmt.Sprintf("/method/%d/%s", pathParam0, pathParam1)
+	url := "http://" + c.remoteAddress + fmt.Sprintf("/method/%d/%s", pathParam0, pathParam1)
 
 	request, err := http.NewRequest("POST", url, body)
 
@@ -353,7 +353,7 @@ func (c *FooServiceClient) Method1(input *exports.BodyType, pathParam0 int64, pa
 func (c *FooServiceClient) Method2(pathParam0 int64, pathParam1 string, headerParam0 string, headerParam1 float64, headerParam2 int64) (*exports.ReturnType, error) {
 	var body io.Reader
 
-	url := c.remoteAddress + fmt.Sprintf("/method/%d/%s", pathParam0, pathParam1)
+	url := "http://" + c.remoteAddress + fmt.Sprintf("/method/%d/%s", pathParam0, pathParam1)
 
 	request, err := http.NewRequest("POST", url, body)
 	request.Header.Set("header_param_0", fmt.Sprintf("%s", headerParam0))
@@ -389,7 +389,7 @@ func (c *FooServiceClient) Method3(input *exports.BodyType, pathParam0 int64, pa
 
 	body = bytes.NewBuffer(b)
 
-	url := c.remoteAddress + fmt.Sprintf("/method/%d/%s", pathParam0, pathParam1)
+	url := "http://" + c.remoteAddress + fmt.Sprintf("/method/%d/%s", pathParam0, pathParam1)
 
 	request, err := http.NewRequest("POST", url, body)
 	request.Header.Set("header_param_0", fmt.Sprintf("%s", headerParam0))
@@ -418,7 +418,7 @@ func (c *FooServiceClient) Method3(input *exports.BodyType, pathParam0 int64, pa
 func (c *FooServiceClient) Method4(pathParam0 int64, pathParam1 string, queryParam0 int64, queryParam1 float64, queryParam2 string) (*exports.ReturnType, error) {
 	var body io.Reader
 
-	url := c.remoteAddress + fmt.Sprintf("/method/%d/%s", pathParam0, pathParam1)
+	url := "http://" + c.remoteAddress + fmt.Sprintf("/method/%d/%s", pathParam0, pathParam1)
 
 	url += fmt.Sprintf("?query_param_0=%d", queryParam0)
 	url += fmt.Sprintf("&query_param_1=%f", queryParam1)
@@ -455,7 +455,7 @@ func (c *FooServiceClient) Method5(input *exports.BodyType, pathParam0 int64, pa
 
 	body = bytes.NewBuffer(b)
 
-	url := c.remoteAddress + fmt.Sprintf("/method/%d/%s", pathParam0, pathParam1)
+	url := "http://" + c.remoteAddress + fmt.Sprintf("/method/%d/%s", pathParam0, pathParam1)
 
 	url += fmt.Sprintf("?query_param_0=%d", queryParam0)
 	url += fmt.Sprintf("&query_param_1=%f", queryParam1)
@@ -485,7 +485,7 @@ func (c *FooServiceClient) Method5(input *exports.BodyType, pathParam0 int64, pa
 func (c *FooServiceClient) Method6(pathParam0 int64, pathParam1 string, queryParam0 int64, queryParam1 float64, queryParam2 string, headerParam0 string, headerParam1 float64, headerParam2 int64) (*exports.ReturnType, error) {
 	var body io.Reader
 
-	url := c.remoteAddress + fmt.Sprintf("/method/%d/%s", pathParam0, pathParam1)
+	url := "http://" + c.remoteAddress + fmt.Sprintf("/method/%d/%s", pathParam0, pathParam1)
 
 	url += fmt.Sprintf("?query_param_0=%d", queryParam0)
 	url += fmt.Sprintf("&query_param_1=%f", queryParam1)
@@ -525,7 +525,7 @@ func (c *FooServiceClient) Method7(input *exports.BodyType, pathParam0 int64, pa
 
 	body = bytes.NewBuffer(b)
 
-	url := c.remoteAddress + fmt.Sprintf("/method/%d/%s", pathParam0, pathParam1)
+	url := "http://" + c.remoteAddress + fmt.Sprintf("/method/%d/%s", pathParam0, pathParam1)
 
 	url += fmt.Sprintf("?query_param_0=%d", queryParam0)
 	url += fmt.Sprintf("&query_param_1=%f", queryParam1)
