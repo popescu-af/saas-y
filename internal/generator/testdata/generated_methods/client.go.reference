@@ -251,12 +251,12 @@ func (c *FooServiceClient) MethodNoPathParams6(queryParam0 int64, queryParam1 fl
 }
 
 // MethodNoPathParams7 is the client function for POST '/method_no_path_params'.
-func (c *FooServiceClient) MethodNoPathParams7(input *exports.BodyType, queryParam0 int64, queryParam1 float64, queryParam2 string, headerParam0 string, headerParam1 float64, headerParam2 int64) (*exports.ReturnType, error) {
+func (c *FooServiceClient) MethodNoPathParams7(input *exports.BodyType, queryParam0 int64, queryParam1 float64, queryParam2 string, headerParam0 string, headerParam1 float64, headerParam2 int64) error {
 	var body io.Reader
 
 	b, err := json.Marshal(input)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	body = bytes.NewBuffer(b)
@@ -274,20 +274,15 @@ func (c *FooServiceClient) MethodNoPathParams7(input *exports.BodyType, queryPar
 
 	response, err := http.DefaultClient.Do(request)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	defer response.Body.Close()
 
 	if response.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("POST %s failed with status code %d", url, response.StatusCode)
+		return fmt.Errorf("POST %s failed with status code %d", url, response.StatusCode)
 	}
 
-	result := new(exports.ReturnType)
-	if err := json.NewDecoder(response.Body).Decode(result); err != nil {
-		return nil, err
-	}
-
-	return result, nil
+	return nil
 }
 
 // Method0 is the client function for POST '/method/{pathParam0:int}/{pathParam1:string}'.
@@ -415,7 +410,7 @@ func (c *FooServiceClient) Method3(input *exports.BodyType, pathParam0 int64, pa
 }
 
 // Method4 is the client function for POST '/method/{pathParam0:int}/{pathParam1:string}'.
-func (c *FooServiceClient) Method4(pathParam0 int64, pathParam1 string, queryParam0 int64, queryParam1 float64, queryParam2 string) (*exports.ReturnType, error) {
+func (c *FooServiceClient) Method4(pathParam0 int64, pathParam1 string, queryParam0 int64, queryParam1 float64, queryParam2 string) error {
 	var body io.Reader
 
 	url := "http://" + c.remoteAddress + fmt.Sprintf("/method/%d/%s", pathParam0, pathParam1)
@@ -428,20 +423,15 @@ func (c *FooServiceClient) Method4(pathParam0 int64, pathParam1 string, queryPar
 
 	response, err := http.DefaultClient.Do(request)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	defer response.Body.Close()
 
 	if response.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("POST %s failed with status code %d", url, response.StatusCode)
+		return fmt.Errorf("POST %s failed with status code %d", url, response.StatusCode)
 	}
 
-	result := new(exports.ReturnType)
-	if err := json.NewDecoder(response.Body).Decode(result); err != nil {
-		return nil, err
-	}
-
-	return result, nil
+	return nil
 }
 
 // Method5 is the client function for POST '/method/{pathParam0:int}/{pathParam1:string}'.
@@ -552,10 +542,4 @@ func (c *FooServiceClient) Method7(input *exports.BodyType, pathParam0 int64, pa
 	}
 
 	return result, nil
-}
-
-// OverrideRemoteAddress overrides this client's remote address.
-// Helpful when the server is stateful and multi-instance.
-func (c *FooServiceClient) OverrideRemoteAddress(address string) {
-	c.remoteAddress = address
 }

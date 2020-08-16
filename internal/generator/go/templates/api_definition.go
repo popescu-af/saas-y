@@ -46,7 +46,12 @@ type API interface {
 					{{- .Type | typeName -}},
 				{{- end -}}
 			{{- end -}}
-			)(*{{$method.ReturnType | capitalize | symbolize}}, error)
+			)
+			{{- if eq $method.ReturnType "" -}}
+				error
+			{{- else -}}
+				(*{{$method.ReturnType | capitalize | symbolize}}, error)
+			{{- end}}
 		{{end -}}
 		{{end -}}
 	{{- end -}}
@@ -85,11 +90,15 @@ type APIClient interface {
 					{{- .Type | typeName -}},
 				{{- end -}}
 			{{- end -}}
-			)(*{{$method.ReturnType | capitalize | symbolize}}, error)
+			)
+			{{- if eq $method.ReturnType "" -}}
+				error
+			{{- else -}}
+				(*{{$method.ReturnType | capitalize | symbolize}}, error)
+			{{- end}}
 		{{end -}}
 		{{end -}}
 	{{- end}}
-			OverrideRemoteAddress(address string)
 	{{- if eq foundWebSocket "yes"}}
 			CloseConnections()
 	{{end -}}

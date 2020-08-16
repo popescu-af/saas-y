@@ -136,14 +136,15 @@ func (h *HTTPWrapper) {{$mname | capitalize | symbolize}}(w http.ResponseWriter,
 
 	{{end}}{{end}}{{end}}
 	// Call implementation
-	result, err := h.api.{{$mname | capitalize | symbolize}}({{printParamStack}})
+	{{if ne $method.ReturnType ""}}result,{{end}} err := h.api.{{$mname | capitalize | symbolize}}({{printParamStack}})
 	if err != nil {
 		writeErrorToHTTPResponse(err, w)
 		log.ErrorCtx("call to implementation failed", log.Context{"error": err})
 		return
 	}
+	{{- if ne $method.ReturnType ""}}
 
-	encodeJSONResponse(result, nil, w)
+	encodeJSONResponse(result, nil, w){{end}}
 }
 {{end}}
 {{end}}{{end}}`

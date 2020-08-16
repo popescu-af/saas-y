@@ -66,9 +66,9 @@ func (i *Implementation) MethodNoPathParams6(queryParam0 int64, queryParam1 floa
 }
 
 // MethodNoPathParams7 implementation.
-func (i *Implementation) MethodNoPathParams7(input *exports.BodyType, queryParam0 int64, queryParam1 float64, queryParam2 string, headerParam0 string, headerParam1 float64, headerParam2 int64) (*exports.ReturnType, error) {
+func (i *Implementation) MethodNoPathParams7(input *exports.BodyType, queryParam0 int64, queryParam1 float64, queryParam2 string, headerParam0 string, headerParam1 float64, headerParam2 int64) error {
 	log.Info("called method_no_path_params_7")
-	return nil, errors.New("method 'method_no_path_params_7' not implemented")
+	return errors.New("method 'method_no_path_params_7' not implemented")
 }
 
 // /method/{pathParam0:int}/{pathParam1:string}
@@ -98,9 +98,9 @@ func (i *Implementation) Method3(input *exports.BodyType, pathParam0 int64, path
 }
 
 // Method4 implementation.
-func (i *Implementation) Method4(pathParam0 int64, pathParam1 string, queryParam0 int64, queryParam1 float64, queryParam2 string) (*exports.ReturnType, error) {
+func (i *Implementation) Method4(pathParam0 int64, pathParam1 string, queryParam0 int64, queryParam1 float64, queryParam2 string) error {
 	log.Info("called method_4")
-	return nil, errors.New("method 'method_4' not implemented")
+	return errors.New("method 'method_4' not implemented")
 }
 
 // Method5 implementation.

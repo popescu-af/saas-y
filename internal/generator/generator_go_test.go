@@ -128,7 +128,7 @@ func TestGeneratedMethods(t *testing.T) {
 					"method_no_path_params_4": {Type: model.POST, QueryParams: qParams, HeaderParams: nil, InputType: "", ReturnType: "return_type"},
 					"method_no_path_params_5": {Type: model.POST, QueryParams: qParams, HeaderParams: nil, InputType: bType, ReturnType: "return_type"},
 					"method_no_path_params_6": {Type: model.POST, QueryParams: qParams, HeaderParams: hParams, InputType: "", ReturnType: "return_type"},
-					"method_no_path_params_7": {Type: model.POST, QueryParams: qParams, HeaderParams: hParams, InputType: bType, ReturnType: "return_type"},
+					"method_no_path_params_7": {Type: model.POST, QueryParams: qParams, HeaderParams: hParams, InputType: bType},
 				},
 			},
 			{
@@ -138,7 +138,7 @@ func TestGeneratedMethods(t *testing.T) {
 					"method_1": {Type: model.POST, QueryParams: nil, HeaderParams: nil, InputType: bType, ReturnType: "return_type"},
 					"method_2": {Type: model.POST, QueryParams: nil, HeaderParams: hParams, InputType: "", ReturnType: "return_type"},
 					"method_3": {Type: model.POST, QueryParams: nil, HeaderParams: hParams, InputType: bType, ReturnType: "return_type"},
-					"method_4": {Type: model.POST, QueryParams: qParams, HeaderParams: nil, InputType: "", ReturnType: "return_type"},
+					"method_4": {Type: model.POST, QueryParams: qParams, HeaderParams: nil, InputType: ""},
 					"method_5": {Type: model.POST, QueryParams: qParams, HeaderParams: nil, InputType: bType, ReturnType: "return_type"},
 					"method_6": {Type: model.POST, QueryParams: qParams, HeaderParams: hParams, InputType: "", ReturnType: "return_type"},
 					"method_7": {Type: model.POST, QueryParams: qParams, HeaderParams: hParams, InputType: bType, ReturnType: "return_type"},

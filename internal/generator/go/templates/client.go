@@ -73,13 +73,18 @@ func (c *{{$cleanName}}Client) {{$mname | capitalize}}(
 			{{- .Name}} {{.Type | typeName}},
 		{{- end -}}
 	{{- end -}}
-) (*exports.{{$method.ReturnType | capitalize | symbolize}}, error) {
+)
+{{- if eq $method.ReturnType "" -}}
+error {
+{{- else -}}
+(*exports.{{$method.ReturnType | capitalize | symbolize}}, error) {
+{{- end}}
 	var body io.Reader
 
 	{{if $method.InputType -}}
 		b, err := json.Marshal(input)
 		if err != nil {
-			return nil, err
+			return {{if ne $method.ReturnType ""}}nil,{{end}} err
 		}
 
 		body = bytes.NewBuffer(b)
@@ -107,30 +112,29 @@ func (c *{{$cleanName}}Client) {{$mname | capitalize}}(
 
 	response, err := http.DefaultClient.Do(request)
 	if err != nil {
-		return nil, err
+		return {{if ne $method.ReturnType ""}}nil,{{end}} err
 	}
 	defer response.Body.Close()
 
 	if response.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("{{$method.Type}} %s failed with status code %d", url, response.StatusCode)
+		return {{if ne $method.ReturnType ""}}nil,{{end}} fmt.Errorf("{{$method.Type}} %s failed with status code %d", url, response.StatusCode)
 	}
 
+	{{if eq $method.ReturnType "" -}}
+	return nil
+	{{- else -}}
 	result := new(exports.{{$method.ReturnType | capitalize | symbolize}})
 	if err := json.NewDecoder(response.Body).Decode(result); err != nil {
 		return nil, err
 	}
 
 	return result, nil
+	{{- end}}
 }
 {{end}}
 
 {{end}}
 {{end}}
-	// OverrideRemoteAddress overrides this client's remote address.
-	// Helpful when the server is stateful and multi-instance.
-	func (c *{{$cleanName}}Client) OverrideRemoteAddress(address string) {
-		c.remoteAddress = address
-	}
 {{if eq foundWebSocket "yes"}}
 	// CloseConnections closes all connections made by this client.
 	func (c *{{$cleanName}}Client) CloseConnections() {

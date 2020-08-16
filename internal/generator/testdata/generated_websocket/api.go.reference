@@ -19,6 +19,5 @@ type APIClient interface {
 	Method2(*BodyType) (*ReturnType, error)
 	NewMethodWs1Client(connection.ChannelListener) error
 
-	OverrideRemoteAddress(address string)
 	CloseConnections()
 }

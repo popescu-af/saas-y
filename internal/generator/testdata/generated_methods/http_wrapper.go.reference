@@ -386,14 +386,12 @@ func (h *HTTPWrapper) MethodNoPathParams7(w http.ResponseWriter, r *http.Request
 	}
 
 	// Call implementation
-	result, err := h.api.MethodNoPathParams7(body, queryParam0, queryParam1, queryParam2, headerParam0, headerParam1, headerParam2)
+	err := h.api.MethodNoPathParams7(body, queryParam0, queryParam1, queryParam2, headerParam0, headerParam1, headerParam2)
 	if err != nil {
 		writeErrorToHTTPResponse(err, w)
 		log.ErrorCtx("call to implementation failed", log.Context{"error": err})
 		return
 	}
-
-	encodeJSONResponse(result, nil, w)
 }
 
 // Method0 HTTP wrapper.
@@ -569,14 +567,12 @@ func (h *HTTPWrapper) Method4(w http.ResponseWriter, r *http.Request) {
 	queryParam2 := query.Get("query_param_2")
 
 	// Call implementation
-	result, err := h.api.Method4(pathParam0, pathParam1, queryParam0, queryParam1, queryParam2)
+	err := h.api.Method4(pathParam0, pathParam1, queryParam0, queryParam1, queryParam2)
 	if err != nil {
 		writeErrorToHTTPResponse(err, w)
 		log.ErrorCtx("call to implementation failed", log.Context{"error": err})
 		return
 	}
-
-	encodeJSONResponse(result, nil, w)
 }
 
 // Method5 HTTP wrapper.

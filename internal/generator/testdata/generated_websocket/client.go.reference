@@ -102,12 +102,6 @@ func (c *FooServiceClient) NewMethodWs1Client(listener connection.ChannelListene
 	return nil
 }
 
-// OverrideRemoteAddress overrides this client's remote address.
-// Helpful when the server is stateful and multi-instance.
-func (c *FooServiceClient) OverrideRemoteAddress(address string) {
-	c.remoteAddress = address
-}
-
 // CloseConnections closes all connections made by this client.
 func (c *FooServiceClient) CloseConnections() {
 	c.connectionManager.CloseConnections()

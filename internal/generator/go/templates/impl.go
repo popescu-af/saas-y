@@ -81,10 +81,18 @@ func NewImpl(env config.Env,
 					{{- .Name}} {{.Type | typeName}},
 				{{- end -}}
 			{{- end -}}
-		) (*exports.{{$method.ReturnType | capitalize | symbolize}}, error) {
+		)
+		{{- if eq $method.ReturnType "" -}}
+		error {
+			log.Info("called {{$mname}}")
+			return errors.New("method '{{$mname}}' not implemented")
+		}
+		{{- else -}}
+		(*exports.{{$method.ReturnType | capitalize | symbolize}}, error) {
 			log.Info("called {{$mname}}")
 			return nil, errors.New("method '{{$mname}}' not implemented")
 		}
+		{{- end -}}
 	{{- end}}
 	{{- end -}}
 {{- end -}}`

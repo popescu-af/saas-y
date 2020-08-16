@@ -33,7 +33,7 @@ func main() {
 		{{range $d := .DependencyInfos}}
 			{{- with $name := $d.Name | cleanName | capitalize -}}
 				{{$d.Name | cleanName | toLower}}.New{{$name}}Client(env.{{$name}}Addr),
-			{{- end -}}
+			{{- end}}
 		{{end}}
 	)
 	httpWrapper := service.NewHTTPWrapper(impl)
