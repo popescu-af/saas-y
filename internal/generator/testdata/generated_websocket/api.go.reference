@@ -17,7 +17,7 @@ type APIClient interface {
 	// /some_path
 	Method0(int64, float64, string) (*ReturnType, error)
 	Method2(*BodyType) (*ReturnType, error)
-	NewMethodWs1Client(connection.ChannelListener) error
+	NewMethodWs1Client(connection.ChannelListener) (*connection.FullDuplex, error)
 
 	CloseConnections()
 }
