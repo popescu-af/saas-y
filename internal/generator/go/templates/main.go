@@ -29,7 +29,6 @@ func main() {
 	}
 
 	impl := logic.NewImpl(
-		env,
 		{{range $d := .DependencyInfos}}
 			{{- with $name := $d.Name | cleanName | capitalize -}}
 				{{$d.Name | cleanName | toLower}}.New{{$name}}Client(env.{{$name}}Addr),

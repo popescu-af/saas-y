@@ -6,20 +6,16 @@ import (
 	"github.com/popescu-af/saas-y/pkg/connection"
 	"github.com/popescu-af/saas-y/pkg/log"
 
-	"foo-service/internal/config"
 	"foo-service/pkg/exports"
 )
 
 // Implementation is the main implementation of the API interface.
 type Implementation struct {
-	env config.Env
 }
 
 // NewImpl creates an instance of the main implementation.
-func NewImpl(env config.Env) exports.API {
-	return &Implementation{
-		env: env,
-	}
+func NewImpl() exports.API {
+	return &Implementation{}
 }
 
 // /some_path

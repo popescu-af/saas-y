@@ -10,7 +10,6 @@ import (
 	"github.com/popescu-af/saas-y/pkg/log"
 	"github.com/popescu-af/saas-y/pkg/connection"
 
-	"{{.RepositoryURL}}/internal/config"
 	"{{.RepositoryURL}}/pkg/exports"
 
 	{{range $d := .DependencyInfos -}}
@@ -20,20 +19,18 @@ import (
 
 // Implementation is the main implementation of the API interface.
 type Implementation struct {
-	env config.Env
 	{{range $d := .DependencyInfos -}}
 	{{$d.Name | cleanName}} {{$d.Name | cleanName | toLower}}.APIClient
 	{{end}}
 }
 
 // NewImpl creates an instance of the main implementation.
-func NewImpl(env config.Env,
+func NewImpl(
 	{{- range $d := .DependencyInfos -}}
 	{{$d.Name | cleanName}} {{$d.Name | cleanName | toLower}}.APIClient,
 	{{- end -}}
 ) exports.API {
 	return &Implementation{
-		env: env,
 		{{range $d := .DependencyInfos -}}
 		{{$d.Name | cleanName}}: {{$d.Name | cleanName}},
 		{{end}}
