@@ -62,8 +62,7 @@ func (c *ChannelMock) Close() {
 	c.other.WriteMessage(&Message{
 		Type: CloseMessage,
 	})
-	c.self.closed = true
-	c.self.cv.Signal()
+	c.self.Close()
 }
 
 // NewChannelMock creates a ChannelMock instance.
@@ -86,12 +85,12 @@ var errChannelClosed = fmt.Errorf("channel is closed")
 
 // ReadMessage reads a message from the mock channel.
 func (c *ChannelMockEndpoint) ReadMessage() (*Message, error) {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
 	if c.closed {
 		return nil, errChannelClosed
 	}
-
-	c.mutex.Lock()
-	defer c.mutex.Unlock()
 
 	if len(c.msgs) == 0 {
 		c.cv.Wait()
@@ -111,17 +110,26 @@ func (c *ChannelMockEndpoint) ReadMessage() (*Message, error) {
 
 // WriteMessage writes a message to the mock channel.
 func (c *ChannelMockEndpoint) WriteMessage(m *Message) error {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
 	if c.closed {
 		return errChannelClosed
 	}
-
-	c.mutex.Lock()
-	defer c.mutex.Unlock()
 
 	c.msgs = append(c.msgs, m)
 	c.cv.Signal()
 
 	return nil
+}
+
+// Close closes the endpoint.
+func (c *ChannelMockEndpoint) Close() {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
+	c.closed = true
+	c.cv.Signal()
 }
 
 // NewChannelMockEndpoint creates a channel endpoint instance.
