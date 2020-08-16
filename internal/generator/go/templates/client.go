@@ -41,14 +41,14 @@ func New{{$cleanName}}Client(remoteAddress string) *{{$cleanName}}Client {
 {{if eq $method.Type "WS"}}
 // New{{$mname | capitalize}}Client creates a client for websocket at the path '{{$a.Path}}'.
 // The caller is responsible to close the returned websocket channel when done.
-func (c *{{$cleanName}}Client) New{{$mname | capitalize}}Client(listener connection.ChannelListener) error {
+func (c *{{$cleanName}}Client) New{{$mname | capitalize}}Client(listener connection.ChannelListener) (*connection.FullDuplex, error) {
 	u := url.URL{Scheme: "ws", Host: c.remoteAddress, Path: "{{$a.Path}}"}
 	conn, err := connection.NewWebSocketClient(u, listener)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	c.connectionManager.AddConnection(conn)
-	return nil
+	return conn, nil
 }
 {{- else -}}
 // {{$mname | capitalize}} is the client function for {{$method.Type}} '{{$a.Path}}'.

@@ -92,14 +92,14 @@ func (c *FooServiceClient) Method2(input *exports.BodyType) (*exports.ReturnType
 
 // NewMethodWs1Client creates a client for websocket at the path '/some_path'.
 // The caller is responsible to close the returned websocket channel when done.
-func (c *FooServiceClient) NewMethodWs1Client(listener connection.ChannelListener) error {
+func (c *FooServiceClient) NewMethodWs1Client(listener connection.ChannelListener) (*connection.FullDuplex, error) {
 	u := url.URL{Scheme: "ws", Host: c.remoteAddress, Path: "/some_path"}
 	conn, err := connection.NewWebSocketClient(u, listener)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	c.connectionManager.AddConnection(conn)
-	return nil
+	return conn, nil
 }
 
 // CloseConnections closes all connections made by this client.
