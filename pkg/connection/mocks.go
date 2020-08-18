@@ -4,8 +4,10 @@ import (
 	"fmt"
 	"sync"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/require"
 )
 
 // ChannelListenerMock is a mock for the ChannelListener interface.
@@ -137,4 +139,64 @@ func NewChannelMockEndpoint() *ChannelMockEndpoint {
 	result := new(ChannelMockEndpoint)
 	result.cv = sync.NewCond(&result.mutex)
 	return result
+}
+
+// EndpointMockInstance is useful for mocking full-duplex endpoints that
+// can talk to the service to be tested.
+type EndpointMockInstance struct {
+	channel  Channel
+	listener *ChannelListenerMock
+	conn     *FullDuplex
+}
+
+// ChannelListenerCreator creates channel listeners for the service side, for testing.
+type ChannelListenerCreator func(t *testing.T) (ChannelListener, error)
+
+// SpawnClientInstances spawns instances of clients of the service to be tested.
+func SpawnClientInstances(t *testing.T, clientCount int, listenerCreator ChannelListenerCreator) ([]*EndpointMockInstance, *sync.WaitGroup) {
+	var result []*EndpointMockInstance
+	wg := &sync.WaitGroup{}
+
+	for i := 0; i < clientCount; i++ {
+		wg.Add(2)
+
+		serverEndpoint := NewChannelMockEndpoint()
+		clientEndpoint := NewChannelMockEndpoint()
+
+		// Instantiate server stuff
+		serverChannel := NewChannelMock(serverEndpoint, clientEndpoint)
+		serverListener, err := listenerCreator(t)
+		require.NoError(t, err, "unexpected failure when creating server listener")
+
+		server := NewFullDuplex(serverListener, serverChannel)
+
+		go func() {
+			defer wg.Done()
+			defer server.Close()
+
+			server.Run()
+		}()
+
+		// Instantiate client stuff
+		clientChannel := NewChannelMock(clientEndpoint, serverEndpoint)
+		clientListener := NewChannelListenerMock()
+		client := &EndpointMockInstance{
+			channel:  clientChannel,
+			listener: clientListener,
+			conn:     NewFullDuplex(clientListener, clientChannel),
+		}
+
+		go func() {
+			defer wg.Done()
+
+			client.conn.Run()
+		}()
+
+		result = append(result, client)
+	}
+
+	// Wait for the connections to be created
+	time.Sleep(time.Duration(50) * time.Millisecond)
+
+	return result, wg
 }
