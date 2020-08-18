@@ -144,9 +144,9 @@ func NewChannelMockEndpoint() *ChannelMockEndpoint {
 // EndpointMockInstance is useful for mocking full-duplex endpoints that
 // can talk to the service to be tested.
 type EndpointMockInstance struct {
-	channel  Channel
-	listener *ChannelListenerMock
-	conn     *FullDuplex
+	Channel  Channel
+	Listener *ChannelListenerMock
+	Conn     *FullDuplex
 }
 
 // ChannelListenerCreator creates channel listeners for the service side, for testing.
@@ -181,15 +181,15 @@ func SpawnClientInstances(t *testing.T, clientCount int, listenerCreator Channel
 		clientChannel := NewChannelMock(clientEndpoint, serverEndpoint)
 		clientListener := NewChannelListenerMock()
 		client := &EndpointMockInstance{
-			channel:  clientChannel,
-			listener: clientListener,
-			conn:     NewFullDuplex(clientListener, clientChannel),
+			Channel:  clientChannel,
+			Listener: clientListener,
+			Conn:     NewFullDuplex(clientListener, clientChannel),
 		}
 
 		go func() {
 			defer wg.Done()
 
-			client.conn.Run()
+			client.Conn.Run()
 		}()
 
 		result = append(result, client)
