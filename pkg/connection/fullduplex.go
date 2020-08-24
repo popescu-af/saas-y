@@ -39,6 +39,21 @@ type Message struct {
 	Payload []byte
 }
 
+// Full duplex protocol message codes.
+const (
+	// Success is used for replying when the previous request was processed successfully,
+	// without any particular result being sent back. When results are involved, positive
+	// codes should be defined by implementations, depending on their use case.
+	Success = 0
+	// InvalidMessage is received when the last request contained a malformed message,
+	// from the point of view of the service implementation.
+	InvalidMessage = -1
+	// KeyCollision is used when a key already exists and cannot be acted upon.
+	KeyCollision = -2
+	// NotFound is used when the specified resource is non-existent.
+	NotFound = -3
+)
+
 // WriteOnChannelFunc can be called to write back on the channel
 // from inside the processing message method.
 type WriteOnChannelFunc func(*Message) error
