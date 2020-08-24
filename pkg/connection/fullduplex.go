@@ -1,6 +1,7 @@
 package connection
 
 import (
+	"encoding/json"
 	"fmt"
 	"sync"
 
@@ -236,4 +237,25 @@ func (m *FullDuplexManager) CloseConnections() {
 			log.ErrorCtx("manager - failed to close connection", log.Context{"error": err})
 		}
 	}
+}
+
+// ToTextMessage converts a JSON-annotated struct to a Message of type Text.
+// It returns a nil value if the marshaling does not succeed.
+func ToTextMessage(v interface{}) *Message {
+	b, err := json.Marshal(v)
+	if err != nil {
+		log.ErrorCtx("failed to marshal input", map[string]interface{}{"error": err})
+		return nil
+	}
+
+	return &Message{
+		Type:    TextMessage,
+		Payload: b,
+	}
+}
+
+// FromTextMessage creates an instance of a JSON-annotated type from a
+// Message of type Text.
+func FromTextMessage(m *Message, v interface{}) error {
+	return json.Unmarshal(m.Payload, v)
 }
