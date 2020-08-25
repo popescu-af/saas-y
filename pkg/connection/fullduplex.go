@@ -52,6 +52,10 @@ const (
 	KeyCollision = -2
 	// NotFound is used when the specified resource is non-existent.
 	NotFound = -3
+	// Unauthorized is used when requested access to the specified resource needs authorization.
+	Unauthorized = -4
+	// NotAllowed is used when requested access to the specified resource is not allowed.
+	NotAllowed = -5
 )
 
 // WriteOnChannelFunc can be called to write back on the channel
