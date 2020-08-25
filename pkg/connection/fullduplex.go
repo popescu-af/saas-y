@@ -56,6 +56,10 @@ const (
 	Unauthorized = -4
 	// NotAllowed is used when requested access to the specified resource is not allowed.
 	NotAllowed = -5
+	// Timeout is used when a request times out.
+	Timeout = -6
+	// InternalError is used when something goes wrong in the implementation.
+	InternalError = -7
 )
 
 // WriteOnChannelFunc can be called to write back on the channel
