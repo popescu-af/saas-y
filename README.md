@@ -1,13 +1,84 @@
 # saas-y
-saas-y generates framework code and configuration for a SaaS platform.
+saas-y is a sassy SaaS framework code and configuration generator. It thinks developers should not spend time writing boilerplate for the cloud infrastructure and glue code.
 
-## Installation
-TODO
+Of course, saas-y is NOT very mature as of now, so one might find many problems / things to improve. But most definitely it strives to be a useful tool, at least for simple cloud apps, made up of one or more services.
 
-## Usage
+## Prerequisites
+
+* public repo for your tutorial project
+* k8s cluster (or local minikube, microk8s or k3s)
+* (optional) docker registry (one can use the docker-registry.yaml file to deploy an instance of the registry)
+
+## Installation and Usage
+
 ```bash
-# TODO
+git clone https://github.com/popescu-af/saas-y.git
+cd saas-y
+go install cmd/saas-y.go
+
+# Basic example: edit hello-world.json to point to a repository you own
+saas-y example/hello-world.json tutorial
+
+# After the `tutorial` directory is generated, its contents need to be
+# copied to a local clone of the repository mentioned in the hello-world.json
+# and pushed.
+cp tutorial/* /path/to/local/clone
+cd /path/to/local/clone
+git add .
+git commit -m "Initial commit."
+git push
 ```
+
+After the last command, a directory named `tutorial` should have been created.
+A few steps are required for the tutorial program to be implemented properly.
+
+* first of all, the code 
+
+* edit `services/time-svc/internal/logic/impl.go`
+  * replace `"errors"` with `"time"` in the list of imports
+  * replace _`GetTime`_ function with the following implementation
+```go
+func (i *Implementation) GetTime() (*exports.Time, error) {
+	log.Info("called get_time")
+	return &exports.Time{
+		Value: time.Now().String(),
+	}, nil
+}
+```
+
+* edit `services/tutorial-svc/internal/logic/impl.go`
+  * replace `"errors"` with `"fmt"` in the list of imports
+  * replace _`Greet`_ function with the following implementation
+```go
+func (i *Implementation) Greet(name string) (*exports.Greeting, error) {
+	log.Info("called greet")
+
+	t, err := timesvc.GetTime()
+	if err != nil {
+		return nil, err
+	}
+
+	return &exports.Greeting{
+		Message: fmt.Sprintf("Hello, %s! Current time is %s", name, t.Value),
+	}, nil
+}
+```
+
+* (optional) deploy the docker-registry service to your cluster
+```bash
+kubectl apply -f tutorial/deploy/docker-registry.yaml
+# wait a bit for it to start (use k9s to monitor)
+```
+
+* port-forward your docker registy to `localhost:5000`
+  * `docker.for.mac.localhost` (KEEP IN MIND FOR MAC)
+
+cd services/time-svc && make deploy
+cd ../tutorial-svc && make deploy
+
+* port-forward the tutorial-svc
+* curl it
+  * that's it
 
 ## Input
 The input consists of a JSON file with the following format
@@ -136,11 +207,8 @@ The input consists of a JSON file with the following format
 | structs | list of structures used in by the APIs of all services | see above JSON |
 | external_services | list of services that are build elsewhere, to be directly used by means of pre-built docker images | see above JSON |
 
-## Framework generation
-TODO: description
-
-### services
-TODO: services' JSON -> AST services -> generated directories and files
+## More Detailed Description
+_coming soon_
 
 ## License
-Proprietary
+MIT

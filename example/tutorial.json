@@ -1,0 +1,79 @@
+{
+    "repository_url": "github.com/user/repository",
+    "domain": "example.com",
+    "subdomains": [
+        {
+            "name": "tutorial",
+            "paths": [
+                {
+                    "value": "/api/1.0.0",
+                    "endpoint": "tutorial-svc"
+                }
+            ]
+        }
+    ],
+    "services": [
+        {
+            "name": "tutorial-svc",
+            "port": "80",
+            "api": [
+                {
+                    "path": "/api/1.0.0/{name:string}",
+                    "methods": {
+                        "greet": {
+                            "type": "GET",
+                            "return_type": "greeting"
+                        }
+                    }
+                }
+            ],
+            "structs": [
+                {
+                    "name": "input",
+                    "fields": [
+                        {
+                            "name": "name",
+                            "type": "string"
+                        }
+                    ]
+                },
+                {
+                    "name": "greeting",
+                    "fields": [
+                        {
+                            "name": "message",
+                            "type": "string"
+                        }
+                    ]
+                }
+            ],
+            "dependencies": ["time-svc"]
+        },
+        {
+            "name": "time-svc",
+            "port": "80",
+            "api": [
+                {
+                    "path": "/api/1.0.0",
+                    "methods": {
+                        "get_time": {
+                            "type": "GET",
+                            "return_type": "time"
+                        }
+                    }
+                }
+            ],
+            "structs": [
+                {
+                    "name": "time",
+                    "fields": [
+                        {
+                            "name": "value",
+                            "type": "string"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
