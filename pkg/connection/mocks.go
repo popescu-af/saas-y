@@ -30,12 +30,11 @@ func (c *ChannelListenerMock) WaitAndAssertMessageArrived(t *testing.T) {
 }
 
 // ProcessMessage implements the method with the same name from ChannelListener.
-func (c *ChannelListenerMock) ProcessMessage(msg *Message, write WriteOnChannelFunc) error {
+func (c *ChannelListenerMock) ProcessMessage(msg *Message, write WriteOnChannelFunc) {
 	defer c.wg.Done()
 
 	c.Called()
 	c.Msg = msg
-	return nil
 }
 
 // NewChannelListenerMock creates a ChannelListenerMock instance.

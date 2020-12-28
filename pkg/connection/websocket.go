@@ -49,7 +49,13 @@ func NewWebSocketClient(url url.URL, listener ChannelListener) (*FullDuplex, err
 	return conn, nil
 }
 
-var upgrader = websocket.Upgrader{}
+// TODO: Properly instantiate the upgrader, with the possibility of
+// customizing the origin checker function
+var upgrader = func() websocket.Upgrader {
+	upgrader := websocket.Upgrader{}
+	upgrader.CheckOrigin = func(r *http.Request) bool { return true }
+	return upgrader
+}()
 
 // NewWebSocketServer does the same as NewWebSocketClient, but from a server point of view.
 func NewWebSocketServer(w http.ResponseWriter, r *http.Request, listener ChannelListener) (*FullDuplex, error) {
