@@ -45,7 +45,7 @@ func NewWebSocketClient(url url.URL, listener ChannelListener) (*FullDuplex, err
 	}
 
 	channel := newWebSocketChannel(c)
-	conn := NewFullDuplex(listener, channel)
+	conn := NewFullDuplex(listener, channel, "client")
 	return conn, nil
 }
 
@@ -66,6 +66,6 @@ func NewWebSocketServer(w http.ResponseWriter, r *http.Request, listener Channel
 	}
 
 	channel := newWebSocketChannel(c)
-	conn := NewFullDuplex(listener, channel)
+	conn := NewFullDuplex(listener, channel, "server")
 	return conn, nil
 }

@@ -82,25 +82,27 @@ type ChannelListener interface {
 // and a channel. It handles messages arriving on the channel through the listener
 // and also handles sending messages and closing the communication.
 type FullDuplex struct {
-	listener       ChannelListener
-	channel        Channel
-	writeCh        chan *Message
-	stopProcessing chan bool
-	wgStop         sync.WaitGroup
-	lockState      sync.Mutex
-	lockStop       sync.Mutex
-	isRunning      bool
-	isClosed       bool
+	name        string
+	listener    ChannelListener
+	channel     Channel
+	writeCh     chan *Message
+	stopWriting chan bool
+	wgStop      sync.WaitGroup
+	lockState   sync.Mutex
+	lockStop    sync.Mutex
+	isRunning   bool
+	isClosed    bool
 }
 
 // NewFullDuplex creates a new, inactive full-duplex connection.
 // Call Run to run it.
-func NewFullDuplex(listener ChannelListener, channel Channel) *FullDuplex {
+func NewFullDuplex(listener ChannelListener, channel Channel, name string) *FullDuplex {
 	return &FullDuplex{
-		listener:       listener,
-		channel:        channel,
-		writeCh:        make(chan *Message, 8), // write buffer of size 8
-		stopProcessing: make(chan bool),
+		name:        name,
+		listener:    listener,
+		channel:     channel,
+		writeCh:     make(chan *Message, 8), // write buffer of size 8
+		stopWriting: make(chan bool),
 	}
 }
 
@@ -120,62 +122,63 @@ func (f *FullDuplex) Run() error {
 	var wg sync.WaitGroup
 	wg.Add(2)
 
-	// processor <- reader
-	msgCh := make(chan *Message)
+	writeOnChannel := func(msg *Message) {
+		log.DebugCtx("pushing message for write", log.Context{"_name": f.name})
+		f.writeCh <- msg
+	}
 
 	// reader
 	go func() {
 		defer wg.Done()
-		defer log.InfoCtx("reading done", map[string]interface{}{"instance": fmt.Sprintf("%p", f)})
+		defer log.InfoCtx("reading done", log.Context{"_name": f.name})
 
 		for {
 			msg, err := f.channel.Read()
 			if err != nil {
-				log.ErrorCtx("failed to read message", log.Context{"error": err})
+				log.ErrorCtx("failed to read message", log.Context{"_name": f.name, "error": err})
 				return
 			}
 
-			msgCh <- msg
-
-			if msg.Type == CloseMessage {
+			switch msg.Type {
+			case CloseMessage:
+				log.InfoCtx("channel closed by the other party", log.Context{"_name": f.name})
+				f.stopWriting <- true
 				return
+			case PingMessage:
+				writeOnChannel(&Message{Type: PongMessage})
+			case PongMessage:
+				log.InfoCtx("received pong", log.Context{"_name": f.name})
+			default:
+				log.InfoCtx("doing processing", log.Context{"_name": f.name})
+				log.DebugCtx("with payload", log.Context{"_name": f.name, "msg_payload": string(msg.Payload)})
+
+				f.listener.ProcessMessage(msg, writeOnChannel)
+				log.DebugCtx("done processing", log.Context{"_name": f.name})
 			}
 		}
 	}()
 
-	// processor
+	// writer
 	go func() {
 		defer wg.Done()
-		defer log.InfoCtx("processing done", map[string]interface{}{"instance": fmt.Sprintf("%p", f)})
-
-		writeOnChannel := func(msg *Message) {
-			f.writeCh <- msg
-		}
+		defer log.InfoCtx("processing done", log.Context{"_name": f.name})
 
 		for {
 			select {
-			case <-f.stopProcessing:
-				f.channel.Close() // unblocks Read()
+			case <-f.stopWriting:
+				f.channel.Close()
 				return
-			case msg := <-msgCh:
-				switch msg.Type {
-				case CloseMessage:
-					log.Info("channel closed by the other party")
-					return
-				case PingMessage:
-					writeOnChannel(&Message{Type: PongMessage})
-				case PongMessage:
-					// do nothing for now
-				default:
-					f.listener.ProcessMessage(msg, writeOnChannel)
-				}
 			case msg := <-f.writeCh:
 				// code that actually writes on the channel
+				log.InfoCtx("sending message", log.Context{"_name": f.name})
+				log.DebugCtx("with payload", log.Context{"_name": f.name, "msg_payload": string(msg.Payload)})
+
 				if err := f.channel.Write(msg); err != nil {
-					log.ErrorCtx("failed to send message", log.Context{"error": err})
+					log.ErrorCtx("failed to send message", log.Context{"_name": f.name, "error": err})
 					f.channel.Close()
 					return
 				}
+				log.DebugCtx("done sending message", log.Context{"_name": f.name})
 			}
 		}
 	}()
@@ -213,8 +216,8 @@ func (f *FullDuplex) Close() error {
 		return fmt.Errorf("not running")
 	}
 
-	log.Info("called close")
-	f.stopProcessing <- true
+	log.InfoCtx("called close", log.Context{"_name": f.name})
+	f.stopWriting <- true
 
 	f.wgStop.Wait()
 	return nil

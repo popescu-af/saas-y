@@ -2,6 +2,7 @@ package connection
 
 import (
 	"fmt"
+	"strconv"
 	"sync"
 	"testing"
 	"time"
@@ -152,7 +153,7 @@ type EndpointMockInstance struct {
 type ChannelListenerCreator func(t *testing.T) (ChannelListener, error)
 
 // SpawnClientInstances spawns instances of clients of the service to be tested.
-func SpawnClientInstances(t *testing.T, clientCount int, listenerCreator ChannelListenerCreator) ([]*EndpointMockInstance, *sync.WaitGroup) {
+func SpawnClientInstances(t *testing.T, clientCount int, listenerCreator ChannelListenerCreator, clientName, serviceName string) ([]*EndpointMockInstance, *sync.WaitGroup) {
 	var result []*EndpointMockInstance
 	wg := &sync.WaitGroup{}
 
@@ -167,7 +168,7 @@ func SpawnClientInstances(t *testing.T, clientCount int, listenerCreator Channel
 		serverListener, err := listenerCreator(t)
 		require.NoError(t, err, "unexpected failure when creating server listener")
 
-		server := NewFullDuplex(serverListener, serverChannel)
+		server := NewFullDuplex(serverListener, serverChannel, serviceName+" -> "+clientName+" : "+strconv.Itoa(i))
 
 		go func() {
 			defer wg.Done()
@@ -182,7 +183,7 @@ func SpawnClientInstances(t *testing.T, clientCount int, listenerCreator Channel
 		client := &EndpointMockInstance{
 			Channel:  clientChannel,
 			Listener: clientListener,
-			Conn:     NewFullDuplex(clientListener, clientChannel),
+			Conn:     NewFullDuplex(clientListener, clientChannel, clientName+" -> "+serviceName+" : "+strconv.Itoa(i)),
 		}
 
 		go func() {
