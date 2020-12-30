@@ -33,3 +33,8 @@ func (r *Redis) Set(key string, value []byte, expiration time.Duration) error {
 func (r *Redis) Delete(key string) error {
 	return r.client.Del(context.TODO(), key).Err()
 }
+
+// Ready tells if the redis connection is ready.
+func (r *Redis) Ready() error {
+	return r.client.Ping(context.TODO()).Err()
+}

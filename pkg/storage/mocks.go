@@ -16,7 +16,7 @@ type KeyValueMock struct {
 	storage map[string][]byte
 }
 
-// Get implements the method with the same name from ChannelListener.
+// Get implements the method with the same name from KeyValue.
 func (k *KeyValueMock) Get(key string) ([]byte, error) {
 	k.mutex.RLock()
 	defer k.mutex.RUnlock()
@@ -28,7 +28,7 @@ func (k *KeyValueMock) Get(key string) ([]byte, error) {
 	return nil, fmt.Errorf("key not present")
 }
 
-// Set implements the method with the same name from ChannelListener.
+// Set implements the method with the same name from KeyValue.
 func (k *KeyValueMock) Set(key string, value []byte, expiration time.Duration) error {
 	k.mutex.Lock()
 	defer k.mutex.Unlock()
@@ -38,13 +38,18 @@ func (k *KeyValueMock) Set(key string, value []byte, expiration time.Duration) e
 	return nil
 }
 
-// Delete implements the method with the same name from ChannelListener.
+// Delete implements the method with the same name from KeyValue.
 func (k *KeyValueMock) Delete(key string) error {
 	k.mutex.Lock()
 	defer k.mutex.Unlock()
 
 	k.Called()
 	delete(k.storage, key)
+	return nil
+}
+
+// Ready implements the method with the same name from KeyValue.
+func (k *KeyValueMock) Ready() error {
 	return nil
 }
 
