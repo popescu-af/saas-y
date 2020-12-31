@@ -25,7 +25,8 @@ cd /path/to/your/repository/clone
 vim spec.json # edit spec.json to point to your repository
 saas-y -input spec.json -output .
 
-# After the last command, everything that is necessary for the services is generated, except the implementation does nothing.
+# After the last command, everything that is necessary for the services is generated,
+# except the implementation does nothing.
 ```
 
 ### Adding a simple implementation to the generated code
@@ -229,7 +230,7 @@ The input consists of a JSON file with the following format
 | env | list of environmental variables a service needs | see above JSON |
 | dependencies | list of services the service depends on | see above JSON |
 | structs | list of structures used in by the APIs of all services | see above JSON |
-| external_services | list of services that are build elsewhere, to be directly used by means of pre-built docker images | see above JSON |
+| external_services | **(not yet implemented)** list of services that are build elsewhere, to be directly used by means of pre-built docker images | see above JSON |
 
 ## More Detailed Description
 _coming soon_
