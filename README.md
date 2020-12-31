@@ -5,36 +5,32 @@ Of course, saas-y is NOT very mature as of now, so one might find many problems 
 
 ## Prerequisites
 
-* public repo for your tutorial project
+* public/private repo for your tutorial project
+  * for a private repo, you need to set `GITHUB_URL` env variable to a github link containing a personal access token, i.e. `https://${GITHUB_TOKEN}:x-oauth-basic@github.com/`
 * k8s cluster (or local minikube, microk8s or k3s)
-* (optional) docker registry (one can use the docker-registry.yaml file to deploy an instance of the registry)
+* docker registry (one can use the docker-registry.yaml file to deploy an instance of the registry to the k8s cluster)
 
 ## Installation and Usage
 
 ```bash
+# install saas-y
 git clone https://github.com/popescu-af/saas-y.git
 cd saas-y
 go install cmd/saas-y.go
 
-# Basic example: edit hello-world.json to point to a repository you own
-saas-y example/hello-world.json tutorial
+# copy the spec file for the tutorial
+cp example/tutorial.json /path/to/your/repository/clone/spec.json
 
-# After the `tutorial` directory is generated, its contents need to be
-# copied to a local clone of the repository mentioned in the hello-world.json
-# and pushed.
-cp tutorial/* /path/to/local/clone
-cd /path/to/local/clone
-git add .
-git commit -m "Initial commit."
-git push
+cd /path/to/your/repository/clone
+vim spec.json # edit spec.json to point to your repository
+saas-y -input spec.json -output .
+
+# After the last command, everything that is necessary for the services is generated, except the implementation does nothing.
 ```
 
-After the last command, a directory named `tutorial` should have been created.
-A few steps are required for the tutorial program to be implemented properly.
+### Adding a simple implementation to the generated code
 
-* first of all, the code 
-
-* edit `services/time-svc/internal/logic/impl.go`
+Edit `services/time-svc/internal/logic/impl.go`
   * replace `"errors"` with `"time"` in the list of imports
   * replace _`GetTime`_ function with the following implementation
 ```go
@@ -46,14 +42,14 @@ func (i *Implementation) GetTime() (*exports.Time, error) {
 }
 ```
 
-* edit `services/tutorial-svc/internal/logic/impl.go`
+Edit `services/tutorial-svc/internal/logic/impl.go`
   * replace `"errors"` with `"fmt"` in the list of imports
   * replace _`Greet`_ function with the following implementation
 ```go
 func (i *Implementation) Greet(name string) (*exports.Greeting, error) {
 	log.Info("called greet")
 
-	t, err := timesvc.GetTime()
+	t, err := i.timeSvc.GetTime()
 	if err != nil {
 		return nil, err
 	}
@@ -64,26 +60,53 @@ func (i *Implementation) Greet(name string) (*exports.Greeting, error) {
 }
 ```
 
-* (optional) deploy the docker-registry service to your cluster
+Create a commit with all the files
 ```bash
-kubectl apply -f tutorial/deploy/docker-registry.yaml
+git add .
+git commit -m "Initial commit."
+git push
+```
+
+### Kubernetes deployment
+
+(optional) Deploy the docker-registry service to your cluster, if you don't have it already.
+If you have a docker registry available somewhere else, you will need to modify the `Makefile`s of each service to point to your registry.
+```bash
+kubectl apply -f deploy/docker-registry.yaml
 # wait a bit for it to start (use k9s to monitor)
 ```
 
-* port-forward your docker registy to `localhost:5000`
-  * `docker.for.mac.localhost` (KEEP IN MIND FOR MAC)
+Port-forward your docker registy to `localhost:5000` with k9s or by running
+```bash
+# in a separate terminal
+kubectl port-forward svc/docker-registry 5000:5000
+```
 
-cd services/time-svc && make deploy
-cd ../tutorial-svc && make deploy
+Deploy the services
+```bash
+make -C services/time-svc deploy
+make -C services/tutorial-svc deploy
+```
 
-* port-forward the tutorial-svc
-* curl it
-  * that's it
+Test the main service (`tutorial-svc`)
+```bash
+# in a separate terminal
+kubectl port-forward svc/tutorial-svc 8000:8000
+
+# call the API
+curl http://localhost:8000/api/1.0.0/Ted | jq '.'
+
+# Outputs
+# {
+#   "message": "Hello, Ted! Current time is 2020-12-31 15:48:41.917955957 +0000 UTC m=+4092.467002507"
+# }
+```
 
 ## Input
 The input consists of a JSON file with the following format
 ```json
 {
+    "repository_url": "github.com/user/repository",
     "domain": "example.com",
     "subdomains": [
         {
@@ -197,6 +220,7 @@ The input consists of a JSON file with the following format
 ## Concepts
 | Name | Definition | Example |
 | ---- | ---------- | ------- |
+| repository_url | where the SaaS code is supposed to be kept and versioned | github.com/user/repository |
 | domain | where the SaaS is supposed to be deployed | example.com |
 | subdomains | list of subdomains that will be accessible | api, www, ... |
 | path | domain path to be routed to a service | /rest/1.0.0 |

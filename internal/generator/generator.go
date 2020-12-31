@@ -207,6 +207,13 @@ func CommonEntity(obj interface{}, templ string, resultPath string) (err error) 
 			"replaceHyphens": func(s string) string {
 				return strings.ReplaceAll(s, "-", "_")
 			},
+			"domainUserRepos": func(s string) string {
+				comps := strings.Split(s, "/")
+				if len(comps) == 1 {
+					return s + "/*"
+				}
+				return comps[0] + "/" + comps[1] + "/*"
+			},
 		}).
 		Parse(templ))
 	err = applyObjectToTemplateAndSaveToFile(obj, loadedTempl, resultPath)
