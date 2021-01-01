@@ -27,7 +27,7 @@ func main() {
 
 	err = golang.GenerateSourcesFromJSONSpec(inputFilePath, outputDirPath)
 	if err != nil {
-		log.Fatalf("saas-y error: %v", err)
+		log.Fatalf("error: %v", err)
 	}
 }
 
