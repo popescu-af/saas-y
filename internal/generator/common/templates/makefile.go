@@ -17,7 +17,7 @@ endif
 build:
 	docker buildx build --network host --platform ${PLATFORM} \
 		--build-arg GITHUB_URL="${GITHUB_URL}" \
-		-t tutorial-svc:${BUILD_TAG} .
+		-t {{.Name}}:${BUILD_TAG} .
 
 .PHONY: tag
 tag: build
