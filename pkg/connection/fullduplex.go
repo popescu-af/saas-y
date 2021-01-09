@@ -123,37 +123,36 @@ func (f *FullDuplex) Run() error {
 	wg.Add(2)
 
 	writeOnChannel := func(msg *Message) {
-		log.DebugCtx("pushing message for write", log.Context{"_name": f.name})
+		log.DebugCtx("pushing message for write", log.Context{"name": f.name})
 		f.writeCh <- msg
 	}
 
 	// reader
 	go func() {
 		defer wg.Done()
-		defer log.InfoCtx("reading done", log.Context{"_name": f.name})
+		defer log.DebugCtx("reading done", log.Context{"name": f.name})
 
 		for {
 			msg, err := f.channel.Read()
 			if err != nil {
-				log.ErrorCtx("failed to read message", log.Context{"_name": f.name, "error": err})
+				log.ErrorCtx("failed to read message", log.Context{"name": f.name, "error": err})
 				return
 			}
 
 			switch msg.Type {
 			case CloseMessage:
-				log.InfoCtx("channel closed by the other party", log.Context{"_name": f.name})
+				log.DebugCtx("channel closed by the other party", log.Context{"name": f.name})
 				f.stopWriting <- true
 				return
 			case PingMessage:
+				log.InfoCtx("received ping", log.Context{"name": f.name})
 				writeOnChannel(&Message{Type: PongMessage})
 			case PongMessage:
-				log.InfoCtx("received pong", log.Context{"_name": f.name})
+				log.InfoCtx("received pong", log.Context{"name": f.name})
 			default:
-				log.InfoCtx("doing processing", log.Context{"_name": f.name})
-				log.DebugCtx("with payload", log.Context{"_name": f.name, "msg_payload": string(msg.Payload)})
-
+				log.DebugCtx("processing with payload", log.Context{"name": f.name, "msg_payload": string(msg.Payload)})
 				f.listener.ProcessMessage(msg, writeOnChannel)
-				log.DebugCtx("done processing", log.Context{"_name": f.name})
+				log.DebugCtx("done processing", log.Context{"name": f.name})
 			}
 		}
 	}()
@@ -161,7 +160,7 @@ func (f *FullDuplex) Run() error {
 	// writer
 	go func() {
 		defer wg.Done()
-		defer log.InfoCtx("processing done", log.Context{"_name": f.name})
+		defer log.DebugCtx("processing done", log.Context{"name": f.name})
 
 		for {
 			select {
@@ -170,15 +169,14 @@ func (f *FullDuplex) Run() error {
 				return
 			case msg := <-f.writeCh:
 				// code that actually writes on the channel
-				log.InfoCtx("sending message", log.Context{"_name": f.name})
-				log.DebugCtx("with payload", log.Context{"_name": f.name, "msg_payload": string(msg.Payload)})
+				log.DebugCtx("sending with payload", log.Context{"name": f.name, "msg_payload": string(msg.Payload)})
 
 				if err := f.channel.Write(msg); err != nil {
-					log.ErrorCtx("failed to send message", log.Context{"_name": f.name, "error": err})
+					log.ErrorCtx("failed to send message", log.Context{"name": f.name, "error": err})
 					f.channel.Close()
 					return
 				}
-				log.DebugCtx("done sending message", log.Context{"_name": f.name})
+				log.DebugCtx("done sending message", log.Context{"name": f.name})
 			}
 		}
 	}()
@@ -216,7 +214,7 @@ func (f *FullDuplex) Close() error {
 		return fmt.Errorf("not running")
 	}
 
-	log.InfoCtx("called close", log.Context{"_name": f.name})
+	log.DebugCtx("called close", log.Context{"name": f.name})
 	f.stopWriting <- true
 
 	f.wgStop.Wait()
