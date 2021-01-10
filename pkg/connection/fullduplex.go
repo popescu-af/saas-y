@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"sync"
 
+	"github.com/mailru/easygo/netpoll"
 	"github.com/popescu-af/saas-y/pkg/log"
 )
 
@@ -82,118 +83,94 @@ type ChannelListener interface {
 // and a channel. It handles messages arriving on the channel through the listener
 // and also handles sending messages and closing the communication.
 type FullDuplex struct {
-	name        string
-	listener    ChannelListener
-	channel     Channel
-	writeCh     chan *Message
-	stopWriting chan bool
-	wgStop      sync.WaitGroup
-	lockState   sync.Mutex
-	lockStop    sync.Mutex
-	isRunning   bool
-	isClosed    bool
+	name     string
+	listener ChannelListener
+	channel  Channel
+	writeCh  chan *Message
+	stopCh   chan bool
+	finished sync.WaitGroup
 }
 
 // NewFullDuplex creates a new, inactive full-duplex connection.
 // Call Run to run it.
 func NewFullDuplex(listener ChannelListener, channel Channel, name string) *FullDuplex {
 	return &FullDuplex{
-		name:        name,
-		listener:    listener,
-		channel:     channel,
-		writeCh:     make(chan *Message, 8), // write buffer of size 8
-		stopWriting: make(chan bool),
+		name:     name,
+		listener: listener,
+		channel:  channel,
+		writeCh:  make(chan *Message),
+		stopCh:   make(chan bool),
 	}
 }
 
 // Run is a blocking function that handles messages arriving on the channel.
 func (f *FullDuplex) Run() error {
-	f.lockState.Lock()
-	if f.isClosed {
-		f.lockState.Unlock()
-		return fmt.Errorf("already closed")
+	defer log.DebugCtx("channel closed", log.Context{"name": f.name})
+	defer f.finished.Done()
+
+	f.finished.Add(1)
+
+	poller, err := netpoll.New(nil)
+	if err != nil {
+		return err
 	}
 
-	if f.isRunning {
-		f.lockState.Unlock()
-		return fmt.Errorf("already running")
-	}
+	// TODO: make WS-agnostic
+	fd := netpoll.Must(netpoll.HandleRead(f.channel.(*webSocketChannel).wsConn.UnderlyingConn()))
 
-	var wg sync.WaitGroup
-	wg.Add(2)
-
-	writeOnChannel := func(msg *Message) {
-		log.DebugCtx("pushing message for write", log.Context{"name": f.name})
-		f.writeCh <- msg
-	}
-
-	// reader
-	go func() {
-		defer wg.Done()
-		defer log.DebugCtx("reading done", log.Context{"name": f.name})
-
-		for {
-			msg, err := f.channel.Read()
-			if err != nil {
-				log.ErrorCtx("failed to read message", log.Context{"name": f.name, "error": err})
-				return
-			}
-
-			switch msg.Type {
-			case CloseMessage:
-				log.DebugCtx("channel closed by the other party", log.Context{"name": f.name})
-				f.stopWriting <- true
-				return
-			case PingMessage:
-				log.InfoCtx("received ping", log.Context{"name": f.name})
-				writeOnChannel(&Message{Type: PongMessage})
-			case PongMessage:
-				log.InfoCtx("received pong", log.Context{"name": f.name})
-			default:
-				log.DebugCtx("processing with payload", log.Context{"name": f.name, "msg_payload": string(msg.Payload)})
-				f.listener.ProcessMessage(msg, writeOnChannel)
-				log.DebugCtx("done processing", log.Context{"name": f.name})
-			}
+	readCh := make(chan *Message)
+	poller.Start(fd, func(ev netpoll.Event) {
+		if ev&netpoll.EventReadHup != 0 {
+			poller.Stop(fd)
+			f.channel.Close()
+			return
 		}
-	}()
 
-	// writer
-	go func() {
-		defer wg.Done()
-		defer log.DebugCtx("processing done", log.Context{"name": f.name})
-
-		for {
-			select {
-			case <-f.stopWriting:
-				f.channel.Close()
-				return
-			case msg := <-f.writeCh:
-				// code that actually writes on the channel
-				log.DebugCtx("sending with payload", log.Context{"name": f.name, "msg_payload": string(msg.Payload)})
-
-				if err := f.channel.Write(msg); err != nil {
-					log.ErrorCtx("failed to send message", log.Context{"name": f.name, "error": err})
-					f.channel.Close()
-					return
-				}
-				log.DebugCtx("done sending message", log.Context{"name": f.name})
-			}
+		msg, err := f.channel.Read()
+		if err != nil {
+			log.ErrorCtx("failed to read message", log.Context{"name": f.name, "error": err})
+			return
 		}
-	}()
+		readCh <- msg
+	})
 
-	f.isRunning = true
-	f.wgStop.Add(1)
-	f.lockState.Unlock()
-	wg.Wait()
+	handleRead := func(msg *Message) {
+		switch msg.Type {
+		case CloseMessage:
+			log.DebugCtx("channel closed by the other party", log.Context{"name": f.name})
+			f.stopCh <- true
+		case PingMessage:
+			log.InfoCtx("received ping", log.Context{"name": f.name})
+			f.writeCh <- &Message{Type: PongMessage}
+		case PongMessage:
+			log.InfoCtx("received pong", log.Context{"name": f.name})
+		default:
+			log.DebugCtx("processing with payload", log.Context{"name": f.name, "msg_payload": string(msg.Payload)})
+			f.listener.ProcessMessage(msg, func(msg *Message) {
+				f.writeCh <- msg
+			})
+			log.DebugCtx("done processing", log.Context{"name": f.name})
+		}
+	}
 
-	f.lockState.Lock()
-	defer f.lockState.Unlock()
+	handleWrite := func(msg *Message) {
+		log.DebugCtx("sending with payload", log.Context{"name": f.name, "msg_payload": string(msg.Payload)})
+		if err := f.channel.Write(msg); err != nil {
+			log.ErrorCtx("failed to send message", log.Context{"name": f.name, "error": err})
+		}
+	}
 
-	f.isRunning = false
-	f.isClosed = true
-
-	f.wgStop.Done()
-	return nil
+	// main loop
+	for {
+		select {
+		case msg := <-readCh:
+			go handleRead(msg)
+		case msg := <-f.writeCh:
+			handleWrite(msg)
+		case <-f.stopCh:
+			return nil
+		}
+	}
 }
 
 // SendMessage sends a message on the full duplex channel.
@@ -202,40 +179,26 @@ func (f *FullDuplex) SendMessage(m *Message) {
 }
 
 // Close stops a full-duplex connection.
-func (f *FullDuplex) Close() error {
-	f.lockStop.Lock()
-	defer f.lockStop.Unlock()
-
-	f.lockState.Lock()
-	isRunning := f.isRunning
-	f.lockState.Unlock()
-
-	if !isRunning {
-		return fmt.Errorf("not running")
-	}
-
-	log.DebugCtx("called close", log.Context{"name": f.name})
-	f.stopWriting <- true
-
-	f.wgStop.Wait()
-	return nil
+func (f *FullDuplex) Close() {
+	defer f.finished.Wait()
+	f.stopCh <- true
 }
 
-// IsRunning returns the running status of a full-duplex connection.
-func (f *FullDuplex) IsRunning() bool {
-	f.lockState.Lock()
-	defer f.lockState.Unlock()
+// // IsRunning returns the running status of a full-duplex connection.
+// func (f *FullDuplex) IsRunning() bool {
+// 	f.lockState.Lock()
+// 	defer f.lockState.Unlock()
 
-	return f.isRunning
-}
+// 	return f.isRunning
+// }
 
-// IsClosed returns the closed status of a full-duplex connection.
-func (f *FullDuplex) IsClosed() bool {
-	f.lockState.Lock()
-	defer f.lockState.Unlock()
+// // IsClosed returns the closed status of a full-duplex connection.
+// func (f *FullDuplex) IsClosed() bool {
+// 	f.lockState.Lock()
+// 	defer f.lockState.Unlock()
 
-	return f.isClosed
-}
+// 	return f.isClosed
+// }
 
 // FullDuplexManager keeps track of a list of existing full-duplex connections.
 type FullDuplexManager struct {
@@ -257,10 +220,11 @@ func (m *FullDuplexManager) AddConnection(conn *FullDuplex) {
 // CloseConnections closes all managed connections.
 func (m *FullDuplexManager) CloseConnections() {
 	for _, c := range m.connections {
-		err := c.Close()
-		if err != nil {
-			log.ErrorCtx("manager - failed to close connection", log.Context{"error": err})
-		}
+		// err :=
+		c.Close()
+		// if err != nil {
+		// 	log.ErrorCtx("manager - failed to close connection", log.Context{"error": err})
+		// }
 	}
 }
 
