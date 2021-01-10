@@ -122,7 +122,7 @@ func (f *FullDuplex) Run() error {
 	poller.Start(fd, func(ev netpoll.Event) {
 		if ev&netpoll.EventReadHup != 0 {
 			poller.Stop(fd)
-			f.channel.Close()
+			f.stopCh <- true
 			return
 		}
 
