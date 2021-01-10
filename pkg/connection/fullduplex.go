@@ -141,13 +141,13 @@ func (f *FullDuplex) Run() error {
 			f.stopCh <- true
 		case PingMessage:
 			log.InfoCtx("received ping", log.Context{"name": f.name})
-			f.writeCh <- &Message{Type: PongMessage}
+			f.SendMessage(&Message{Type: PongMessage})
 		case PongMessage:
 			log.InfoCtx("received pong", log.Context{"name": f.name})
 		default:
 			log.DebugCtx("processing with payload", log.Context{"name": f.name, "msg_payload": string(msg.Payload)})
 			f.listener.ProcessMessage(msg, func(msg *Message) {
-				f.writeCh <- msg
+				f.SendMessage(msg)
 			})
 			log.DebugCtx("done processing", log.Context{"name": f.name})
 		}
@@ -175,7 +175,9 @@ func (f *FullDuplex) Run() error {
 
 // SendMessage sends a message on the full duplex channel.
 func (f *FullDuplex) SendMessage(m *Message) {
-	f.writeCh <- m
+	go func() {
+		f.writeCh <- m
+	}()
 }
 
 // Close stops a full-duplex connection.
