@@ -99,7 +99,7 @@ func NewFullDuplex(listener ChannelListener, channel Channel, name string) *Full
 		listener: listener,
 		channel:  channel,
 		writeCh:  make(chan *Message),
-		stopCh:   make(chan bool),
+		stopCh:   make(chan bool), // ch <- false : no need to notify the other party
 	}
 }
 
@@ -115,30 +115,40 @@ func (f *FullDuplex) Run() error {
 		return err
 	}
 
-	// TODO: make WS-agnostic
-	fd := netpoll.Must(netpoll.HandleRead(f.channel.(*webSocketChannel).wsConn.UnderlyingConn()))
-
 	readCh := make(chan *Message)
-	poller.Start(fd, func(ev netpoll.Event) {
-		if ev&netpoll.EventReadHup != 0 {
-			poller.Stop(fd)
-			f.stopCh <- true
-			return
-		}
-
+	readMessage := func() {
 		msg, err := f.channel.Read()
 		if err != nil {
 			log.ErrorCtx("failed to read message", log.Context{"name": f.name, "error": err})
 			return
 		}
 		readCh <- msg
-	})
+	}
+
+	switch c := f.channel.(type) {
+	case *webSocketChannel:
+		fd := netpoll.Must(netpoll.HandleRead(c.wsConn.UnderlyingConn()))
+		poller.Start(fd, func(ev netpoll.Event) {
+			if ev&netpoll.EventReadHup != 0 {
+				poller.Stop(fd)
+				f.stopCh <- false // no need to notify the other party
+				return
+			}
+			readMessage()
+		})
+	default:
+		go func() {
+			for {
+				readMessage()
+			}
+		}()
+	}
 
 	handleRead := func(msg *Message) {
 		switch msg.Type {
 		case CloseMessage:
 			log.DebugCtx("channel closed by the other party", log.Context{"name": f.name})
-			f.stopCh <- true
+			f.stopCh <- false
 		case PingMessage:
 			log.InfoCtx("received ping", log.Context{"name": f.name})
 			f.SendMessage(&Message{Type: PongMessage})
@@ -167,7 +177,10 @@ func (f *FullDuplex) Run() error {
 			go handleRead(msg)
 		case msg := <-f.writeCh:
 			handleWrite(msg)
-		case <-f.stopCh:
+		case notifyOtherParty := <-f.stopCh:
+			if notifyOtherParty {
+				f.SendMessage(&Message{Type: CloseMessage})
+			}
 			return nil
 		}
 	}
