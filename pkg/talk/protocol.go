@@ -1,5 +1,9 @@
 package talk
 
+import (
+	"encoding/json"
+)
+
 // Message types, same as websocket.
 const (
 	// TextMessage denotes a text data message.
@@ -30,6 +34,26 @@ func SimpleMessage(text string) *Message {
 		Type:    TextMessage,
 		Payload: []byte(text),
 	}
+}
+
+// ToTextMessage converts a JSON-annotated struct to a Message of type Text.
+// It returns a nil value if the marshaling does not succeed.
+func ToTextMessage(v interface{}) (*Message, error) {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return nil, err
+	}
+
+	return &Message{
+		Type:    TextMessage,
+		Payload: b,
+	}, nil
+}
+
+// FromTextMessage creates an instance of a JSON-annotated type from a
+// Message of type Text.
+func FromTextMessage(m *Message, v interface{}) error {
+	return json.Unmarshal(m.Payload, v)
 }
 
 // Connection is the interface for an endpoint.
