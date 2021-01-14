@@ -1,6 +1,14 @@
 package talk
 
-import "sync"
+import (
+	"sync"
+
+	"github.com/popescu-af/saas-y/pkg/worker"
+)
+
+// WorkerPool is a worker pool, which if initialised, is used
+// instead of launching new goroutines every time when needed.
+var WorkerPool *worker.Pool
 
 // Agent is the class for talking agents.
 type Agent struct {
@@ -36,9 +44,14 @@ func (a *Agent) Listen() {
 
 // Say sends a message.
 func (a *Agent) Say(m *Message) {
-	go func() {
+	f := func() {
 		a.msgCh <- m
-	}()
+	}
+	if WorkerPool != nil {
+		WorkerPool.Post(f)
+	} else {
+		go f()
+	}
 }
 
 // Stop closes the connection and stops listening.
