@@ -29,20 +29,20 @@ type FakeConnection struct {
 	index          int
 	messageArrived sync.WaitGroup
 	mtxCallback    sync.Mutex
-	callback       func(*Message)
+	callback       func(*Message, bool)
 }
 
-func (c *FakeConnection) cb(m *Message) {
+func (c *FakeConnection) cb(m *Message, closed bool) {
 	c.mtxCallback.Lock()
 	defer c.mtxCallback.Unlock()
 	if c.callback != nil {
-		c.callback(m)
+		c.callback(m, closed)
 	}
 }
 
 // Subscribe subscribes the given callback to the connection's
 // message arrival event loop.
-func (c *FakeConnection) Subscribe(cb func(*Message)) {
+func (c *FakeConnection) Subscribe(cb func(*Message, bool)) {
 	c.mtxCallback.Lock()
 	defer c.mtxCallback.Unlock()
 	c.callback = cb
@@ -68,7 +68,7 @@ func (c *FakeConnection) ExpectMessages(count int) {
 	go func() {
 		for i := 0; i < count; i++ {
 			m := <-c.channel.ch[c.index]
-			c.cb(m)
+			c.cb(m, m.Type == CloseMessage)
 			c.messageArrived.Done()
 		}
 	}()

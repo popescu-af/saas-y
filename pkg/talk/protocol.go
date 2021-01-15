@@ -62,7 +62,7 @@ func FromTextMessage(m *Message, v interface{}) error {
 
 // Connection is the interface for an endpoint.
 type Connection interface {
-	Subscribe(func(*Message))
+	Subscribe(func(*Message, bool))
 	Write(*Message) error
 	Close()
 }

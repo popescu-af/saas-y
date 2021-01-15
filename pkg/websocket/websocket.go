@@ -19,7 +19,7 @@ type connection struct {
 }
 
 // Subscribe subscribes the given callback to the poller read events.
-func (c *connection) Subscribe(cb func(*talk.Message)) {
+func (c *connection) Subscribe(cb func(*talk.Message, bool)) {
 	fd := netpoll.Must(netpoll.HandleRead(c.conn.UnderlyingConn()))
 	c.poller.Start(fd, func(ev netpoll.Event) {
 		if ev&netpoll.EventReadHup != 0 {
@@ -30,10 +30,11 @@ func (c *connection) Subscribe(cb func(*talk.Message)) {
 		mt, message, err := c.conn.ReadMessage()
 		if err != nil {
 			log.ErrorCtx("read message", log.Context{"error": err})
+			cb(nil, true)
 			return
 		}
 
-		cb(&talk.Message{Type: mt, Payload: message})
+		cb(&talk.Message{Type: mt, Payload: message}, false)
 	})
 }
 

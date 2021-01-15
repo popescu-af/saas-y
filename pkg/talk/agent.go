@@ -60,8 +60,8 @@ func (a *Agent) Listen() {
 	a.setRunning(true)
 	defer a.setRunning(false)
 
-	a.conn.Subscribe(func(m *Message) {
-		if m.Type == CloseMessage {
+	a.conn.Subscribe(func(m *Message, closed bool) {
+		if closed {
 			a.stop()
 			return
 		}
