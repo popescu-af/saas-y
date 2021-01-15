@@ -26,6 +26,9 @@ func (a *Agent) say(m *Message) {
 	a.mtxConn.Lock()
 	defer a.mtxConn.Unlock()
 	a.conn.Write(m)
+	if m.Type == CloseMessage {
+		a.conn.Close()
+	}
 }
 
 func (a *Agent) setRunning(r bool) {
@@ -73,7 +76,7 @@ func (a *Agent) Listen() {
 	}
 }
 
-// Say sends a message to the counterparting agent.
+// Say sends a message to the peer agent.
 func (a *Agent) Say(m *Message) {
 	f := func() {
 		a.say(m)
@@ -88,7 +91,7 @@ func (a *Agent) Say(m *Message) {
 // Stop halts listening and closes the connection.
 func (a *Agent) Stop() {
 	if a.stop() {
-		a.conn.Close()
+		a.say(&Message{Type: CloseMessage})
 	}
 }
 

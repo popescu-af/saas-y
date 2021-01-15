@@ -23,6 +23,7 @@ func (c *connection) Subscribe(cb func(*talk.Message, bool)) {
 	fd := netpoll.Must(netpoll.HandleRead(c.conn.UnderlyingConn()))
 	c.poller.Start(fd, func(ev netpoll.Event) {
 		if ev&netpoll.EventReadHup != 0 {
+			cb(nil, true)
 			c.poller.Stop(fd)
 			return
 		}
