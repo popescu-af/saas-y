@@ -11,41 +11,72 @@ import (
 var WorkerPool *worker.Pool
 
 // Agent is the class for talking agents.
+// A talking agent both accepts and sends messages.
 type Agent struct {
-	conn    Connection
-	recv    ReceiveFun
-	msgCh   chan *Message
-	exitCh  chan struct{}
-	exited  sync.WaitGroup
-	running bool
+	mtxConn   sync.Mutex
+	conn      Connection
+	recv      ReceiveFun
+	exitCh    chan struct{}
+	exited    sync.WaitGroup
+	mtxStatus sync.Mutex
+	running   bool
 }
 
-// Listen listens for incoming messages until Stop() is called.
+func (a *Agent) say(m *Message) {
+	a.mtxConn.Lock()
+	defer a.mtxConn.Unlock()
+	a.conn.Write(m)
+}
+
+func (a *Agent) setRunning(r bool) {
+	a.mtxStatus.Lock()
+	defer a.mtxStatus.Unlock()
+	a.running = r
+}
+
+func (a *Agent) stop() bool {
+	if !a.IsRunning() {
+		return false
+	}
+	a.exitCh <- struct{}{}
+	a.exited.Wait()
+	return true
+}
+
+// IsRunning returns true if the agent is still running.
+// An stopped agent is not usable anymore.
+func (a *Agent) IsRunning() bool {
+	a.mtxStatus.Lock()
+	defer a.mtxStatus.Unlock()
+	return a.running
+}
+
+// Listen blocks the current goroutine and makes the agent listen
+// for incoming messages until Stop() is called.
 func (a *Agent) Listen() {
 	defer a.exited.Done()
 
 	a.exited.Add(1)
-	a.running = true
+	a.setRunning(true)
+	defer a.setRunning(false)
 
 	a.conn.Subscribe(func(m *Message) {
+		if m.Type == CloseMessage {
+			a.stop()
+			return
+		}
 		a.recv(m, a.Say)
 	})
 
-	for {
-		select {
-		case m := <-a.msgCh:
-			a.conn.Write(m)
-		case <-a.exitCh:
-			a.running = false
-			return
-		}
+	for range a.exitCh {
+		break
 	}
 }
 
-// Say sends a message.
+// Say sends a message to the counterparting agent.
 func (a *Agent) Say(m *Message) {
 	f := func() {
-		a.msgCh <- m
+		a.say(m)
 	}
 	if WorkerPool != nil {
 		WorkerPool.Post(f)
@@ -54,15 +85,11 @@ func (a *Agent) Say(m *Message) {
 	}
 }
 
-// Stop closes the connection and stops listening.
+// Stop halts listening and closes the connection.
 func (a *Agent) Stop() {
-	if !a.running {
-		return
+	if a.stop() {
+		a.conn.Close()
 	}
-
-	defer a.exited.Wait()
-	a.conn.Close()
-	a.exitCh <- struct{}{}
 }
 
 // NewAgent creates a new talking agent.
@@ -71,7 +98,6 @@ func NewAgent(c Connection, r ReceiveFun) *Agent {
 	return &Agent{
 		conn:   c,
 		recv:   r,
-		msgCh:  make(chan *Message),
 		exitCh: make(chan struct{}),
 	}
 }

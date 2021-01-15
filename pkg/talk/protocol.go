@@ -2,6 +2,7 @@ package talk
 
 import (
 	"encoding/json"
+	"fmt"
 )
 
 // Message types, same as websocket.
@@ -53,6 +54,9 @@ func ToTextMessage(v interface{}) (*Message, error) {
 // FromTextMessage creates an instance of a JSON-annotated type from a
 // Message of type Text.
 func FromTextMessage(m *Message, v interface{}) error {
+	if m == nil {
+		return fmt.Errorf("empty message")
+	}
 	return json.Unmarshal(m.Payload, v)
 }
 

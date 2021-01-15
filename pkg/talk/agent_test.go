@@ -126,3 +126,21 @@ func TestComplexTalk(t *testing.T) {
 	conns01[1].WaitForMessages()
 	conns01[0].WaitForMessages()
 }
+
+func TestClosingOneSideTerminatesListeningOtherSide(t *testing.T) {
+	recv0 := func(m *Message, reply SendFun) {
+	}
+	recv1 := func(m *Message, reply SendFun) {
+	}
+	conns, agents, _ := NewChatSetup(recv0, recv1)
+
+	require.True(t, agents[0].IsRunning())
+	require.True(t, agents[1].IsRunning())
+
+	conns[1].ExpectMessages(1)
+	agents[0].Stop()
+	conns[1].WaitForMessages()
+
+	require.False(t, agents[0].IsRunning())
+	require.False(t, agents[1].IsRunning())
+}
