@@ -11,27 +11,64 @@ import (
 	"github.com/popescu-af/saas-y/pkg/talk"
 )
 
+type pollerPool struct {
+	pollers []netpoll.Poller
+	index   int
+	count   int
+}
+
+func (p *pollerPool) Next() netpoll.Poller {
+	p.index = (p.index + 1) % p.count
+	return p.pollers[p.index]
+}
+
+var defaultPollerPool = func() *pollerPool {
+	count := 1024
+	p := &pollerPool{
+		pollers: make([]netpoll.Poller, count),
+		index:   count - 1,
+		count:   count,
+	}
+
+	var err error
+	for i := 0; i < count; i++ {
+		p.pollers[i], err = netpoll.New(nil)
+		if err != nil {
+			log.ErrorCtx("cannot create poller", log.Context{"error": err})
+			return nil
+		}
+	}
+	return p
+}()
+
 // connection is a wrapper over a web socket connection
 // that implements the talk.Connection interface.
 type connection struct {
-	conn   *websocket.Conn
-	poller netpoll.Poller
+	conn *websocket.Conn
 }
 
 // Subscribe subscribes the given callback to the poller read events.
 func (c *connection) Subscribe(cb func(*talk.Message, bool)) {
 	fd := netpoll.Must(netpoll.HandleRead(c.conn.UnderlyingConn()))
-	c.poller.Start(fd, func(ev netpoll.Event) {
+	poller := defaultPollerPool.Next()
+	poller.Start(fd, func(ev netpoll.Event) {
+		unsubscribe := false
+		defer func() {
+			if unsubscribe {
+				cb(nil, true)
+				poller.Stop(fd)
+			}
+		}()
+
 		if ev&netpoll.EventReadHup != 0 {
-			cb(nil, true)
-			c.poller.Stop(fd)
+			unsubscribe = true
 			return
 		}
 
 		mt, message, err := c.conn.ReadMessage()
 		if err != nil {
 			log.ErrorCtx("read message", log.Context{"error": err})
-			cb(nil, true)
+			unsubscribe = true
 			return
 		}
 
@@ -50,15 +87,7 @@ func (c *connection) Close() {
 }
 
 func newConnection(c *websocket.Conn) (*connection, error) {
-	poller, err := netpoll.New(nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return &connection{
-		conn:   c,
-		poller: poller,
-	}, nil
+	return &connection{conn: c}, nil
 }
 
 // NewClient creates a talking agent wrapping a websocket client.
