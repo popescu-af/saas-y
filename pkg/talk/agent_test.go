@@ -144,3 +144,7 @@ func TestClosingOneSideTerminatesListeningOtherSide(t *testing.T) {
 	require.False(t, agents[0].IsRunning())
 	require.False(t, agents[1].IsRunning())
 }
+
+func TestMessenger(t *testing.T) {
+	// TODO: write test
+}
