@@ -22,16 +22,27 @@ func (p *pollerPool) Next() netpoll.Poller {
 	return p.pollers[p.index]
 }
 
-var defaultPollerPool = func() *pollerPool {
-	count := 1024
+var defaultPollerPool = initPollerPool(32)
+
+// ResizePollerPool initializes the poller pool to the desired number
+// of netpoll pollers, which will be used by the websocket connections.
+func ResizePollerPool(n int) {
+	defaultPollerPool = initPollerPool(n)
+}
+
+func initPollerPool(n int) *pollerPool {
+	if n < 1 {
+		n = 1
+	}
+
 	p := &pollerPool{
-		pollers: make([]netpoll.Poller, count),
-		index:   count - 1,
-		count:   count,
+		pollers: make([]netpoll.Poller, n),
+		index:   n - 1,
+		count:   n,
 	}
 
 	var err error
-	for i := 0; i < count; i++ {
+	for i := 0; i < n; i++ {
 		p.pollers[i], err = netpoll.New(nil)
 		if err != nil {
 			log.ErrorCtx("cannot create poller", log.Context{"error": err})
@@ -39,7 +50,7 @@ var defaultPollerPool = func() *pollerPool {
 		}
 	}
 	return p
-}()
+}
 
 // connection is a wrapper over a web socket connection
 // that implements the talk.Connection interface.
